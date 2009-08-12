@@ -1,0 +1,83 @@
+<project name="HtmlCleaner" default="build" basedir=".">
+
+	<description>HtmlCleaner</description>
+
+	<property name="version" value="2_1"/>
+	<property name="dir.src" value="src"/>
+    <property name="dir.lib" value="lib"/>
+    <property name="dir.doc" value="doc"/>
+    <property name="dir.dist" value="dist"/>
+    <property name="dir.zip" value="zip"/>
+	<property name="jarfile" value="htmlcleaner${version}.jar"/>
+
+	<!-- classpath -->
+	<path id="classpath.compile">
+		<pathelement location="${dir.lib}/ant.jar"/>
+		<pathelement location="${dir.lib}/jdom.jar"/>
+	</path>
+
+    <!--  sources targets -->
+	<target name="build" description="compilation of source files">
+		<mkdir dir="${dir.dist}"/>
+		<javac srcdir="${dir.src}" destdir="${dir.dist}"
+			   listfiles="on" source="1.4" target="1.4"
+			   excludes="org/htmlcleaner/Test.java">
+			<classpath refid="classpath.compile"/>
+		</javac>
+    </target>
+
+	<!--  creates jar library -->
+	<target name="jar" depends="build" description="creates jar library">
+		<jar destfile="${jarfile}" basedir="${dir.dist}" manifest="config/MANIFEST.MF"/>
+    </target>
+
+	<!--  delete distribution folders -->
+	<target name="clean" description="cleans distribution">
+		<delete file="${jarfile}"/>
+        <delete dir="${dir.dist}"/>
+        <delete dir="${dir.zip}"/>
+        <delete dir="${dir.doc}"/>
+    </target>
+
+    <!--  generate Java docs -->
+    <target name="javadoc">
+        <javadoc access="protected"
+                 author="true"
+                 source="1.4"
+                 destdir="doc"
+                 nodeprecated="false"
+                 nodeprecatedlist="false"
+                 noindex="false"
+                 nonavbar="false"
+                 notree="false"
+                 packagenames="org.htmlcleaner"
+                 sourcepath="src"
+                 splitindex="true"
+                 use="true"
+                 version="true"/>
+    </target>
+
+    <target depends="jar,javadoc" name="zip">
+        <mkdir dir="${dir.zip}"/>
+
+        <zip destfile="${dir.zip}/htmlcleaner${version}-bin.zip">
+            <zipfileset file="${jarfile}"/>
+            <zipfileset dir="doc" prefix="doc"/>
+            <zipfileset file="default.xml"/>
+        </zip>
+
+        <zip destfile="${dir.zip}/htmlcleaner${version}-all.zip">
+            <zipfileset file="${jarfile}"/>
+            <zipfileset file="licence.txt"/>
+            <zipfileset dir="src" prefix="src" excludes="org/htmlcleaner/Test.java" />
+            <zipfileset dir="test" prefix="test" />
+            <zipfileset dir="config" prefix="config"/>
+            <zipfileset dir="doc" prefix="doc"/>
+            <zipfileset dir="lib" prefix="lib"/>
+            <zipfileset file="default.xml"/>
+            <zipfileset file="build.xml"/>
+            <zipfileset file="pom.xml"/>
+        </zip>
+    </target>
+
+</project>
