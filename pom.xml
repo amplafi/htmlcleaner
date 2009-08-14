@@ -39,9 +39,13 @@
             <email>vnikic@users.sourceforge.net</email>
         </developer>
     </developers>
-
+<!-- 
     <scm>
         <url>http://htmlcleaner.svn.sourceforge.net/</url>
+    </scm>
+ -->
+     <scm>
+        <developerConnection>scm:svn:https://svn1.hosted-projects.com/transparentpolitics/modified-opensource/${artifactId}/trunk</developerConnection>
     </scm>
 
     <dependencies>
