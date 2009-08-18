@@ -52,6 +52,9 @@ public abstract class XmlSerializer {
 	protected CleanerProperties props;
 	private boolean creatingHtmlDom;
 
+    protected XmlSerializer() {
+
+    }
 	protected XmlSerializer(CleanerProperties props) {
 		this.props = props;
     }
@@ -84,6 +87,13 @@ public abstract class XmlSerializer {
 
     public void writeXmlToFile(TagNode tagNode, String fileName) throws IOException {
         writeXmlToFile(tagNode,fileName, HtmlCleaner.DEFAULT_CHARSET);
+    }
+
+    public String getXmlAsString(CleanerProperties cleanerProperties, String htmlContent, String charset) throws IOException {
+        this.props = cleanerProperties;
+        HtmlCleaner htmlCleaner = new HtmlCleaner(cleanerProperties);
+        TagNode tagNode= htmlCleaner.clean(htmlContent);
+        return getXmlAsString(tagNode, charset==null||charset.length()==0?HtmlCleaner.DEFAULT_CHARSET:charset);
     }
 
     public String getXmlAsString(TagNode tagNode, String charset) throws IOException {
