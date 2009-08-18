@@ -267,7 +267,7 @@ public class HtmlCleaner {
 	public HtmlCleaner(ITagInfoProvider tagInfoProvider, CleanerProperties properties) {
         this.tagInfoProvider = tagInfoProvider == null ? DefaultTagProvider.getInstance() : tagInfoProvider;
         this.properties = properties == null ? new CleanerProperties() : properties;
-        this.properties.tagInfoProvider = this.tagInfoProvider;
+        this.properties.setTagInfoProvider(this.tagInfoProvider);
     }
 
     public TagNode clean(String htmlContent) throws IOException {

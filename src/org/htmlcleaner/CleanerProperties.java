@@ -49,28 +49,34 @@ public class CleanerProperties {
     public static final String BOOL_ATT_EMPTY = "empty";
     public static final String BOOL_ATT_TRUE = "true";
 
-    ITagInfoProvider tagInfoProvider = null;
+    private ITagInfoProvider tagInfoProvider;
+    private boolean advancedXmlEscape;
+    private boolean useCdataForScriptAndStyle;
+    private boolean translateSpecialEntities;
+    private boolean recognizeUnicodeChars;
+    private boolean omitUnknownTags;
+    private boolean treatUnknownTagsAsContent;
+    private boolean omitDeprecatedTags;
+    private boolean omitComments;
+    private boolean treatDeprecatedTagsAsContent;
+    private OptionalOutput omitXmlDeclaration;
+    private OptionalOutput omitDoctypeDeclaration;
+    private OptionalOutput omitHtmlEnvelope;
+    private boolean useEmptyElementTags;
+    private boolean allowMultiWordAttributes;
+    private String booleanAttributeValues;
+    private boolean ignoreQuestAndExclam;
+    private boolean allowHtmlInsideAttributes;
+    private boolean namespacesAware;
+    private String hyphenReplacementInComment;
+    private String pruneTags;
 
-    boolean advancedXmlEscape = true;
-    boolean useCdataForScriptAndStyle = true;
-    boolean translateSpecialEntities = true;
-    boolean recognizeUnicodeChars = true;
-    boolean omitUnknownTags = false;
-    boolean treatUnknownTagsAsContent = false;
-    boolean omitDeprecatedTags = false;
-    boolean treatDeprecatedTagsAsContent = false;
-    boolean omitComments = false;
-    boolean omitXmlDeclaration = false;
-    boolean omitDoctypeDeclaration = true;
-    boolean omitHtmlEnvelope = false;
-    boolean useEmptyElementTags = true;
-    boolean allowMultiWordAttributes = true;
-    boolean allowHtmlInsideAttributes = false;
-    boolean ignoreQuestAndExclam = false;
-    boolean namespacesAware = true;
-    String hyphenReplacementInComment = "=";
-    String pruneTags = null;
-    String booleanAttributeValues = BOOL_ATT_SELF;
+    /**
+     * @param tagInfoProvider the tagInfoProvider to set
+     */
+    void setTagInfoProvider(ITagInfoProvider tagInfoProvider) {
+        this.tagInfoProvider = tagInfoProvider;
+    }
 
     public ITagInfoProvider getTagInfoProvider() {
         return tagInfoProvider;
@@ -149,27 +155,27 @@ public class CleanerProperties {
     }
 
     public boolean isOmitXmlDeclaration() {
-        return omitXmlDeclaration;
+        return omitXmlDeclaration == OptionalOutput.omit;
     }
 
     public void setOmitXmlDeclaration(boolean omitXmlDeclaration) {
-        this.omitXmlDeclaration = omitXmlDeclaration;
+        this.omitXmlDeclaration = omitXmlDeclaration?OptionalOutput.omit:OptionalOutput.always;
     }
 
     public boolean isOmitDoctypeDeclaration() {
-        return omitDoctypeDeclaration;
+        return omitDoctypeDeclaration == OptionalOutput.omit;
     }
 
     public void setOmitDoctypeDeclaration(boolean omitDoctypeDeclaration) {
-        this.omitDoctypeDeclaration = omitDoctypeDeclaration;
+        this.omitDoctypeDeclaration = omitDoctypeDeclaration?OptionalOutput.omit:OptionalOutput.always;
     }
 
     public boolean isOmitHtmlEnvelope() {
-        return omitHtmlEnvelope;
+        return omitHtmlEnvelope == OptionalOutput.omit;
     }
 
     public void setOmitHtmlEnvelope(boolean omitHtmlEnvelope) {
-        this.omitHtmlEnvelope = omitHtmlEnvelope;
+        this.omitHtmlEnvelope = omitHtmlEnvelope?OptionalOutput.omit:OptionalOutput.always;
     }
 
     public boolean isUseEmptyElementTags() {
@@ -238,8 +244,30 @@ public class CleanerProperties {
              BOOL_ATT_TRUE.equalsIgnoreCase(booleanAttributeValues) ) {
             this.booleanAttributeValues = booleanAttributeValues.toLowerCase();
         } else {
-            this.booleanAttributeValues = BOOL_ATT_SELF;    
+            this.booleanAttributeValues = BOOL_ATT_SELF;
         }
     }
-    
+    public void reset() {
+        advancedXmlEscape = true;
+        useCdataForScriptAndStyle = true;
+        translateSpecialEntities = true;
+        recognizeUnicodeChars = true;
+        omitUnknownTags = false;
+        treatUnknownTagsAsContent = false;
+        omitDeprecatedTags = false;
+        treatDeprecatedTagsAsContent = false;
+        omitComments = false;
+        omitXmlDeclaration = OptionalOutput.always;
+        omitDoctypeDeclaration = OptionalOutput.always;
+        omitHtmlEnvelope = OptionalOutput.always;
+        useEmptyElementTags = true;
+        allowMultiWordAttributes = true;
+        allowHtmlInsideAttributes = false;
+        ignoreQuestAndExclam = false;
+        namespacesAware = true;
+        hyphenReplacementInComment = "=";
+        pruneTags = null;
+        booleanAttributeValues = BOOL_ATT_SELF;
+    }
+
 }
