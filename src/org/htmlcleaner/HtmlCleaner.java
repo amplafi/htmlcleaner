@@ -314,7 +314,7 @@ public class HtmlCleaner {
         _bodyOpened = false;
         _headTags.clear();
         allTags.clear();
-        setPruneTags(properties.pruneTags);
+        setPruneTags(properties.getPruneTags());
 
         htmlNode = new TagNode("html", this);
         bodyNode = new TagNode("body", this);
@@ -362,7 +362,7 @@ public class HtmlCleaner {
     private void calculateRootNode(Set namespacePrefixes) {
         this.rootNode =  this.htmlNode;
 
-        if (properties.omitHtmlEnvelope) {
+        if (properties.isOmitHtmlEnvelope()) {
             List bodyChildren = this.bodyNode.getChildren();
             if (bodyChildren != null) {
                 Iterator iterator = bodyChildren.iterator();
@@ -378,7 +378,7 @@ public class HtmlCleaner {
 
         Map atts = this.rootNode.getAttributes();
 
-        if (properties.namespacesAware && namespacePrefixes != null) {
+        if (properties.isNamespacesAware() && namespacePrefixes != null) {
             Iterator iterator = namespacePrefixes.iterator();
             while (iterator.hasNext()) {
                 String prefix = (String) iterator.next();
@@ -502,7 +502,7 @@ public class HtmlCleaner {
 				String tagName = endTagToken.getName();
 				TagInfo tag = tagInfoProvider.getTagInfo(tagName);
 
-				if ( (tag == null && properties.omitUnknownTags) || (tag != null && tag.isDeprecated() && properties.omitDeprecatedTags) ) {
+				if ( (tag == null && properties.isOmitUnknownTags()) || (tag != null && tag.isDeprecated() && properties.isOmitDeprecatedTags()) ) {
 					nodeIterator.set(null);
 				} else if ( tag != null && !tag.allowsBody() ) {
 					nodeIterator.set(null);
@@ -550,7 +550,7 @@ public class HtmlCleaner {
                     addAttributesToTag(headNode, startTagToken.getAttributes());
 					nodeIterator.set(null);
                 // unknows HTML tag and unknown tags are not allowed
-                } else if ( (tag == null && properties.omitUnknownTags) || (tag != null && tag.isDeprecated() && properties.omitDeprecatedTags) ) {
+                } else if ( (tag == null && properties.isOmitUnknownTags()) || (tag != null && tag.isDeprecated() && properties.isOmitDeprecatedTags()) ) {
                     nodeIterator.set(null);
                 // if current tag is unknown and last open tag doesn't allow any other tags in its body
                 } else if ( tag == null && lastTagInfo != null && !lastTagInfo.allowsAnything() ) {
