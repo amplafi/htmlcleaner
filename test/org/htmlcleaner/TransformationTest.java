@@ -12,11 +12,12 @@ public class TransformationTest extends TestCase {
 
     private HtmlCleaner cleaner;
 
+    @Override
     protected void setUp() throws Exception {
         cleaner = new HtmlCleaner();
     }
 
-    public void test1() throws XPatherException, IOException {
+    public void test1() throws IOException {
         CleanerTransformations transformations = new CleanerTransformations();
         TagTransformation tagTransformation = new TagTransformation("strong", "span", false);
         tagTransformation.addAttributeTransformation("style", "font-weight:bold");
@@ -56,7 +57,7 @@ public class TransformationTest extends TestCase {
         transformations.addTransformation(t);
 
         cleaner.setTransformations(transformations);
-        
+
         TagNode node = cleaner.clean( new File("test/org/htmlcleaner/files/test8.html"), "UTF-8" );
 
         String xml = new PrettyXmlSerializer(props).getXmlAsString(node);

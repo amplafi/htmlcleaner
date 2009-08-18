@@ -9,10 +9,11 @@ import org.jdom.output.XMLOutputter;
 import java.io.*;
 
 /**
- * Tests parsing and tag balancing.  
+ * Tests parsing and tag balancing.
  */
 public class TagBalancingTest extends TestCase {
 
+    @Override
     protected void setUp() throws Exception {
     }
 
@@ -33,7 +34,7 @@ public class TagBalancingTest extends TestCase {
         assertHtml(new File("test/org/htmlcleaner/files/test7.html"), "/head/noscript/meta/@http-equiv", "refresh");
     }
 
-    public void testTagProviders() throws XPatherException, IOException {
+    public void testTagProviders() throws IOException {
         HtmlCleaner cleaner1 = new HtmlCleaner();
         HtmlCleaner cleaner2 = new HtmlCleaner(new ConfigFileTagProvider(new File("default.xml")));
         SimpleXmlSerializer serializer = new SimpleXmlSerializer(cleaner1.getProperties());
