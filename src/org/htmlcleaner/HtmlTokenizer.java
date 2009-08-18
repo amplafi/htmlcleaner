@@ -1,35 +1,35 @@
 /*  Copyright (c) 2006-2007, Vladimir Nikic
     All rights reserved.
-	
-    Redistribution and use of this software in source and binary forms, 
-    with or without modification, are permitted provided that the following 
+
+    Redistribution and use of this software in source and binary forms,
+    with or without modification, are permitted provided that the following
     conditions are met:
-	
+
     * Redistributions of source code must retain the above
       copyright notice, this list of conditions and the
       following disclaimer.
-	
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the
       following disclaimer in the documentation and/or other
       materials provided with the distribution.
-	
-    * The name of HtmlCleaner may not be used to endorse or promote 
+
+    * The name of HtmlCleaner may not be used to endorse or promote
       products derived from this software without specific prior
       written permission.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
-	
+
     You can contact Vladimir Nikic by sending e-mail to
     nikic_vladimir@yahoo.com. Please include the word "HtmlCleaner" in the
     subject line.
@@ -52,12 +52,12 @@ import java.util.*;
 
  */
 public class HtmlTokenizer {
-	
+
 	private final static int WORKING_BUFFER_SIZE = 1024;
 
     private BufferedReader _reader;
     private char[] _working = new char[WORKING_BUFFER_SIZE];
-    
+
     private transient int _pos = 0;
     private transient int _len = -1;
 
@@ -68,7 +68,7 @@ public class HtmlTokenizer {
     private transient TagToken _currentTagToken = null;
     private transient List _tokenList = new ArrayList();
     private transient Set _namespacePrefixes = new HashSet();
-    
+
     private boolean _asExpected = true;
 
     private boolean _isScriptContext = false;
@@ -80,9 +80,9 @@ public class HtmlTokenizer {
     /**
      * Constructor - cretes instance of the parser with specified content.
      * @param cleaner
-     * @throws IOException
+     * @param reader
      */
-    public HtmlTokenizer(HtmlCleaner cleaner, Reader reader) throws IOException {
+    public HtmlTokenizer(HtmlCleaner cleaner, Reader reader) {
         this._reader = new BufferedReader(reader);
         this.cleaner = cleaner;
         this.props = cleaner.getProperties();
@@ -441,7 +441,7 @@ public class HtmlTokenizer {
                 }
                 addToken(_currentTagToken);
             }
-            
+
             if ( isChar('>') ) {
             	go();
                 if ( "script".equalsIgnoreCase(tagName) ) {
@@ -595,9 +595,9 @@ public class HtmlTokenizer {
                 saveCurrent();
                 go();
                 attValue = attributeValue();
-            } else if (CleanerProperties.BOOL_ATT_EMPTY.equals(props.booleanAttributeValues)) {
+            } else if (CleanerProperties.BOOL_ATT_EMPTY.equals(props.getBooleanAttributeValues())) {
                 attValue = "";
-            } else if (CleanerProperties.BOOL_ATT_TRUE.equals(props.booleanAttributeValues)) {
+            } else if (CleanerProperties.BOOL_ATT_TRUE.equals(props.getBooleanAttributeValues())) {
                 attValue = "true";
             } else {
                 attValue = attName;
@@ -619,7 +619,7 @@ public class HtmlTokenizer {
      */
     private String attributeValue() throws IOException {
         skipWhitespaces();
-        
+
         if ( isChar('<') || isChar('>') || startsWith("/>") ) {
         	return "";
         }
@@ -717,7 +717,7 @@ public class HtmlTokenizer {
             _saved.delete(0, _saved.length());
         }
     }
-    
+
     private void doctype() throws IOException {
     	go(9);
 
@@ -729,14 +729,14 @@ public class HtmlTokenizer {
 	    String part3 = attributeValue();
 	    skipWhitespaces();
 	    String part4 = attributeValue();
-	    
+
 	    ignoreUntil('<');
-	    
+
 	    _docType = new DoctypeToken(part1, part2, part3, part4);
     }
 
     public DoctypeToken getDocType() {
         return _docType;
     }
-    
+
 }
