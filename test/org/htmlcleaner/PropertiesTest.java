@@ -4,6 +4,8 @@ import junit.framework.TestCase;
 
 import java.io.IOException;
 import java.io.File;
+import java.util.Arrays;
+import java.util.regex.Matcher;
 
 /**
  * Testing node manipulation after cleaning.
@@ -164,19 +166,57 @@ public class PropertiesTest extends TestCase {
         // test first when generating xml
         TagNode node = cleaner.clean("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n" +
         		"<div>&amp;&quot;&apos;&lt;&gt;&nbsp;&garbage;&</div>");
-        String xmlString = new SimpleXmlSerializer(properties).getXmlAsString(node, "UTF-8" );
+        SimpleXmlSerializer simpleXmlSerializer = new SimpleXmlSerializer(properties);
+        String xmlString = simpleXmlSerializer.getXmlAsString(node, "UTF-8" );
         assertEquals("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n" +
                 "<html><head /><body><div>&amp;&quot;&apos;&lt;&gt;&amp;nbsp;&amp;garbage;&amp;</div></body></html>", xmlString.trim());
 
+        simpleXmlSerializer.setCreatingHtmlDom(true);
         // then test when generating html
-        String domString = new SimpleXmlSerializer(properties) {
-            @Override
-            protected String escapeXml(String xmlContent) {
-                return Utils.escapeXml(xmlContent, props, true);
-            }
-        }.getXmlAsString(node, "UTF-8" );
+        String domString = simpleXmlSerializer.getXmlAsString(node, "UTF-8" );
         assertEquals("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n" +
                 "<html><head /><body><div>&\"'<>&nbsp;&amp;garbage;&amp;</div></body></html>", domString.trim());
     }
 
+    /**
+     * make sure that the unicode character has leading 'x'.
+     * <ul>
+     * <li>&#138A; is converted by FF to 3 characters: &#138; + 'A' + ';'</li>
+     * <li>&#0x138A; is converted by FF to 6? 7? characters: &#0 'x'+'1'+'3'+ '8' + 'A' + ';'
+     * #0 is displayed kind of weird</li>
+     * <li>&#x138A; is a single character</li>
+     * </ul>
+     * @throws Exception
+     */
+    public void testHexConversion() throws Exception {
+        SimpleXmlSerializer simpleXmlSerializer = new SimpleXmlSerializer();
+        simpleXmlSerializer.setCreatingHtmlDom(false);
+        CleanerProperties properties = new CleanerProperties();
+        properties.setOmitHtmlEnvelope(true);
+        properties.setOmitXmlDeclaration(true);
+
+        String xmlString = simpleXmlSerializer.getXmlAsString(properties, "<div>&#138A;</div>", "UTF-8");
+        assertEquals("<div>"+new String(new char[] {138, 'A',';'})+"</div>", xmlString);
+        xmlString = simpleXmlSerializer.getXmlAsString(properties, "<div>&#x138A;</div>", "UTF-8");
+        assertEquals("<div>"+new String(new char[] {0x138A})+"</div>", xmlString);
+        properties.reset();
+
+    }
+
+    public void testPattern() {
+        for(String input : Arrays.asList( "0x138A;", "x138A;", "138;", "139", "x13A", "13F", "13")) {
+            Matcher m = Utils.HEX_STRICT.matcher(input);
+            if (m.find()) {
+                System.out.println(input+" strict "+m.start() + " "+ m.end()+ " "+m.group(1));
+            }
+            m = Utils.HEX_RELAXED.matcher(input);
+            if (m.find()) {
+                System.out.println(input+" relaxed "+ m.start() + " "+ m.end()+ " "+m.group(1));
+            }
+            m = Utils.DECIMAL.matcher(input);
+            if (m.find()) {
+                System.out.println(input+" decimal "+m.start() + " "+ m.end()+ " "+m.group(1));
+            }
+        }
+    }
 }

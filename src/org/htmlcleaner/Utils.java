@@ -41,6 +41,8 @@ import java.io.*;
 import java.net.URL;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>Common utilities.</p>
@@ -117,16 +119,10 @@ public class Utils {
         return buffer;
     }
 
-    public static boolean isHexadecimalDigit(char ch) {
-        return Character.isDigit(ch) ||
-               ch == 'A' || ch == 'a' || ch == 'B' || ch == 'b' || ch == 'C' || ch == 'c' ||
-               ch == 'D' || ch == 'd' || ch == 'E' || ch == 'e' || ch == 'F' || ch == 'f';
-    }
-
     /**
      * Escapes XML string.
      * @param s String to be escaped
-     * @param props Cleaner properties gover affect escaping behaviour
+     * @param props Cleaner properties affects escaping behaviour
      * @param isDomCreation Tells if escaped content will be part of the DOM
      */
     public static String escapeXml(String s, CleanerProperties props, boolean isDomCreation) {
@@ -145,27 +141,27 @@ public class Utils {
     				SpecialEntity code;
                     if ( (advanced || recognizeUnicodeChars) && (i < len-1) && (s.charAt(i+1) == '#') ) {
     					int charIndex = i + 2;
-    					String unicode = "";
-    					while ( charIndex < len &&
-                                (isHexadecimalDigit(s.charAt(charIndex)) || s.charAt(charIndex) == 'x' || s.charAt(charIndex) == 'X')
-                              ) {
-    						unicode += s.charAt(charIndex);
-    						charIndex++;
-    					}
-    					if (charIndex == len || !"".equals(unicode)) {
+    					StringBuilder unicode = new StringBuilder();
+    					// TODO -- should this already be
+    					charIndex = extractCharCode(s, charIndex, true, unicode);
+    					if (unicode.length() > 0) {
     						try {
-    							char unicodeChar = unicode.toLowerCase().startsWith("x") ?
+    							char unicodeChar = unicode.substring(0,1).equals("x") ?
                                                         (char)Integer.parseInt(unicode.substring(1), 16) :
-                                                        (char)Integer.parseInt(unicode);
-    							if ( "&<>\'\"".indexOf(unicodeChar) < 0 ) {
-	    							int replaceChunkSize = (charIndex < len && s.charAt(charIndex) == ';') ? unicode.length()+1 : unicode.length();
+                                                        (char)Integer.parseInt(unicode.toString());
+                                if ( unicodeChar ==0) {
+                                    // null character &#0Peanut for example
+                                    // just consume character &
+                                    result.append("&amp;");
+                                } else if ( "&<>\'\"".indexOf(unicodeChar) < 0 ) {
 	    							result.append( recognizeUnicodeChars ? String.valueOf(unicodeChar) : "&#" + unicode + ";" );
-	    							i += replaceChunkSize + 1;
+	                                i = charIndex;
     							} else {
-        							i = charIndex;
         							result.append("&amp;#" + unicode + ";");
+                                    i = charIndex;
     							}
     						} catch (NumberFormatException e) {
+    						    // should never happen now
     							i = charIndex;
     							result.append("&amp;#" + unicode + ";");
     						}
@@ -212,6 +208,42 @@ public class Utils {
     	}
 
     	return null;
+    }
+
+    // TODO have pattern consume leading 0's and discard.
+    public static Pattern HEX_STRICT = Pattern.compile("^(x[\\p{XDigit}]+)(;?)");
+    public static Pattern HEX_RELAXED = Pattern.compile("^0*(x[\\p{XDigit}]+)(;?)");
+    public static Pattern DECIMAL = Pattern.compile("^([\\p{Digit}]+)(;?)");
+    /**
+     * <ul>
+     * <li>(earlier code was failing on this) - &#138A; is converted by FF to 3 characters: &#138; + 'A' + ';'</li>
+     * <li>&#0x138A; is converted by FF to 6? 7? characters: &#0 'x'+'1'+'3'+ '8' + 'A' + ';'
+     * #0 is displayed kind of weird</li>
+     * <li>&#x138A; is a single character</li>
+     * </ul>
+     *
+     * @param s
+     * @param charIndex
+     * @param relaxedUnicode '&#0x138;' is treated like '&#x138;'
+     * @param unicode
+     * @return
+     */
+    private static int extractCharCode(String s, int charIndex, boolean relaxedUnicode, StringBuilder unicode) {
+        int len = s.length();
+        CharSequence subSequence = s.subSequence(charIndex, Math.min(len,charIndex+15));
+        Matcher matcher;
+        if( relaxedUnicode ) {
+            matcher = HEX_RELAXED.matcher(subSequence);
+        } else {
+            matcher = HEX_STRICT.matcher(subSequence);
+        }
+        // silly note: remember calling find() twice finds second match :-)
+        if (matcher.find() || ((matcher = DECIMAL.matcher(subSequence)).find())) {
+            // -1 so normal loop incrementing skips the ';'
+            charIndex += matcher.end() -1;
+            unicode.append(matcher.group(1));
+        }
+        return charIndex;
     }
 
     /**
