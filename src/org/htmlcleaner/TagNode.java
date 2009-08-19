@@ -1,35 +1,35 @@
 /*  Copyright (c) 2006-2007, Vladimir Nikic
     All rights reserved.
-	
-    Redistribution and use of this software in source and binary forms, 
-    with or without modification, are permitted provided that the following 
+
+    Redistribution and use of this software in source and binary forms,
+    with or without modification, are permitted provided that the following
     conditions are met:
-	
+
     * Redistributions of source code must retain the above
       copyright notice, this list of conditions and the
       following disclaimer.
-	
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the
       following disclaimer in the documentation and/or other
       materials provided with the distribution.
-	
-    * The name of HtmlCleaner may not be used to endorse or promote 
+
+    * The name of HtmlCleaner may not be used to endorse or promote
       products derived from this software without specific prior
       written permission.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
-	
+
     You can contact Vladimir Nikic by sending e-mail to
     nikic_vladimir@yahoo.com. Please include the word "HtmlCleaner" in the
     subject line.
@@ -45,7 +45,7 @@ import java.util.*;
  * <p>
  *      XML node tag - basic node of the cleaned HTML tree. At the same time, it represents start tag token
  *      after HTML parsing phase and before cleaning phase. After cleaning process, tree structure remains
- *      containing tag nodes (TagNode class), content (text nodes - ContentToken), comments (CommentToken) 
+ *      containing tag nodes (TagNode class), content (text nodes - ContentToken), comments (CommentToken)
  *      and optionally doctype node (DoctypeToken).
  * </p>
  *
@@ -125,12 +125,12 @@ public class TagNode extends TagToken {
         }
     }
 
-    private TagNode parent = null; 
+    private TagNode parent;
     private Map attributes = new LinkedHashMap();
     private List children = new ArrayList();
-    private DoctypeToken docType = null;
-    private List itemsToMove = null;
-    
+    private DoctypeToken docType;
+    private List itemsToMove;
+
     private transient HtmlCleaner cleaner = null;
     private transient boolean isFormed = false;
 
@@ -138,7 +138,7 @@ public class TagNode extends TagToken {
     public TagNode(String name) {
         this(name, null);
     }
-    
+
     public TagNode(String name, HtmlCleaner cleaner) {
         super(name == null ? null : name.toLowerCase());
         this.cleaner = cleaner;
@@ -152,7 +152,7 @@ public class TagNode extends TagToken {
 
     /**
      * @param attName
-     * @return Value of the specified attribute, or null if it this tag doesn't contain it. 
+     * @return Value of the specified attribute, or null if it this tag doesn't contain it.
      */
     public String getAttributeByName(String attName) {
 		return attName != null ? (String) attributes.get(attName.toLowerCase()) : null;
@@ -178,6 +178,7 @@ public class TagNode extends TagToken {
      * @param attName
      * @param attValue
      */
+    @Override
     public void addAttribute(String attName, String attValue) {
         if ( attName != null && !"".equals(attName.trim()) ) {
             attributes.put( attName.toLowerCase(), attValue == null ? "" : attValue );
@@ -457,15 +458,15 @@ public class TagNode extends TagToken {
     public boolean removeChild(Object child) {
         return this.children.remove(child);
     }
-    
+
     void addItemForMoving(Object item) {
     	if (itemsToMove == null) {
     		itemsToMove = new ArrayList();
     	}
-    	
+
     	itemsToMove.add(item);
     }
-    
+
     List getItemsToMove() {
 		return itemsToMove;
 	}
@@ -513,7 +514,7 @@ public class TagNode extends TagToken {
     public void serialize(XmlSerializer xmlSerializer, Writer writer) throws IOException {
     	xmlSerializer.serialize(this, writer);
     }
-    
+
     public TagNode makeCopy() {
     	TagNode copy = new TagNode(name, cleaner);
         copy.attributes.putAll(attributes);

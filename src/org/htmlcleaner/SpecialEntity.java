@@ -21,16 +21,16 @@ public class SpecialEntity{
     public SpecialEntity(String key, int intCode, String domString, boolean htmlSpecialEntity) {
         this.key = key;
         this.intCode = intCode;
-        String xmlString = "&" + key +";";
+        String str = "&" + key +";";
         if ( domString != null) {
             this.domString = domString;
         } else {
-            this.domString = xmlString;
+            this.domString = str;
         }
         if ( htmlSpecialEntity ) {
             this.xmlString = "&amp;"+this.key+";";
         } else {
-            this.xmlString = xmlString;
+            this.xmlString = str;
         }
         this.htmlSpecialEntity = htmlSpecialEntity;
     }

@@ -36,7 +36,8 @@ public class PropertiesTest extends TestCase {
 
         properties.setTranslateSpecialEntities(true);
         String specialHtmlEntities = "<div>"+ new String(new char[] {244,8240, 215,376, 8364})+"</div>";
-        assertTrue( getXmlString().indexOf(specialHtmlEntities) >= 0 );
+        String xmlString = getXmlString();
+        assertTrue( xmlString.indexOf(specialHtmlEntities) >= 0 );
         properties.setTranslateSpecialEntities(false);
         assertTrue( getXmlString().indexOf(specialHtmlEntities) < 0 );
 

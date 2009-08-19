@@ -71,6 +71,10 @@ public class CleanerProperties {
     private String hyphenReplacementInComment;
     private String pruneTags;
 
+    public CleanerProperties() {
+        reset();
+    }
+
     /**
      * @param tagInfoProvider the tagInfoProvider to set
      */
