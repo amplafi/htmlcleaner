@@ -44,9 +44,9 @@ import java.util.ListIterator;
 
 /**
  * <p>
- *  Broswer compact XML serializer - creates resulting XML by stripping whitespaces wherever possible,
+ *  Browser compact XML serializer - creates resulting XML by stripping whitespaces wherever possible,
  *  but preserving single whitespace where at least one exists. This behaviour is well suited
- *  for web-browsers, which usualy treat multiple whitespaces as single one, but make diffrence
+ *  for web-browsers, which usually treat multiple whitespaces as single one, but make difference
  *  between single whitespace and empty text.
  * </p>
  *
@@ -59,6 +59,7 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
 		super(props);
 	}
 
+    @Override
     protected void serialize(TagNode tagNode, Writer writer) throws IOException {
         serializeOpenTag(tagNode, writer, false);
 

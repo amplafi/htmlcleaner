@@ -213,7 +213,7 @@ public class ConfigFileTagProvider extends HashMap implements ITagInfoProvider {
                                       "all".equals(section) ? TagInfo.HEAD_AND_BODY : ("head".equals(section) ? TagInfo.HEAD : TagInfo.BODY),
                                       deprecated != null && "true".equals(deprecated),
                                       unique != null && "true".equals(unique),
-                                      ignorePermitted != null && "true".equals(ignorePermitted) );
+                                      ignorePermitted != null && "true".equals(ignorePermitted), CloseTag.required );
                 if (generateCode) {
                     String s = "tagInfo = new TagInfo(\"#1\", #2, #3, #4, #5, #6);";
                     s = s.replaceAll("#1", name);

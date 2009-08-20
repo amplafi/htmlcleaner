@@ -135,8 +135,7 @@ public abstract class XmlSerializer {
 	}
 
 	protected boolean dontEscape(TagNode tagNode) {
-		String tagName = tagNode.getName();
-		return props.isUseCdataForScriptAndStyle() && ("script".equalsIgnoreCase(tagName) || "style".equalsIgnoreCase(tagName));
+		return props.isUseCdataForScriptAndStyle() && isScriptOrStyle(tagNode);
 	}
 
 	protected boolean isScriptOrStyle(TagNode tagNode) {
@@ -146,7 +145,7 @@ public abstract class XmlSerializer {
 
     protected boolean isMinimizedTagSyntax(TagNode tagNode) {
         final TagInfo tagInfo = props.getTagInfoProvider().getTagInfo(tagNode.getName());
-        return tagNode.getChildren().size() == 0 &&
+        return tagNode.getChildren().isEmpty() && (tagInfo == null || tagInfo.isMinimizedTagPermitted()) &&
                ( props.isUseEmptyElementTags() || (tagInfo != null && tagInfo.isEmptyTag()) );
     }
 

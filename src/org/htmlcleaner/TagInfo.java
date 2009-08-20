@@ -1,35 +1,35 @@
 /*  Copyright (c) 2006-2007, Vladimir Nikic
     All rights reserved.
-	
-    Redistribution and use of this software in source and binary forms, 
-    with or without modification, are permitted provided that the following 
+
+    Redistribution and use of this software in source and binary forms,
+    with or without modification, are permitted provided that the following
     conditions are met:
-	
+
     * Redistributions of source code must retain the above
       copyright notice, this list of conditions and the
       following disclaimer.
-	
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the
       following disclaimer in the documentation and/or other
       materials provided with the distribution.
-	
-    * The name of HtmlCleaner may not be used to endorse or promote 
+
+    * The name of HtmlCleaner may not be used to endorse or promote
       products derived from this software without specific prior
       written permission.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
-	
+
     You can contact Vladimir Nikic by sending e-mail to
     nikic_vladimir@yahoo.com. Please include the word "HtmlCleaner" in the
     subject line.
@@ -80,7 +80,7 @@ import java.util.*;
  *      </li>
  * </ul>
  * </p>
- * 
+ *
  * <p>
  * Tag TR for instance (table row) may define the following dependancies:
  *      <ul>
@@ -94,10 +94,10 @@ import java.util.*;
  *   <ul>
  *      <li><code>tr</code> must be in context of <code>table</code>, otherwise it will be ignored,</li>
  *      <li><code>tr</code> may can be directly inside <code>tbody</code>, <code>tfoot</code> and <code>thead</code>,
- *          otherwise <code>tbody</code> will be implicitely created in front of it.</li>
+ *          otherwise <code>tbody</code> will be implicitly created in front of it.</li>
  *      <li><code>tr</code> can contain <code>td</code> and <code>th</code>, all other tags and content will be pushed out of current
  *      limiting context, in the case of html tables, in front of enclosing <code>table</code> tag.</li>
- *      <li>if previous open tag is one of <code>tr</code>, <code>caption</code> or <code>colgroup</code>, it will be implicitely closed.</li>
+ *      <li>if previous open tag is one of <code>tr</code>, <code>caption</code> or <code>colgroup</code>, it will be implicitly closed.</li>
  *   </ul>
  * </p>
  * <br>
@@ -109,7 +109,7 @@ public class TagInfo {
     protected static final int HEAD_AND_BODY = 0;
 	protected static final int HEAD = 1;
 	protected static final int BODY = 2;
-	
+
 	protected static final int CONTENT_ALL = 0;
 	protected static final int CONTENT_NONE = 1;
 	protected static final int CONTENT_TEXT = 2;
@@ -123,20 +123,21 @@ public class TagInfo {
     private Set copyTags = new HashSet();
     private Set continueAfterTags = new HashSet();
     private int belongsTo = BODY;
-    private String requiredParent = null;
-    private String fatalTag = null; 
-    private boolean deprecated = false; 
-    private boolean unique = false; 
-    private boolean ignorePermitted = false;
+    private String requiredParent;
+    private String fatalTag;
+    private boolean deprecated;
+    private boolean unique;
+    private boolean ignorePermitted;
+    private CloseTag closeTag;
 
-
-    public TagInfo(String name, int contentType, int belongsTo, boolean depricated, boolean unique, boolean ignorePermitted) {
+    public TagInfo(String name, int contentType, int belongsTo, boolean deprecated, boolean unique, boolean ignorePermitted, CloseTag closeTag) {
         this.name = name;
         this.contentType = contentType;
         this.belongsTo = belongsTo;
-        this.deprecated = depricated;
+        this.deprecated = deprecated;
         this.unique = unique;
         this.ignorePermitted = ignorePermitted;
+        this.closeTag = closeTag;
     }
 
     public void defineFatalTags(String commaSeparatedListOfTags) {
@@ -323,33 +324,33 @@ public class TagInfo {
     // other functionality
 
     boolean allowsBody() {
-    	return CONTENT_NONE != contentType; 
+    	return CONTENT_NONE != contentType;
     }
-    
+
     boolean isHigher(String tagName) {
     	return higherTags.contains(tagName);
     }
-    
+
     boolean isCopy(String tagName) {
     	return copyTags.contains(tagName);
     }
 
     boolean hasCopyTags() {
-    	return !copyTags.isEmpty(); 
+    	return !copyTags.isEmpty();
     }
 
     boolean isContinueAfter(String tagName) {
     	return continueAfterTags.contains(tagName);
     }
-    
+
     boolean hasPermittedTags() {
-    	return !permittedTags.isEmpty(); 
+    	return !permittedTags.isEmpty();
     }
 
     boolean isHeadTag() {
     	return belongsTo == HEAD;
     }
-    
+
     boolean isHeadAndBodyTag() {
     	return belongsTo == HEAD || belongsTo == HEAD_AND_BODY;
     }
@@ -381,12 +382,19 @@ public class TagInfo {
         } else if ( CONTENT_TEXT == contentType ) {
     		return !(token instanceof TagToken);
     	}
-    	
+
     	return false;
     }
-    
+
     boolean allowsAnything() {
     	return CONTENT_ALL == contentType && childTags.size() == 0;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isMinimizedTagPermitted() {
+        return this.closeTag.isMinimizedTagPermitted();
     }
 
 }

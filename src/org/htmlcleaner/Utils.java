@@ -211,8 +211,8 @@ public class Utils {
     }
 
     // TODO have pattern consume leading 0's and discard.
-    public static Pattern HEX_STRICT = Pattern.compile("^(x[\\p{XDigit}]+)(;?)");
-    public static Pattern HEX_RELAXED = Pattern.compile("^0*(x[\\p{XDigit}]+)(;?)");
+    public static Pattern HEX_STRICT = Pattern.compile("^([x|X][\\p{XDigit}]+)(;?)");
+    public static Pattern HEX_RELAXED = Pattern.compile("^0*([x|X][\\p{XDigit}]+)(;?)");
     public static Pattern DECIMAL = Pattern.compile("^([\\p{Digit}]+)(;?)");
     /**
      * <ul>

@@ -4,7 +4,6 @@ import junit.framework.TestCase;
 
 import java.io.IOException;
 import java.io.File;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 
 /**
@@ -97,10 +96,14 @@ public class PropertiesTest extends TestCase {
         assertTrue( getXmlString().indexOf("</body></html>") >= 0 );
 
         properties.setUseEmptyElementTags(true);
-        assertTrue( getXmlString().indexOf("<a href=\"index.php\" />") >= 0 );
+        xmlString = getXmlString();
+        assertTrue( xmlString.indexOf("<a href=\"index.php\"></a>") >= 0 );
+        assertTrue(xmlString, xmlString.indexOf("<tr><td /></tr><tr />") >= 0);
         properties.setUseEmptyElementTags(false);
-        assertTrue( getXmlString().indexOf("<a href=\"index.php\"></a>") >= 0 );
-        assertTrue( getXmlString().indexOf("<br />") >= 0 );
+        xmlString = getXmlString();
+        assertTrue(xmlString.indexOf("<table><tbody><tr><td></td></tr><tr></tr></tbody></table>") >= 0);
+        assertTrue( xmlString.indexOf("<a href=\"index.php\"></a>") >= 0 );
+        assertTrue( xmlString.indexOf("<br />") >= 0 );
 
         properties.setAllowMultiWordAttributes(false);
         assertTrue( getXmlString().indexOf("<div att=\"a b c\">") < 0 );
@@ -204,19 +207,70 @@ public class PropertiesTest extends TestCase {
     }
 
     public void testPattern() {
-        for(String input : Arrays.asList( "0x138A;", "x138A;", "138;", "139", "x13A", "13F", "13")) {
+        for(Object[] test : new Object[][] {
+            new Object[] { "0x138A;", false, -1, -1, null,
+                                      true, 0, 7, "x138A",
+                                      true, 0, 1, "0"},
+            new Object[] {"x138A;", true, 0, 6, "x138A",
+                                    true, 0, 6, "x138A",
+                                    false, -1,-1, null},
+            new Object[] {"138;", false, -1, -1, null,
+                                  false, -1, -1, null,
+                                  true, 0, 4, "138"},
+            new Object[] {"139", false, -1, -1, null,
+                                 false, -1, -1, null,
+                                 true, 0, 3, "139"},
+            new Object[] {"x13A", true, 0, 4, "x13A",
+                                    true, 0, 4, "x13A",
+                                    false, -1, -1, null},
+            new Object[] {"13F", false, -1, -1, null,
+                                 false, -1, -1, null,
+                                 true, 0, 2, "13"},
+            new Object[] {"13", false, -1, -1, null,
+                                false, -1, -1, null,
+                                true, 0, 2, "13"},
+            new Object[] {"X13AZ", true, 0, 4, "X13A",
+                                   true, 0, 4, "X13A",
+                                   false, -1, -1, null}}) {
+            int i = 0;
+            String input = (String) test[i++];
+            boolean strict = (Boolean) test[i++];
+            int sstart = (Integer) test[i++];
+            int send = (Integer) test[i++];
+            String sgroup = (String) test[i++];
+            boolean relaxed = (Boolean) test[i++];
+            int rstart = (Integer) test[i++];
+            int rend = (Integer) test[i++];
+            String rgroup = (String) test[i++];
+            boolean decimal = (Boolean) test[i++];
+            int dstart = (Integer) test[i++];
+            int dend = (Integer) test[i++];
+            String dgroup = (String) test[i++];
             Matcher m = Utils.HEX_STRICT.matcher(input);
-            if (m.find()) {
-                System.out.println(input+" strict "+m.start() + " "+ m.end()+ " "+m.group(1));
+            boolean actual = m.find();
+            assertEquals(input, strict, actual);
+            if (actual) {
+                assertEquals(input + " strict start ", sstart, m.start());
+                assertEquals(input + " strict end ", send, m.end());
+                assertEquals(input + " strict group ", sgroup, m.group(1));
             }
             m = Utils.HEX_RELAXED.matcher(input);
-            if (m.find()) {
-                System.out.println(input+" relaxed "+ m.start() + " "+ m.end()+ " "+m.group(1));
+            actual = m.find();
+            assertEquals(input, relaxed, actual);
+            if (actual) {
+                assertEquals(input + " relaxed start ", rstart, m.start());
+                assertEquals(input + " relaxed end ", rend, m.end());
+                assertEquals(input + " relaxed group ", rgroup, m.group(1));
             }
             m = Utils.DECIMAL.matcher(input);
-            if (m.find()) {
-                System.out.println(input+" decimal "+m.start() + " "+ m.end()+ " "+m.group(1));
+            actual = m.find();
+            assertEquals(input, decimal, actual);
+            if (actual) {
+                assertEquals(input + " decimal start ", dstart, m.start());
+                assertEquals(input + " decimal end ", dend, m.end());
+                assertEquals(input + " decimal group ", dgroup, m.group(1));
             }
         }
     }
+
 }
