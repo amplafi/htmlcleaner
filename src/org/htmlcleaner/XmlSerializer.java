@@ -134,8 +134,15 @@ public abstract class XmlSerializer {
 		return Utils.escapeXml(xmlContent, props, isCreatingHtmlDom());
 	}
 
+	/**
+	 * encapsulate content with <[CDATA[ ]]> for things like script and style elements
+	 * @param tagNode
+	 * @return true if <[CDATA[ ]]> should be used.
+	 */
 	protected boolean dontEscape(TagNode tagNode) {
-		return props.isUseCdataForScriptAndStyle() && isScriptOrStyle(tagNode);
+	    // make sure <script src=..></script> doesn't get turned into <script src=..><[CDATA[]]></script>
+	    // TODO check for blank content as well.
+		return props.isUseCdataForScriptAndStyle() && isScriptOrStyle(tagNode) && !tagNode.getChildren().isEmpty();
 	}
 
 	protected boolean isScriptOrStyle(TagNode tagNode) {

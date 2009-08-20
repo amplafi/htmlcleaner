@@ -23,21 +23,25 @@ public class PropertiesTest extends TestCase {
     public void testProperties() throws Exception {
         properties.setNamespacesAware(false);
 
+        String xmlString;
         properties.setAdvancedXmlEscape(true);
         assertTrue( getXmlString().indexOf("<div>&amp;&quot;&apos;&lt;&gt;</div>") >= 0 );
         properties.setAdvancedXmlEscape(false);
         assertTrue( getXmlString().indexOf("<div>&amp;amp;&amp;quot;&amp;apos;&amp;lt;&amp;gt;</div>") >= 0 );
 
         properties.setUseCdataForScriptAndStyle(true);
-        assertTrue( getXmlString().indexOf("<script><![CDATA[var x=y&&z;]]></script>") >= 0 );
-        assertTrue( getXmlString().indexOf("<style><![CDATA[.test{font-size:10;}]]></style>") >= 0 );
+        xmlString = getXmlString();
+        assertTrue( xmlString.indexOf("<script><![CDATA[var x=y&&z;]]></script>") >= 0 );
+        assertTrue( xmlString.indexOf("<style><![CDATA[.test{font-size:10;}]]></style>") >= 0 );
+        assertTrue( xmlString.indexOf("<script></script>") >= 0 );
+        assertTrue( xmlString.indexOf("<style></style>") >= 0 );
         properties.setUseCdataForScriptAndStyle(false);
         assertTrue( getXmlString().indexOf("<script>var x=y&amp;&amp;z;</script>") >= 0 );
         assertTrue( getXmlString().indexOf("<style>.test{font-size:10;}</style>") >= 0 );
 
         properties.setTranslateSpecialEntities(true);
         String specialHtmlEntities = "<div>"+ new String(new char[] {244,8240, 215,376, 8364})+"</div>";
-        String xmlString = getXmlString();
+        xmlString = getXmlString();
         assertTrue( xmlString.indexOf(specialHtmlEntities) >= 0 );
         properties.setTranslateSpecialEntities(false);
         assertTrue( getXmlString().indexOf(specialHtmlEntities) < 0 );
