@@ -12,6 +12,7 @@ public class BadTerminationTest extends TestCase{
         CleanerProperties cleanerProperties = new CleanerProperties();
         cleanerProperties.setOmitHtmlEnvelope(true);
         cleanerProperties.setOmitXmlDeclaration(true);
+        cleanerProperties.setUseEmptyElementTags(false);
         String output = new SimpleXmlSerializer().getXmlAsString(cleanerProperties, "<div></div id=\"foo\">", "UTF-8");
         assertEquals("<div></div>", output);
         // </{whitespace} is treated like a comment by FF
