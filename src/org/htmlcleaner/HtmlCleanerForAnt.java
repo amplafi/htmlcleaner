@@ -57,8 +57,8 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
     private String text;
     private String src;
     private String dest;
-    private String incharset = HtmlCleaner.DEFAULT_CHARSET;
-    private String outcharset = HtmlCleaner.DEFAULT_CHARSET;
+    private String incharset = CleanerProperties.DEFAULT_CHARSET;
+    private String outcharset = CleanerProperties.DEFAULT_CHARSET;
     private String taginfofile = null;
     private String outputtype = "simple";
     private boolean advancedxmlescape = true;
@@ -303,7 +303,7 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
             } else {
                 out = new FileOutputStream(dest);
             }
-                
+
             if ( "compact".equals(outputtype) ) {
                 new CompactXmlSerializer(props).writeXmlToStream(node, out, outcharset);
             } else if ( "browser-compact".equals(outputtype) ) {

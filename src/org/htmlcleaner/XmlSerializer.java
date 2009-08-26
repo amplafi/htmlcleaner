@@ -78,7 +78,7 @@ public abstract class XmlSerializer {
     }
 
     public void writeXmlToStream(TagNode tagNode, OutputStream out) throws IOException {
-         writeXmlToStream( tagNode, out, HtmlCleaner.DEFAULT_CHARSET );
+         writeXmlToStream( tagNode, out, props.getCharset() );
     }
 
     public void writeXmlToFile(TagNode tagNode, String fileName, String charset) throws IOException {
@@ -86,14 +86,14 @@ public abstract class XmlSerializer {
     }
 
     public void writeXmlToFile(TagNode tagNode, String fileName) throws IOException {
-        writeXmlToFile(tagNode,fileName, HtmlCleaner.DEFAULT_CHARSET);
+        writeXmlToFile(tagNode,fileName, props.getCharset());
     }
 
     public String getXmlAsString(CleanerProperties cleanerProperties, String htmlContent, String charset) throws IOException {
         this.props = cleanerProperties;
         HtmlCleaner htmlCleaner = new HtmlCleaner(cleanerProperties);
         TagNode tagNode= htmlCleaner.clean(htmlContent);
-        return getXmlAsString(tagNode, charset==null||charset.length()==0?HtmlCleaner.DEFAULT_CHARSET:charset);
+        return getXmlAsString(tagNode, charset==null||charset.length()==0?props.getCharset():charset);
     }
 
     public String getXmlAsString(TagNode tagNode, String charset) throws IOException {
@@ -103,7 +103,7 @@ public abstract class XmlSerializer {
     }
 
     public String getXmlAsString(TagNode tagNode) throws IOException {
-        return getXmlAsString(tagNode, HtmlCleaner.DEFAULT_CHARSET);
+        return getXmlAsString(tagNode, props.getCharset());
     }
 
     public void writeXml(TagNode tagNode, Writer writer, String charset) throws IOException {

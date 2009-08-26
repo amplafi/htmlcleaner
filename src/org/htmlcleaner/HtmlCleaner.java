@@ -90,8 +90,6 @@ import java.util.*;
  */
 public class HtmlCleaner {
 
-    public static final String DEFAULT_CHARSET = System.getProperty("file.encoding");
-
     /**
      * Contains information about single open tag
      */
@@ -281,7 +279,7 @@ public class HtmlCleaner {
     }
 
     public TagNode clean(File file) throws IOException {
-        return clean(file, DEFAULT_CHARSET);
+        return clean(file, properties.getCharset());
     }
 
     public TagNode clean(URL url, String charset) throws IOException {
@@ -291,7 +289,7 @@ public class HtmlCleaner {
     }
 
     public TagNode clean(URL url) throws IOException {
-        return clean(url, DEFAULT_CHARSET);
+        return clean(url, properties.getCharset());
     }
 
     public TagNode clean(InputStream in, String charset) throws IOException {
@@ -299,7 +297,7 @@ public class HtmlCleaner {
     }
 
     public TagNode clean(InputStream in) throws IOException {
-        return clean(in, DEFAULT_CHARSET);
+        return clean(in, properties.getCharset());
     }
 
     /**

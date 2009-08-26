@@ -42,6 +42,20 @@ public class DomSerializer {
         return document;
     }
 
+    protected boolean isScriptOrStyle(Element element) {
+        String tagName = element.getNodeName();
+        return "script".equalsIgnoreCase(tagName) || "style".equalsIgnoreCase(tagName);
+    }
+    /**
+     * encapsulate content with <[CDATA[ ]]> for things like script and style elements
+     * @param tagNode
+     * @return true if <[CDATA[ ]]> should be used.
+     */
+    protected boolean dontEscape(Element element) {
+        // make sure <script src=..></script> doesn't get turned into <script src=..><[CDATA[]]></script>
+        // TODO check for blank content as well.
+        return props.isUseCdataForScriptAndStyle() && isScriptOrStyle(element) && !element.hasChildNodes();
+    }
     private void createSubnodes(Document document, Element element, List tagChildren) {
         if (tagChildren != null) {
             Iterator it = tagChildren.iterator();
@@ -52,11 +66,9 @@ public class DomSerializer {
                     Comment comment = document.createComment( commentToken.getContent() );
                     element.appendChild(comment);
                 } else if (item instanceof ContentToken) {
-                    String nodeName = element.getNodeName();
                     ContentToken contentToken = (ContentToken) item;
                     String content = contentToken.getContent();
-                    boolean specialCase = props.isUseCdataForScriptAndStyle() &&
-                                          ("script".equalsIgnoreCase(nodeName) || "style".equalsIgnoreCase(nodeName));
+                    boolean specialCase = dontEscape(element);
                     if (escapeXml && !specialCase) {
                         content = Utils.escapeXml(content, props, true);
                     }

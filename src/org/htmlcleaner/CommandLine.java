@@ -111,12 +111,12 @@ public class CommandLine {
 
         String inCharset = getArgValue(args, "incharset");
         if ("".equals(inCharset)) {
-            inCharset = HtmlCleaner.DEFAULT_CHARSET;
+            inCharset = CleanerProperties.DEFAULT_CHARSET;
         }
 
         String outCharset = getArgValue(args, "outcharset");
         if ("".equals(outCharset)) {
-            outCharset = HtmlCleaner.DEFAULT_CHARSET;
+            outCharset = CleanerProperties.DEFAULT_CHARSET;
         }
 
         String destination = getArgValue(args, "dest");

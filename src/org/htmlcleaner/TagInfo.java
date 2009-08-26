@@ -42,8 +42,8 @@ import java.util.*;
 /**
  * <p>
  * Class contains information about single HTML tag.<br/>
- * It also contains rules for tag balancing. For each tag, list of dependant
- * tags may be defined. There are several kinds of dependancies used to reorder
+ * It also contains rules for tag balancing. For each tag, list of dependent
+ * tags may be defined. There are several kinds of dependencies used to reorder
  * tags:
  * <ul>
  *      <li>
@@ -52,17 +52,17 @@ import java.util.*;
  *        browsers ignore elements TD, TR, TBODY if they are not in the context of TABLE tag.
  *      </li>
  *      <li>
- *        required enclosing tags - if there is no such, it is implicitely
+ *        required enclosing tags - if there is no such, it is implicitly
  *        created. For example if TD is out of TR - open TR is created before.
  *      </li>
  *      <li>
- *        forbidden tags - it is not allowed to occure inside - for example
+ *        forbidden tags - it is not allowed to occur inside - for example
  *        FORM cannot be inside other FORM and it will be ignored during cleanup.
  *      </li>
  *      <li>
- *        allowed children tags - for example TR allowes TD and TH. If there
- *        are some dependant allowed tags defined then cleaner ignores other tags, treating
- *        them as unallowed, unless they are in some other relationship with this tag.
+ *        allowed children tags - for example TR allows TD and TH. If there
+ *        are some dependent allowed tags defined then cleaner ignores other tags, treating
+ *        them as not allowed, unless they are in some other relationship with this tag.
  *      </li>
  *      <li>
  *        higher level tags - for example for TR higher tags are THEAD, TBODY, TFOOT.
@@ -82,7 +82,7 @@ import java.util.*;
  * </p>
  *
  * <p>
- * Tag TR for instance (table row) may define the following dependancies:
+ * Tag TR for instance (table row) may define the following dependencies:
  *      <ul>
  *          <li>fatal tag is <code>table</code></li>
  *          <li>required enclosing tag is <code>tbody</code></li>

@@ -45,6 +45,8 @@ package org.htmlcleaner;
  */
 public class CleanerProperties {
 
+//    public static final String DEFAULT_CHARSET = System.getProperty("file.encoding");
+    public static final String DEFAULT_CHARSET = "UTF-8";
     public static final String BOOL_ATT_SELF = "self";
     public static final String BOOL_ATT_EMPTY = "empty";
     public static final String BOOL_ATT_TRUE = "true";
@@ -70,6 +72,7 @@ public class CleanerProperties {
     private boolean namespacesAware;
     private String hyphenReplacementInComment;
     private String pruneTags;
+    private String charset;
 
     public CleanerProperties() {
         reset();
@@ -238,6 +241,20 @@ public class CleanerProperties {
         this.pruneTags = pruneTags;
     }
 
+    /**
+     * @param charset the charset to set
+     */
+    public void setCharset(String charset) {
+        this.charset = charset;
+    }
+
+    /**
+     * @return the charset
+     */
+    public String getCharset() {
+        return charset;
+    }
+
     public String getBooleanAttributeValues() {
         return booleanAttributeValues;
     }
@@ -272,6 +289,6 @@ public class CleanerProperties {
         hyphenReplacementInComment = "=";
         pruneTags = null;
         booleanAttributeValues = BOOL_ATT_SELF;
+        charset = "UTF-8";
     }
-
 }
