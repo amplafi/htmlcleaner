@@ -20,7 +20,7 @@
 	<target name="build" description="compilation of source files">
 		<mkdir dir="${dir.dist}"/>
 		<javac srcdir="${dir.src}" destdir="${dir.dist}"
-			   listfiles="on" source="1.4" target="1.4"
+			   listfiles="on" source="1.6" target="1.6"
 			   excludes="org/htmlcleaner/Test.java">
 			<classpath refid="classpath.compile"/>
 		</javac>
