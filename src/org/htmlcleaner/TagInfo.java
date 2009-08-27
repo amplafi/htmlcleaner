@@ -387,7 +387,7 @@ public class TagInfo {
     }
 
     boolean allowsAnything() {
-    	return CONTENT_ALL == contentType && childTags.size() == 0;
+    	return CONTENT_ALL == contentType && childTags.isEmpty();
     }
 
     /**
