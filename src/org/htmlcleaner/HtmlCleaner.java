@@ -106,12 +106,12 @@ public class HtmlCleaner {
 	}
 
     /**
-     * Class that contains information and mathods for managing list of open,
+     * Class that contains information and methods for managing list of open,
      * but unhandled tags.
      */
     private class OpenTags {
         private List list = new ArrayList();
-        private TagPos last = null;
+        private TagPos last;
         private Set set = new HashSet();
 
         private boolean isEmpty() {
@@ -218,11 +218,11 @@ public class HtmlCleaner {
 
     private ITagInfoProvider tagInfoProvider;
 
-    private CleanerTransformations transformations = null;
+    private CleanerTransformations transformations;
 
     private transient OpenTags _openTags;
-    private transient boolean _headOpened = false;
-    private transient boolean _bodyOpened = false;
+    private transient boolean _headOpened;
+    private transient boolean _bodyOpened;
     private transient Set _headTags = new LinkedHashSet();
     private Set allTags = new TreeSet();
 
