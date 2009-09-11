@@ -144,8 +144,6 @@ public class Utils {
      * @return
      */
     public static String escapeXml(String s, boolean advanced, boolean recognizeUnicodeChars, boolean translateSpecialEntities, boolean isDomCreation) {
-        final int aposlength = "&apos;".length();
-
         if (s != null) {
     		int len = s.length();
     		StringBuffer result = new StringBuffer(len);
@@ -191,6 +189,7 @@ public class Utils {
     private static final Pattern ASCII_CHAR = Pattern.compile("\\p{Print}");
     /**
      * @param s
+     * @param domCreation 
      * @param recognizeUnicodeChars
      * @param result
      * @param i

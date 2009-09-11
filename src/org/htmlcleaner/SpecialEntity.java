@@ -30,8 +30,7 @@ public class SpecialEntity{
             this.htmlString = str;
         }
         if ( htmlSpecialEntity ) {
-            // why not just output the unicode &#(intCode) ???
-            this.escapedXmlString = "&amp;"+this.key+";";
+            this.escapedXmlString = String.valueOf((char)this.intCode);
         } else {
             this.escapedXmlString = str;
         }

@@ -179,7 +179,7 @@ public class PropertiesTest extends TestCase {
         SimpleXmlSerializer simpleXmlSerializer = new SimpleXmlSerializer(properties);
         String xmlString = simpleXmlSerializer.getXmlAsString(node, "UTF-8" );
         assertEquals("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n" +
-                "<html><head /><body><div> &amp;&quot;&apos;&apos;&lt;&gt;&amp;nbsp;&amp;garbage;&amp;</div></body></html>", xmlString.trim());
+                "<html><head /><body><div> &amp;&quot;&apos;&apos;&lt;&gt;"+String.valueOf((char)160)+"&amp;garbage;&amp;</div></body></html>", xmlString.trim());
 
         simpleXmlSerializer.setCreatingHtmlDom(true);
         // then test when generating html
@@ -278,6 +278,16 @@ public class PropertiesTest extends TestCase {
                 assertEquals(input + " decimal group ", dgroup, m.group(1));
             }
         }
+    }
+    
+    public void testConvertUnicode() throws Exception {
+        CleanerProperties cleanerProperties = new CleanerProperties();
+        cleanerProperties.setOmitHtmlEnvelope(true);
+        cleanerProperties.setOmitXmlDeclaration(true);
+        cleanerProperties.setUseEmptyElementTags(false);
+        // right tick is special unicode character 8217
+        String output = new SimpleXmlSerializer().getXmlAsString(cleanerProperties, "<h3><u><strong>President’s Message</strong></u><div> </h3>", "UTF-8");
+        assertEquals("<h3><u><strong>President’s Message</strong></u><div> </div></h3>", output);
     }
 
 }

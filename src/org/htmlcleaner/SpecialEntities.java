@@ -67,6 +67,8 @@ public class SpecialEntities {
 	private Map entitiesByUnicodeCharcode = new HashMap();
 	
 	public SpecialEntities() {
+	    boolean greek =true;
+	    boolean math=true;
 		_put(new SpecialEntity("nbsp",	160, null, true));
 		_put(new SpecialEntity("iexcl",	161, null, true));
 		_put(new SpecialEntity("cent",	162, null, true));
@@ -169,9 +171,68 @@ public class SpecialEntities {
 		_put(new SpecialEntity("oelig",	339, null, true));
 		_put(new SpecialEntity("Scaron",	352, null, true));
 		_put(new SpecialEntity("scaron",	353, null, true));
-		_put(new SpecialEntity("Yuml",	376, null, true));
+        _put(new SpecialEntity("Yuml",  376, null, true));
+        _put(new SpecialEntity("fnof",  402, null, true));
 		_put(new SpecialEntity("circ",	710, null, true));
 		_put(new SpecialEntity("tilde",	732, null, true));
+		if ( greek ) {
+		    // 913    Alpha   Α   greek capital letter alpha
+		    _put(new SpecialEntity("Alpha", 913, null, true));
+		    // 914 Beta    Β   greek capital letter beta
+		    _put(new SpecialEntity("Beta", 914, null, true));
+		    // 915 Gamma   Γ   greek capital letter gamma
+            _put(new SpecialEntity("Beta", 914, null, true));
+            // 916 Delta   Δ   greek capital letter delta
+            // 917 Epsilon Ε   greek capital letter epsilon
+            // 918 Zeta    Ζ   greek capital letter zeta
+            // 919 Eta Η   greek capital letter eta
+            // 920 Theta   Θ   greek capital letter theta
+            // 921 Iota    Ι   greek capital letter iota
+            // 922 Kappa   Κ   greek capital letter kappa
+            // 923 Lambda  Λ   greek capital letter lambda
+            // 924 Mu  Μ   greek capital letter mu
+            // 925 Nu  Ν   greek capital letter nu
+            // 926 Xi  Ξ   greek capital letter xi
+            // 927 Omicron Ο   greek capital letter omicron
+            // 928 Pi  Π   greek capital letter pi
+            // 929 Rho Ρ   greek capital letter rho
+            // there is no Sigmaf, and no U+03A2 character either
+            // 931 Sigma   Σ   greek capital letter sigma
+            // 932 Tau Τ   greek capital letter tau
+            // 933 Upsilon Υ   greek capital letter upsilon
+            // 934 Phi Φ   greek capital letter phi
+            // 935 Chi Χ   greek capital letter chi
+            // 936 Psi Ψ   greek capital letter psi
+            // 937 Omega   Ω   greek capital letter omega
+            // 945 alpha   α   greek small letter alpha
+            // 946 beta    β   greek small letter beta
+            // 947 gamma   γ   greek small letter gamma
+            // 948 delta   δ   greek small letter delta
+            // 949 epsilon ε   greek small letter epsilon
+            // 950 zeta    ζ   greek small letter zeta
+            // 951 eta η   greek small letter eta
+            // 952 theta   θ   greek small letter theta
+            // 953 iota    ι   greek small letter iota
+            // 954 kappa   κ   greek small letter kappa
+            // 955 lambda  λ   greek small letter lambda
+            // 956 mu  μ   greek small letter mu
+            // 957 nu  ν   greek small letter nu
+            // 958 xi  ξ   greek small letter xi
+            // 959 omicron ο   greek small letter omicron
+            // 960 pi  π   greek small letter pi
+            // 961 rho ρ   greek small letter rho
+            // 962 sigmaf  ς   greek small letter final sigma
+            // 963 sigma   σ   greek small letter sigma
+            // 964 tau τ   greek small letter tau
+            // 965 upsilon υ   greek small letter upsilon
+            // 966 phi φ   greek small letter phi
+            // 967 chi χ   greek small letter chi
+            // 968 psi ψ   greek small letter psi
+            // 969 omega   ω   greek small letter omega
+            // 977 thetasym    ϑ   greek small letter theta symbol
+            // 978 upsih   ϒ   greek upsilon with hook symbol
+            // 982 piv ϖ   greek pi symbol
+		}
 		_put(new SpecialEntity("ensp",	8194, null, true));
 		_put(new SpecialEntity("emsp",	8195, null, true));
 		_put(new SpecialEntity("thinsp",	8201, null, true));
@@ -188,14 +249,143 @@ public class SpecialEntities {
 		_put(new SpecialEntity("rdquo",	8221, null, true));
 		_put(new SpecialEntity("bdquo",	8222, null, true));
 		_put(new SpecialEntity("dagger",	8224, null, true));
-		_put(new SpecialEntity("Dagger",	8225, null, true));
+        _put(new SpecialEntity("Dagger",    8225, null, true));
+        _put(new SpecialEntity("bull",    8226, null, true));
+        // three ellipses
 		_put(new SpecialEntity("hellip",	8230, null, true));
-		_put(new SpecialEntity("permil",	8240, null, true));
+        _put(new SpecialEntity("permil",    8240, null, true));
+        _put(new SpecialEntity("prime",    8242, null, true));
+        _put(new SpecialEntity("Prime",    8243, null, true));
 		_put(new SpecialEntity("lsaquo",	8249, null, true));
 		_put(new SpecialEntity("rsaquo",	8250, null, true));
+        _put(new SpecialEntity("oline",    8254, null, true));
+        _put(new SpecialEntity("frasl",    8260, null, true));
         _put(new SpecialEntity("euro",  8364, null, true));
-        _put(new SpecialEntity("trade",	8482, null, true));
-
+        _put(new SpecialEntity("image",  8465, null, true));
+        _put(new SpecialEntity("weierp",  8472, null, true));
+        _put(new SpecialEntity("real",  8476, null, true));
+        _put(new SpecialEntity("trade", 8482, null, true));
+        _put(new SpecialEntity("alefsym", 8501, null, true));
+        _put(new SpecialEntity("larr", 8592, null, true));
+        _put(new SpecialEntity("uarr", 8593, null, true));
+        _put(new SpecialEntity("rarr", 8594, null, true));
+        _put(new SpecialEntity("darr", 8595, null, true));
+        _put(new SpecialEntity("harr", 8596, null, true));
+        _put(new SpecialEntity("crarr", 8629, null, true));
+        _put(new SpecialEntity("lArr", 8656, null, true));
+        _put(new SpecialEntity("uArr", 8657, null, true));
+        _put(new SpecialEntity("rArr", 8658, null, true));
+        _put(new SpecialEntity("dArr", 8659, null, true));
+        _put(new SpecialEntity("hArr", 8660, null, true));
+        if (math) {
+            // 8704 forall  ∀   for all
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8706    part    ∂   partial differential
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8707    exist   ∃   there exists
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8709    empty   ∅   empty set = null set = diameter
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8711    nabla   ∇   nabla = backward difference
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8712    isin    ∈   element of
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8713    notin   ∉   not an element of
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8715    ni  ∋   contains as member
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8719    prod    ∏   n-ary product = product sign
+            //prod is NOT the same character as U+03A0 'greek capital letter pi' though the same glyph might be used for both
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8721    sum ∑   n-ary sumation
+            //sum is NOT the same character as U+03A3 'greek capital letter sigma' though the same glyph might be used for both
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8722    minus   −   minus sign
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8727    lowast  ∗   asterisk operator
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8730    radic   √   square root = radical sign
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8733    prop    ∝   proportional to
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8734    infin   ∞   infinity
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8736    ang ∠   angle
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8743    and ∧   logical and = wedge
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8744    or  ∨   logical or = vee
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8745    cap ∩   intersection = cap
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8746    cup ∪   union = cup
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8747    int ∫   integral
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8756    there4  ∴   therefore
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8764    sim ∼   tilde operator = varies with = similar to
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //tilde operator is NOT the same character as the tilde, U+007E, although the same glyph might be used to represent both
+            //8773    cong    ≅   approximately equal to
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8776    asymp   ≈   almost equal to = asymptotic to
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8800    ne  ≠   not equal to
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8801    equiv   ≡   identical to
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8804    le  ≤   less-than or equal to
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8805    ge  ≥   greater-than or equal to
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8834    sub ⊂   subset of
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8835    sup ⊃   superset of
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //note that nsup, 'not a superset of, U+2283' is not covered by the Symbol font encoding and is not included. Should it be, for symmetry? It is in ISOamsn
+            //8836    nsub    ⊄   not a subset of
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8838    sube    ⊆   subset of or equal to
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8839    supe    ⊇   superset of or equal to
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8853    oplus   ⊕   circled plus = direct sum
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8855    otimes  ⊗   circled times = vector product
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8869    perp    ⊥   up tack = orthogonal to = perpendicular
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8901    sdot    ⋅   dot operator
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //dot operator is NOT the same character as U+00B7 middle dot
+            //8968    lceil   ⌈   left ceiling = apl upstile
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8969    rceil   ⌉   right ceiling
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8970    lfloor  ⌊   left floor = apl downstile
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //8971    rfloor  ⌋   right floor
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //9001    lang    〈   left-pointing angle bracket = bra
+            //lang is NOT the same character as U+003C 'less than' or U+2039 'single left-pointing angle quotation mark'
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //9002    rang    〉   right-pointing angle bracket = ket
+            //rang is NOT the same character as U+003E 'greater than' or U+203A 'single right-pointing angle quotation mark'
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //9674    loz ◊   lozenge
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //9824    spades  ♠   black spade suit
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //black here seems to mean filled as opposed to hollow
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //9827    clubs   ♣   black club suit = shamrock
+            _put(new SpecialEntity("hArr", 8660, null, true));
+            //9829    hearts  ♥   black heart suit = valentine
+            _put(new SpecialEntity("hearts", 9829, null, true));
+            //9830    diams   ♦   black diamond suit
+            _put(new SpecialEntity("diams", 9830, null, true));
+        }
         _put(new SpecialEntity("amp",  '&', null, false));
         _put(new SpecialEntity("lt", '<', null, false));
         _put(new SpecialEntity("gt",  '>', null, false));
