@@ -7,30 +7,33 @@ package org.htmlcleaner;
 public class SpecialEntity{
     private final String key;
     private final int intCode;
-    private final String domString;
+    // escaped value outputed when generating html 
+    private final String htmlString;
     private boolean htmlSpecialEntity;
-    private final String xmlString;
+    // escaped value when outputting html
+    private final String escapedXmlString;
 
     /**
      *
      * @param key value between & and the ';' example 'amp' for '&amp;'
      * @param intCode
-     * @param domString
+     * @param htmlString
      * @param htmlSpecialEntity entity is affected by translateSpecialEntities property setting.
      */
-    public SpecialEntity(String key, int intCode, String domString, boolean htmlSpecialEntity) {
+    public SpecialEntity(String key, int intCode, String htmlString, boolean htmlSpecialEntity) {
         this.key = key;
         this.intCode = intCode;
         String str = "&" + key +";";
-        if ( domString != null) {
-            this.domString = domString;
+        if ( htmlString != null) {
+            this.htmlString = htmlString;
         } else {
-            this.domString = str;
+            this.htmlString = str;
         }
         if ( htmlSpecialEntity ) {
-            this.xmlString = "&amp;"+this.key+";";
+            // why not just output the unicode &#(intCode) ???
+            this.escapedXmlString = "&amp;"+this.key+";";
         } else {
-            this.xmlString = str;
+            this.escapedXmlString = str;
         }
         this.htmlSpecialEntity = htmlSpecialEntity;
     }
@@ -52,12 +55,16 @@ public class SpecialEntity{
     /**
      * @return the domString
      */
-    public String getDomString() {
-        return domString;
+    public String getHtmlString() {
+        return htmlString;
     }
 
-    public String getXmlString() {
-        return this.xmlString;
+    public String getEscapedXmlString() {
+        return this.escapedXmlString;
+    }
+    
+    public String getEscaped(boolean htmlEscaped) {
+        return htmlEscaped?this.getHtmlString():this.getEscapedXmlString();
     }
 
     /**
@@ -73,7 +80,4 @@ public class SpecialEntity{
     public char charValue() {
         return (char) intValue();
     }
-
-
-
 }

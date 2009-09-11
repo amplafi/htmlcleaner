@@ -230,9 +230,12 @@ public class HtmlCleaner {
     private TagNode bodyNode;
     private TagNode headNode;
     private TagNode rootNode;
-
-    private Set pruneTagSet = new HashSet();
+    
     private Set pruneNodeSet = new HashSet();
+
+    private HashSet pruneTagSet;
+
+    private HashSet allowTagSet;
 
     /**
      * Constructor - creates cleaner instance with default tag info provider and default properties.
@@ -312,7 +315,9 @@ public class HtmlCleaner {
         _bodyOpened = false;
         _headTags.clear();
         allTags.clear();
-        setPruneTags(properties.getPruneTags());
+        this.pruneTagSet = new HashSet(this.properties.getPruneTagSet());
+        this.allowTagSet = new HashSet(this.properties.getAllowTagSet());
+        this.pruneNodeSet.clear();
 
         htmlNode = new TagNode("html", this);
         bodyNode = new TagNode("body", this);
@@ -765,18 +770,11 @@ public class HtmlCleaner {
         return pruneTagSet;
     }
 
-    private void setPruneTags(String pruneTags) {
-        pruneTagSet.clear();
-        pruneNodeSet.clear();
-        if (pruneTags != null) {
-            StringTokenizer tokenizer = new StringTokenizer(pruneTags, ",");
-            while ( tokenizer.hasMoreTokens() ) {
-                pruneTagSet.add( tokenizer.nextToken().trim().toLowerCase() );
-            }
-        }
+    public Set getAllowTagSet() {
+        return allowTagSet;
     }
 
-    void addPruneNode(TagNode node) {
+    public void addPruneNode(TagNode node) {
         this.pruneNodeSet.add(node);
     }
 

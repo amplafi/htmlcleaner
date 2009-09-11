@@ -129,6 +129,22 @@ public class Utils {
         boolean advanced = props.isAdvancedXmlEscape();
         boolean recognizeUnicodeChars = props.isRecognizeUnicodeChars();
         boolean translateSpecialEntities = props.isTranslateSpecialEntities();
+        return escapeXml(s, advanced, recognizeUnicodeChars, translateSpecialEntities, isDomCreation);
+    }
+    /**
+     * change notes: 
+     * 1) convert ascii characters encoded using &#xx; format to the ascii characters -- may be an attempt to slip in malicious html
+     * 2) convert &#xxx; format characters to &quot; style representation if available for the character.
+     * 3) convert html special entities to xml &#xxx; when outputing in xml
+     * @param s
+     * @param advanced
+     * @param recognizeUnicodeChars
+     * @param translateSpecialEntities
+     * @param isDomCreation
+     * @return
+     */
+    public static String escapeXml(String s, boolean advanced, boolean recognizeUnicodeChars, boolean translateSpecialEntities, boolean isDomCreation) {
+        final int aposlength = "&apos;".length();
 
         if (s != null) {
     		int len = s.length();
@@ -137,37 +153,10 @@ public class Utils {
     		for (int i = 0; i < len; i++) {
     			char ch = s.charAt(i);
 
+    			SpecialEntity code;
     			if (ch == '&') {
-    				SpecialEntity code;
-                    if ( (advanced || recognizeUnicodeChars) && (i < len-1) && (s.charAt(i+1) == '#') ) {
-    					int charIndex = i + 2;
-    					StringBuilder unicode = new StringBuilder();
-    					// TODO -- should this already be
-    					charIndex = extractCharCode(s, charIndex, true, unicode);
-    					if (unicode.length() > 0) {
-    						try {
-    							char unicodeChar = unicode.substring(0,1).equals("x") ?
-                                                        (char)Integer.parseInt(unicode.substring(1), 16) :
-                                                        (char)Integer.parseInt(unicode.toString());
-                                if ( unicodeChar ==0) {
-                                    // null character &#0Peanut for example
-                                    // just consume character &
-                                    result.append("&amp;");
-                                } else if ( "&<>\'\"".indexOf(unicodeChar) < 0 ) {
-	    							result.append( recognizeUnicodeChars ? String.valueOf(unicodeChar) : "&#" + unicode + ";" );
-	                                i = charIndex;
-    							} else {
-        							result.append("&amp;#" + unicode + ";");
-                                    i = charIndex;
-    							}
-    						} catch (NumberFormatException e) {
-    						    // should never happen now
-    							i = charIndex;
-    							result.append("&amp;#" + unicode + ";");
-    						}
-    					} else {
-    						result.append("&amp;");
-    					}
+    				if ( (advanced || recognizeUnicodeChars) && (i < len-1) && (s.charAt(i+1) == '#') ) {
+    					i = convertToUnicode(s, isDomCreation, recognizeUnicodeChars, result, i+2);
     				} else if ((translateSpecialEntities || advanced) &&
 				        (code = SpecialEntities.INSTANCE.getSpecialEntity(s.substring(i, i+Math.min(10, len-i)))) != null) {
 			            if (translateSpecialEntities && code.isHtmlSpecialEntity()) {
@@ -178,12 +167,7 @@ public class Utils {
                             }
 							i += code.getKey().length() + 1;
 						} else if (advanced ) {
-						    if ( isDomCreation) {
-						        result.append(code.getDomString());
-						    } else {
-						        // not domCreation
-						        result.append(code.getXmlString());
-						    }
+					        result.append(code.getEscaped(isDomCreation));
 		                    i += code.getKey().length()+1;
 			            } else {
 			                result.append("&amp;");
@@ -191,14 +175,8 @@ public class Utils {
     				} else {
     					result.append("&amp;");
     				}
-    			} else if (ch == '\'') {
-    				result.append("&apos;");
-    			} else if (ch == '>') {
-    				result.append("&gt;");
-    			} else if (ch == '<') {
-    				result.append("&lt;");
-    			} else if (ch == '\"') {
-    				result.append("&quot;");
+    			} else if ((code = SpecialEntities.INSTANCE.getSpecialEntityByUnicode(ch)) != null ) {
+    				result.append(code.getEscaped(isDomCreation));
     			} else {
     				result.append(ch);
     			}
@@ -208,6 +186,53 @@ public class Utils {
     	}
 
     	return null;
+    }
+
+    private static final Pattern ASCII_CHAR = Pattern.compile("\\p{Print}");
+    /**
+     * @param s
+     * @param recognizeUnicodeChars
+     * @param result
+     * @param i
+     * @return
+     */
+    public static int convertToUnicode(String s, boolean domCreation, boolean recognizeUnicodeChars, StringBuffer result, int i) {
+        StringBuilder unicode = new StringBuilder();
+        int charIndex = extractCharCode(s, i, true, unicode);
+        if (unicode.length() > 0) {
+        	try {
+        		char unicodeChar = unicode.substring(0,1).equals("x") ?
+                                        (char)Integer.parseInt(unicode.substring(1), 16) :
+                                        (char)Integer.parseInt(unicode.toString());
+                SpecialEntity specialEntity = SpecialEntities.INSTANCE.getSpecialEntityByUnicode(unicodeChar);
+                if ( unicodeChar ==0) {
+                    // null character &#0Peanut for example
+                    // just consume character &
+                    result.append("&amp;");
+                } else if ( specialEntity != null && 
+                        // special characters that are always escaped. 
+                        (!specialEntity.isHtmlSpecialEntity() 
+                                // OR we are not outputting unicode characters as the characters ( they are staying escaped ) 
+                                || !recognizeUnicodeChars)) {
+                    result.append(domCreation?specialEntity.getHtmlString():specialEntity.getEscapedXmlString());
+                } else if ( recognizeUnicodeChars ) {
+                    // output unicode characters as their actual byte code with the exception of characters that have special xml meaning.
+                    result.append( String.valueOf(unicodeChar));
+                } else if ( ASCII_CHAR.matcher(new String(new char[] { unicodeChar } )).find()) {
+                    // ascii printable character. this fancy escaping might be an attempt to slip in dangerous characters (i.e. spelling out <script> ) 
+                    // by converting to printable characters we can more easily detect such attacks.
+                    result.append(String.valueOf(unicodeChar));
+                } else {
+        			result.append( "&#").append(unicode).append(";" );
+        		}
+        	} catch (NumberFormatException e) {
+        	    // should never happen now
+        		result.append("&amp;#").append(unicode).append(";" );
+        	}
+        } else {
+        	result.append("&amp;");
+        }
+        return charIndex;
     }
 
     // TODO have pattern consume leading 0's and discard.
@@ -226,9 +251,9 @@ public class Utils {
      * @param charIndex
      * @param relaxedUnicode '&#0x138;' is treated like '&#x138;'
      * @param unicode
-     * @return
+     * @return the index to continue scanning the source string -1 so normal loop incrementing skips the ';'
      */
-    private static int extractCharCode(String s, int charIndex, boolean relaxedUnicode, StringBuilder unicode) {
+    public static int extractCharCode(String s, int charIndex, boolean relaxedUnicode, StringBuilder unicode) {
         int len = s.length();
         CharSequence subSequence = s.subSequence(charIndex, Math.min(len,charIndex+15));
         Matcher matcher;

@@ -37,6 +37,10 @@
 
 package org.htmlcleaner;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 /**
  * Properties defining cleaner's behaviour
  *
@@ -52,6 +56,9 @@ public class CleanerProperties {
     public static final String BOOL_ATT_TRUE = "true";
 
     private ITagInfoProvider tagInfoProvider;
+    /**
+     * If this parameter is set to true, ampersand sign (&) that proceeds valid XML character sequences (&XXX;) will not be escaped with &amp;XXX; 
+     */
     private boolean advancedXmlEscape;
     private boolean useCdataForScriptAndStyle;
     private boolean translateSpecialEntities;
@@ -71,7 +78,24 @@ public class CleanerProperties {
     private boolean allowHtmlInsideAttributes;
     private boolean namespacesAware;
     private String hyphenReplacementInComment;
+    // comma separate list of tags pruned.
     private String pruneTags;
+    // comma separate list of tags allowed.
+    private String allowTags;
+    /**
+     * if true filter out attributes that start with "on" like "onclick", "onblur" or have a value that starts
+     * with "script:". 
+     * The "on*" attributes trigger browser behavior and can be used to run malicious javascript.
+     */
+    private boolean allowActiveAttributes;
+    /**
+     * blacklist of tags
+     */
+    private Set pruneTagSet = new HashSet();
+    /**
+     * the list of allowed tags (whitelist approach v. blacklist approach of pruneTags )
+     */
+    private Set allowTagSet = new HashSet();
     private String charset;
 
     public CleanerProperties() {
@@ -166,7 +190,7 @@ public class CleanerProperties {
     }
 
     public void setOmitXmlDeclaration(boolean omitXmlDeclaration) {
-        this.omitXmlDeclaration = omitXmlDeclaration?OptionalOutput.omit:OptionalOutput.always;
+        this.omitXmlDeclaration = omitXmlDeclaration?OptionalOutput.omit:OptionalOutput.alwaysOutput;
     }
 
     public boolean isOmitDoctypeDeclaration() {
@@ -174,7 +198,7 @@ public class CleanerProperties {
     }
 
     public void setOmitDoctypeDeclaration(boolean omitDoctypeDeclaration) {
-        this.omitDoctypeDeclaration = omitDoctypeDeclaration?OptionalOutput.omit:OptionalOutput.always;
+        this.omitDoctypeDeclaration = omitDoctypeDeclaration?OptionalOutput.omit:OptionalOutput.alwaysOutput;
     }
 
     public boolean isOmitHtmlEnvelope() {
@@ -182,7 +206,7 @@ public class CleanerProperties {
     }
 
     public void setOmitHtmlEnvelope(boolean omitHtmlEnvelope) {
-        this.omitHtmlEnvelope = omitHtmlEnvelope?OptionalOutput.omit:OptionalOutput.always;
+        this.omitHtmlEnvelope = omitHtmlEnvelope?OptionalOutput.omit:OptionalOutput.alwaysOutput;
     }
 
     public boolean isUseEmptyElementTags() {
@@ -239,6 +263,42 @@ public class CleanerProperties {
 
     public void setPruneTags(String pruneTags) {
         this.pruneTags = pruneTags;
+        this.setPruneTagSet(pruneTags);
+    }
+    
+    private void setPruneTagSet(String pruneTags) {
+        pruneTagSet.clear();
+        if (pruneTags != null) {
+            StringTokenizer tokenizer = new StringTokenizer(pruneTags, ",");
+            while ( tokenizer.hasMoreTokens() ) {
+                pruneTagSet.add( tokenizer.nextToken().trim().toLowerCase() );
+            }
+        }
+    }
+    public Set getPruneTagSet() {
+        return pruneTagSet;
+    }
+    
+    public String getAllowTags() {
+        return allowTags;
+    }
+
+    public void setAllowTags(String allowTags) {
+        this.allowTags = allowTags;
+        this.setAllowTagSet(allowTags);
+    }
+
+    private void setAllowTagSet(String allowTags) {
+        allowTagSet.clear();
+        if (allowTags != null) {
+            StringTokenizer tokenizer = new StringTokenizer(allowTags, ",");
+            while ( tokenizer.hasMoreTokens() ) {
+                allowTagSet.add( tokenizer.nextToken().trim().toLowerCase() );
+            }
+        }
+    }
+    public Set getAllowTagSet() {
+        return allowTagSet;
     }
 
     /**
@@ -268,6 +328,45 @@ public class CleanerProperties {
             this.booleanAttributeValues = BOOL_ATT_SELF;
         }
     }
+    /**
+     * @param allowActiveAttributes the allowActiveAttributes to set
+     */
+    public void setAllowActiveAttributes(boolean allowActiveAttributes) {
+        this.allowActiveAttributes = allowActiveAttributes;
+    }
+
+    /**
+     * @return the allowActiveAttributes
+     */
+    public boolean isAllowActiveAttributes() {
+        return allowActiveAttributes;
+    }
+
+    /**
+     * advancedXmlEscape = true;
+     * useCdataForScriptAndStyle = true;
+     * translateSpecialEntities = true;
+     * recognizeUnicodeChars = true; 
+     * omitUnknownTags = false; 
+     * treatUnknownTagsAsContent = false;
+     * omitDeprecatedTags = false;
+     * treatDeprecatedTagsAsContent = false; 
+     * omitComments = false;
+     * omitXmlDeclaration = OptionalOutput.alwaysOutput; 
+     * omitDoctypeDeclaration = OptionalOutput.alwaysOutput; 
+     * omitHtmlEnvelope = OptionalOutput.alwaysOutput;
+     * useEmptyElementTags = true; 
+     * allowMultiWordAttributes = true; 
+     * allowHtmlInsideAttributes = false; 
+     * ignoreQuestAndExclam = false; 
+     * namespacesAware = true; 
+     * hyphenReplacementInComment = "="; 
+     * pruneTags = null; 
+     * allowTags = null;
+     * booleanAttributeValues = BOOL_ATT_SELF; 
+     * charset = "UTF-8";
+     * allowActiveAttributes = true;
+     */
     public void reset() {
         advancedXmlEscape = true;
         useCdataForScriptAndStyle = true;
@@ -278,9 +377,9 @@ public class CleanerProperties {
         omitDeprecatedTags = false;
         treatDeprecatedTagsAsContent = false;
         omitComments = false;
-        omitXmlDeclaration = OptionalOutput.always;
-        omitDoctypeDeclaration = OptionalOutput.always;
-        omitHtmlEnvelope = OptionalOutput.always;
+        omitXmlDeclaration = OptionalOutput.alwaysOutput;
+        omitDoctypeDeclaration = OptionalOutput.alwaysOutput;
+        omitHtmlEnvelope = OptionalOutput.alwaysOutput;
         useEmptyElementTags = true;
         allowMultiWordAttributes = true;
         allowHtmlInsideAttributes = false;
@@ -288,7 +387,9 @@ public class CleanerProperties {
         namespacesAware = true;
         hyphenReplacementInComment = "=";
         pruneTags = null;
+        allowTags = null;
         booleanAttributeValues = BOOL_ATT_SELF;
         charset = "UTF-8";
+        allowActiveAttributes = true;
     }
 }

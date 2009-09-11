@@ -16,5 +16,5 @@ public enum OptionalOutput {
     /**
      * Always outputed, if information is not supplied in the source a default is created.
      */
-    always;
+    alwaysOutput;
 }

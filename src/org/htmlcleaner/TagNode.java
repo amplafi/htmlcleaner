@@ -54,6 +54,7 @@ import java.util.*;
  */
 public class TagNode extends TagToken {
 
+    
     /**
      * Used as base for different node checkers.
      */
@@ -142,9 +143,13 @@ public class TagNode extends TagToken {
     public TagNode(String name, HtmlCleaner cleaner) {
         super(name == null ? null : name.toLowerCase());
         this.cleaner = cleaner;
-        if (cleaner != null) {
+        if (cleaner != null  && name != null) {
             Set pruneTagSet = cleaner.getPruneTagSet();
-            if ( pruneTagSet != null && name != null && pruneTagSet.contains(name.toLowerCase()) ) {
+            if ( pruneTagSet != null && pruneTagSet.contains(name.toLowerCase()) ) {
+                cleaner.addPruneNode(this);
+            }
+            Set allowTagSet = cleaner.getAllowTagSet();
+            if ( allowTagSet != null && !allowTagSet.isEmpty() && !allowTagSet.contains(name.toLowerCase()) ) {
                 cleaner.addPruneNode(this);
             }
         }
@@ -166,7 +171,7 @@ public class TagNode extends TagToken {
 	}
 
     /**
-     * Checks existance of specified attribute.
+     * Checks existence of specified attribute.
      * @param attName
      */
     public boolean hasAttribute(String attName) {
@@ -180,11 +185,27 @@ public class TagNode extends TagToken {
      */
     @Override
     public void addAttribute(String attName, String attValue) {
-        if ( attName != null && !"".equals(attName.trim()) ) {
-            attributes.put( attName.toLowerCase(), attValue == null ? "" : attValue );
+        if ( attName != null ) {
+            String trim = attName.trim().toLowerCase();
+            String value = attValue == null?null:attValue.trim().replaceAll("\\p{Cntrl}", " ");
+            if ( !trim.isEmpty() && !isForbiddenAttribute(trim, value)) {
+                attributes.put(trim, attValue == null ? "" : attValue );
+            }
         }
     }
-
+    /**
+     * Returns true when attribute with given name shouldn't be dumped.
+     *
+     * @param attName
+     * @return
+     */
+    public boolean isForbiddenAttribute(String attName, String value) {
+        if (attName.startsWith("on") || attName.startsWith("on") || attName.startsWith("oN") || attName.startsWith("On")) {
+            return true;
+        } else {
+            return value.contains("script:") || value.contains("Script:");
+        }
+    }
     /**
      * Removes specified attribute from this tag.
      * @param attName
@@ -197,7 +218,7 @@ public class TagNode extends TagToken {
 
     /**
      * @return List of children objects. During the cleanup process there could be different kind of
-     * childern inside, however after clean there should be only TagNode instances.
+     * children inside, however after clean there should be only TagNode instances.
      */
     public List getChildren() {
 		return children;
@@ -357,15 +378,16 @@ public class TagNode extends TagToken {
     /**
      * @param condition
      * @param isRecursive
-     * @return The array of all subelemets that satisfy specified condition.
+     * @return The array of all subelements that satisfy specified condition.
      */
     private TagNode[] getElements(ITagNodeCondition condition, boolean isRecursive) {
         final List list = getElementList(condition, isRecursive);
-        TagNode array[] = new TagNode[ list == null ? 0 : list.size() ];
-        for (int i = 0; i < list.size(); i++) {
-            array[i] = (TagNode) list.get(i);
+        TagNode array[];
+        if ( list == null ) {
+            array = new TagNode[ 0 ];
+        } else {
+            array = (TagNode[]) list.toArray(new TagNode[ list.size() ]);
         }
-
         return array;
     }
 

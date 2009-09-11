@@ -51,19 +51,27 @@ public class SpecialEntities {
 
     public static final SpecialEntities INSTANCE = new SpecialEntities() {
         @Override
-        public Object put(SpecialEntity specialEntity) {
+        @SuppressWarnings("unused") 
+        public void put(SpecialEntity specialEntity) {
             throw new UnsupportedOperationException("cannot add to this instance");
         }
     };
 
+    /**
+     * key is the {@link SpecialEntity#getKey()} ( i.e. "quot" )
+     */
 	private Map entities = new HashMap();
-
+	/**
+	 * Key is the Integer returned by {@link SpecialEntity#intValue()}
+	 */
+	private Map entitiesByUnicodeCharcode = new HashMap();
+	
 	public SpecialEntities() {
 		_put(new SpecialEntity("nbsp",	160, null, true));
 		_put(new SpecialEntity("iexcl",	161, null, true));
-		_put(new SpecialEntity("curren",	164, null, true));
 		_put(new SpecialEntity("cent",	162, null, true));
 		_put(new SpecialEntity("pound",	163, null, true));
+		_put(new SpecialEntity("curren",	164, null, true));
 		_put(new SpecialEntity("yen",		165, null, true));
 		_put(new SpecialEntity("brvbar",	166, null, true));
 		_put(new SpecialEntity("sect",	167, null, true));
@@ -74,7 +82,6 @@ public class SpecialEntities {
 		_put(new SpecialEntity("not",		172, null, true));
 		_put(new SpecialEntity("shy",		173, null, true));
 		_put(new SpecialEntity("reg",		174, null, true));
-		_put(new SpecialEntity("trade",	8482, null, true));
 		_put(new SpecialEntity("macr",	175, null, true));
 		_put(new SpecialEntity("deg",		176, null, true));
 		_put(new SpecialEntity("plusmn",	177, null, true));
@@ -92,13 +99,11 @@ public class SpecialEntities {
 		_put(new SpecialEntity("frac12",	189, null, true));
 		_put(new SpecialEntity("frac34",	190, null, true));
 		_put(new SpecialEntity("iquest",	191, null, true));
-		_put(new SpecialEntity("times",	215, null, true));
-		_put(new SpecialEntity("divide",	247, null, true));
-
 		_put(new SpecialEntity("Agrave",	192, null, true));
 		_put(new SpecialEntity("Aacute",	193, null, true));
 		_put(new SpecialEntity("Acirc",	194, null, true));
 		_put(new SpecialEntity("Atilde",	195, null, true));
+
 		_put(new SpecialEntity("Auml",	196, null, true));
 		_put(new SpecialEntity("Aring",	197, null, true));
 		_put(new SpecialEntity("AElig",	198, null, true));
@@ -118,6 +123,7 @@ public class SpecialEntities {
 		_put(new SpecialEntity("Ocirc",	212, null, true));
 		_put(new SpecialEntity("Otilde",	213, null, true));
 		_put(new SpecialEntity("Ouml",	214, null, true));
+		_put(new SpecialEntity("times",	215, null, true));
 		_put(new SpecialEntity("Oslash",	216, null, true));
 		_put(new SpecialEntity("Ugrave",	217, null, true));
 		_put(new SpecialEntity("Uacute",	218, null, true));
@@ -149,6 +155,7 @@ public class SpecialEntities {
 		_put(new SpecialEntity("ocirc",	244, null, true));
 		_put(new SpecialEntity("otilde",	245, null, true));
 		_put(new SpecialEntity("ouml",	246, null, true));
+		_put(new SpecialEntity("divide",	247, null, true));
 		_put(new SpecialEntity("oslash",	248, null, true));
 		_put(new SpecialEntity("ugrave",	249, null, true));
 		_put(new SpecialEntity("uacute",	250, null, true));
@@ -187,12 +194,14 @@ public class SpecialEntities {
 		_put(new SpecialEntity("lsaquo",	8249, null, true));
 		_put(new SpecialEntity("rsaquo",	8250, null, true));
         _put(new SpecialEntity("euro",  8364, null, true));
+        _put(new SpecialEntity("trade",	8482, null, true));
 
-        _put(new SpecialEntity("amp",  '&', "&", false));
-        _put(new SpecialEntity("lt", '<', "<", false));
-        _put(new SpecialEntity("gt",  '>', ">", false));
-        _put(new SpecialEntity("quot",  '"', "\"", false));
-        _put(new SpecialEntity("apos",  '\'', "'", false));
+        _put(new SpecialEntity("amp",  '&', null, false));
+        _put(new SpecialEntity("lt", '<', null, false));
+        _put(new SpecialEntity("gt",  '>', null, false));
+        _put(new SpecialEntity("quot",  '"', null, false));
+        // this is xml only -- apos appearing in html needs to be converted to ' or maybe &#39; to be universally safe
+        _put(new SpecialEntity("apos",  '\'', "&#39;", false));
 }
 
 	/**
@@ -210,16 +219,20 @@ public class SpecialEntities {
         }
 	    return specialEntity;
 	}
+	
+	public SpecialEntity getSpecialEntityByUnicode(int unicodeCharcode) {
+	    return (SpecialEntity) this.entitiesByUnicodeCharcode.get(unicodeCharcode);
+	}
 
-	public Object put(SpecialEntity specialEntity) {
-	    return _put(specialEntity);
+	public void put(SpecialEntity specialEntity) {
+	    _put(specialEntity);
 	}
 
     /**
      * @param specialEntity
-     * @return
      */
-    private Object _put(SpecialEntity specialEntity) {
-        return entities.put(specialEntity.getKey(), specialEntity);
+    private void _put(SpecialEntity specialEntity) {
+        entities.put(specialEntity.getKey(), specialEntity);
+        entitiesByUnicodeCharcode.put(specialEntity.intValue(), specialEntity);
     }
 }
