@@ -411,9 +411,9 @@ public class SpecialEntities {
             _put(new SpecialEntity("sdot", 8901, null, true));
             //dot operator is NOT the same character as U+00B7 middle dot
             //8968    lceil   ⌈   left ceiling = apl upstile
-            _put(new SpecialEntity("hArr", 8660, null, true));
+            _put(new SpecialEntity("lceil", 8968, null, true));
             //8969    rceil   ⌉   right ceiling
-            _put(new SpecialEntity("hArr", 8660, null, true));
+            _put(new SpecialEntity("rceil", 8969, null, true));
             //8970    lfloor  ⌊   left floor = apl downstile
             _put(new SpecialEntity("lfloor", 8970, null, true));
             //8971    rfloor  ⌋   right floor
