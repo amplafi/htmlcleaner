@@ -106,7 +106,7 @@ public abstract class XmlSerializer {
         return writer.getBuffer().toString();
     }
 
-    public String getXmlAsString(TagNode tagNode) throws IOException {
+    public String getXmlAsString(TagNode tagNode) {
         return getXmlAsString(tagNode, props.getCharset());
     }
 

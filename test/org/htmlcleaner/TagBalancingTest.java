@@ -27,6 +27,10 @@ public class TagBalancingTest extends TestCase {
                 "<html><head /><body><u>a<big>a<i>a<b>at<sup /></b></i></big></u><big><i><b><sup>fi</sup>" +
                         "</b></i></big><i><b><sup>rst</sup></b><sup>text</sup></i></body></html>"
         );
+        assertHtml(
+            "<u><big><i>a",
+            "<html><head /><body><u><big><i>a</i></big></u></body></html>"
+        );
         assertHtml(new File("test/org/htmlcleaner/files/test3.html"), "/head/noscript/meta/@http-equiv", "Refresh");
         assertHtml(new File("test/org/htmlcleaner/files/test3.html"), "count(/head/*)", "24");
         assertHtml(new File("test/org/htmlcleaner/files/test3.html"), "/head/meta[1]/@name", "verify-v1");
