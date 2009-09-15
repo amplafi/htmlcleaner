@@ -246,17 +246,7 @@ public class CommandLine {
                 transInfos.put(key, value);
             }
         }
-        if (transInfos != null) {
-            CleanerTransformations transformations = new CleanerTransformations();
-            Iterator iterator = transInfos.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry entry = (Map.Entry) iterator.next();
-                String tag = (String) entry.getKey();
-                String value = (String) entry.getValue();
-                Utils.updateTagTransformations(transformations, tag, value);
-            }
-            cleaner.setTransformations(transformations);
-        }
+        cleaner.initCleanerTransformations(transInfos);
 
         long start = System.currentTimeMillis();
 

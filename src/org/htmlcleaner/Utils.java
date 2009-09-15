@@ -52,9 +52,6 @@ import java.util.regex.Pattern;
  */
 public class Utils {
 
-    public static String VAR_START = "${";
-    public static String VAR_END = "}";
-
     /**
      * Trims specified string from left.
      * @param s
@@ -325,43 +322,6 @@ public class Utils {
         return o == null || "".equals(o.toString().trim());
     }
 
-    /**
-     * Evaluates string template for specified map of variables. Template string can contain
-     * dynamic parts in the form of ${VARNAME}. Each such part is replaced with value of the
-     * variable if such exists in the map, or with empty string otherwise.
-     *
-     * @param template Template string
-     * @param variables Map of variables (can be null)
-     * @return Evaluated string
-     */
-    public static String evaluateTemplate(String template, Map variables) {
-        if (template == null) {
-            return template;
-        }
-
-        StringBuffer result = new StringBuffer();
-
-        int startIndex = template.indexOf(VAR_START);
-        int endIndex = -1;
-
-        while (startIndex >= 0 && startIndex < template.length()) {
-        	result.append( template.substring(endIndex + 1, startIndex) );
-        	endIndex = template.indexOf(VAR_END, startIndex);
-
-        	if (endIndex > startIndex) {
-        		String varName = template.substring(startIndex + VAR_START.length(), endIndex);
-                Object resultObj = variables != null ? variables.get(varName.toLowerCase()) : "";
-                result.append( resultObj == null ? "" : resultObj.toString() );
-        	}
-
-        	startIndex = template.indexOf( VAR_START, Math.max(endIndex + VAR_END.length(), startIndex + 1) );
-        }
-
-        result.append( template.substring(endIndex + 1) );
-
-        return result.toString();
-    }
-
     public static String[] tokenize(String s, String delimiters) {
         if (s == null) {
             return new String[] {};
@@ -375,36 +335,6 @@ public class Utils {
         }
 
         return result;
-    }
-
-    public static void updateTagTransformations(CleanerTransformations transformations, String key, String value) {
-        int index = key.indexOf('.');
-
-        // new tag transformation case (tagname[=destname[,preserveatts]])
-        if (index <= 0) {
-            String destTag = null;
-            boolean preserveSourceAtts = true;
-            if (value != null) {
-                String[] tokens = tokenize(value, ",;");
-                if (tokens.length > 0) {
-                    destTag = tokens[0];
-                }
-                if (tokens.length > 1) {
-                    preserveSourceAtts = "true".equalsIgnoreCase(tokens[1]) ||
-                                         "yes".equalsIgnoreCase(tokens[1]) ||
-                                         "1".equals(tokens[1]);
-                }
-            }
-            TagTransformation newTagTrans = new TagTransformation(key, destTag, preserveSourceAtts);
-            transformations.addTransformation(newTagTrans);
-        } else {    // attribute transformation description
-            String[] parts = tokenize(key, ".");
-            String tagName = parts[0];
-            TagTransformation trans = transformations.getTransformation(tagName);
-            if (trans != null) {
-                trans.addAttributeTransformation(parts[1], value);
-            }
-        }
     }
 
 }

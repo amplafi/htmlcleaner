@@ -82,12 +82,7 @@ public class CleanerProperties {
     private String pruneTags;
     // comma separate list of tags allowed.
     private String allowTags;
-    /**
-     * if true filter out attributes that start with "on" like "onclick", "onblur" or have a value that starts
-     * with "script:". 
-     * The "on*" attributes trigger browser behavior and can be used to run malicious javascript.
-     */
-    private boolean allowActiveAttributes;
+    private CleanerTransformations cleanerTransformations = new CleanerTransformations();
     /**
      * blacklist of tags
      */
@@ -193,8 +188,12 @@ public class CleanerProperties {
         this.omitXmlDeclaration = omitXmlDeclaration?OptionalOutput.omit:OptionalOutput.alwaysOutput;
     }
 
+    /**
+     * 
+     * @return also return true if omitting the Html Envelope
+     */
     public boolean isOmitDoctypeDeclaration() {
-        return omitDoctypeDeclaration == OptionalOutput.omit;
+        return omitDoctypeDeclaration == OptionalOutput.omit || isOmitHtmlEnvelope();
     }
 
     public void setOmitDoctypeDeclaration(boolean omitDoctypeDeclaration) {
@@ -268,12 +267,7 @@ public class CleanerProperties {
     
     private void setPruneTagSet(String pruneTags) {
         pruneTagSet.clear();
-        if (pruneTags != null) {
-            StringTokenizer tokenizer = new StringTokenizer(pruneTags, ",");
-            while ( tokenizer.hasMoreTokens() ) {
-                pruneTagSet.add( tokenizer.nextToken().trim().toLowerCase() );
-            }
-        }
+        addTagNameConditions(pruneTagSet, pruneTags);
     }
     public Set getPruneTagSet() {
         return pruneTagSet;
@@ -290,10 +284,18 @@ public class CleanerProperties {
 
     private void setAllowTagSet(String allowTags) {
         allowTagSet.clear();
-        if (allowTags != null) {
-            StringTokenizer tokenizer = new StringTokenizer(allowTags, ",");
+        addTagNameConditions(allowTagSet, allowTags);
+    }
+
+    /**
+     * @param tagSet 
+     * @param tagsNameStr
+     */
+    private void addTagNameConditions(Set tagSet, String tagsNameStr) {
+        if (tagsNameStr != null) {
+            StringTokenizer tokenizer = new StringTokenizer(tagsNameStr, ",");
             while ( tokenizer.hasMoreTokens() ) {
-                allowTagSet.add( tokenizer.nextToken().trim().toLowerCase() );
+                tagSet.add( new TagNode.TagNodeNameCondition(tokenizer.nextToken().trim().toLowerCase()) );
             }
         }
     }
@@ -328,19 +330,6 @@ public class CleanerProperties {
             this.booleanAttributeValues = BOOL_ATT_SELF;
         }
     }
-    /**
-     * @param allowActiveAttributes the allowActiveAttributes to set
-     */
-    public void setAllowActiveAttributes(boolean allowActiveAttributes) {
-        this.allowActiveAttributes = allowActiveAttributes;
-    }
-
-    /**
-     * @return the allowActiveAttributes
-     */
-    public boolean isAllowActiveAttributes() {
-        return allowActiveAttributes;
-    }
 
     /**
      * advancedXmlEscape = true;
@@ -365,7 +354,6 @@ public class CleanerProperties {
      * allowTags = null;
      * booleanAttributeValues = BOOL_ATT_SELF; 
      * charset = "UTF-8";
-     * allowActiveAttributes = true;
      */
     public void reset() {
         advancedXmlEscape = true;
@@ -386,10 +374,24 @@ public class CleanerProperties {
         ignoreQuestAndExclam = false;
         namespacesAware = true;
         hyphenReplacementInComment = "=";
-        pruneTags = null;
-        allowTags = null;
+        setPruneTags(null);
+        setAllowTags(null);
         booleanAttributeValues = BOOL_ATT_SELF;
         charset = "UTF-8";
-        allowActiveAttributes = true;
+        cleanerTransformations.clear();
+    }
+
+    /**
+     * @return the cleanerTransformations
+     */
+    public CleanerTransformations getCleanerTransformations() {
+        return cleanerTransformations;
+    }
+    public void setCleanerTransformations(CleanerTransformations cleanerTransformations) {
+        if ( cleanerTransformations == null ) {
+            this.cleanerTransformations.clear();
+        } else {
+            this.cleanerTransformations = cleanerTransformations;
+        }
     }
 }

@@ -89,16 +89,20 @@ public abstract class XmlSerializer {
         writeXmlToFile(tagNode,fileName, props.getCharset());
     }
 
-    public String getXmlAsString(CleanerProperties cleanerProperties, String htmlContent, String charset) throws IOException {
+    public String getXmlAsString(CleanerProperties cleanerProperties, String htmlContent, String charset) {
         this.props = cleanerProperties;
         HtmlCleaner htmlCleaner = new HtmlCleaner(cleanerProperties);
         TagNode tagNode= htmlCleaner.clean(htmlContent);
         return getXmlAsString(tagNode, charset==null||charset.length()==0?props.getCharset():charset);
     }
 
-    public String getXmlAsString(TagNode tagNode, String charset) throws IOException {
+    public String getXmlAsString(TagNode tagNode, String charset) {
         StringWriter writer = new StringWriter();
-        writeXml(tagNode, writer, charset);
+        try {
+            writeXml(tagNode, writer, charset);
+        } catch (IOException e) {
+            throw new HtmlCleanerException(e);
+        }
         return writer.getBuffer().toString();
     }
 
@@ -158,52 +162,57 @@ public abstract class XmlSerializer {
 
     protected void serializeOpenTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
         String tagName = tagNode.getName();
-        Map tagAtttributes = tagNode.getAttributes();
-
-        writer.write("<" + tagName);
-        Iterator it = tagAtttributes.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
-            String attName = (String) entry.getKey();
-            String attValue = (String) entry.getValue();
-
-            if ( !props.isNamespacesAware() && ("xmlns".equals(attName) || attName.startsWith("xmlns:")) ) {
-            	continue;
+        // null tagName when rootNode is a dummy node.
+        // this happens when omitting the html envelope elements ( <html>, <head>, <body> elements )         
+        if ( tagName != null ) {
+            Map tagAtttributes = tagNode.getAttributes();
+    
+            writer.write("<" + tagName);
+            Iterator it = tagAtttributes.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry entry = (Map.Entry) it.next();
+                String attName = (String) entry.getKey();
+                String attValue = (String) entry.getValue();
+    
+                if ( !props.isNamespacesAware() && ("xmlns".equals(attName) || attName.startsWith("xmlns:")) ) {
+                	continue;
+                }
+    
+                writer.write(" " + attName + "=\"" + escapeXml(attValue) + "\"");
             }
-
-            writer.write(" " + attName + "=\"" + escapeXml(attValue) + "\"");
-        }
-
-        if ( isMinimizedTagSyntax(tagNode) ) {
-        	writer.write(" />");
-        	if (newLine) {
-        		writer.write("\n");
-        	}
-        } else if (dontEscape(tagNode)) {
-        	writer.write("><![CDATA[");
-        } else {
-        	writer.write(">");
+    
+            if ( isMinimizedTagSyntax(tagNode) ) {
+            	writer.write(" />");
+            	if (newLine) {
+            		writer.write("\n");
+            	}
+            } else if (dontEscape(tagNode)) {
+            	writer.write("><![CDATA[");
+            } else {
+            	writer.write(">");
+            }
         }
     }
-
     protected void serializeOpenTag(TagNode tagNode, Writer writer) throws IOException {
     	serializeOpenTag(tagNode, writer, true);
     }
 
     protected void serializeEndTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
     	String tagName = tagNode.getName();
-
-    	if (dontEscape(tagNode)) {
-    		writer.write("]]>");
-    	}
-
-    	writer.write( "</" + tagName + ">" );
-
-        if (newLine) {
-    		writer.write("\n");
+    	// null tagName when rootNode is a dummy node.
+    	// this happens when omitting the html envelope elements ( <html>, <head>, <body> elements ) 
+    	if ( tagName != null) {
+        	if (dontEscape(tagNode)) {
+        		writer.write("]]>");
+        	}
+    
+        	writer.write( "</" + tagName + ">" );
+    
+            if (newLine) {
+        		writer.write("\n");
+        	}
     	}
     }
-
     protected void serializeEndTag(TagNode tagNode, Writer writer) throws IOException {
     	serializeEndTag(tagNode, writer, true);
     }

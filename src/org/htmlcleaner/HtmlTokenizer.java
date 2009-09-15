@@ -58,27 +58,27 @@ public class HtmlTokenizer {
     private BufferedReader _reader;
     private char[] _working = new char[WORKING_BUFFER_SIZE];
 
-    private transient int _pos = 0;
+    private transient int _pos;
     private transient int _len = -1;
 
     private transient StringBuffer _saved = new StringBuffer(512);
 
-    private transient boolean _isLateForDoctype = false;
-    private transient DoctypeToken _docType = null;
-    private transient TagToken _currentTagToken = null;
+    private transient boolean _isLateForDoctype;
+    private transient DoctypeToken _docType;
+    private transient TagToken _currentTagToken;
     private transient List _tokenList = new ArrayList();
     private transient Set _namespacePrefixes = new HashSet();
 
     private boolean _asExpected = true;
 
-    private boolean _isScriptContext = false;
+    private boolean _isScriptContext;
 
     private HtmlCleaner cleaner;
     private CleanerProperties props;
     private CleanerTransformations transformations;
 
     /**
-     * Constructor - cretes instance of the parser with specified content.
+     * Constructor - creates instance of the parser with specified content.
      * @param cleaner
      * @param reader
      */
@@ -408,15 +408,8 @@ public class HtmlTokenizer {
             return;
         }
 
-        String tagName = identifier();
-
-        TagTransformation tagTransformation = null;
-        if (transformations != null && transformations.hasTransformationForTag(tagName)) {
-            tagTransformation = transformations.getTransformation(tagName);
-            if (tagTransformation != null) {
-                tagName = tagTransformation.getDestTag();
-            }
-        }
+        String originalTagName = identifier();
+        String tagName = transformations.getTagName(originalTagName);
 
         if (tagName != null) {
             ITagInfoProvider tagInfoProvider = cleaner.getTagInfoProvider();
@@ -428,7 +421,7 @@ public class HtmlTokenizer {
             }
         }
 
-        TagNode tagNode = new TagNode(tagName, cleaner);
+        TagNode tagNode = new TagNode(tagName);
         _currentTagToken = tagNode;
 
         if (_asExpected) {
@@ -436,8 +429,8 @@ public class HtmlTokenizer {
             tagAttributes();
 
             if (tagName != null) {
-                if (tagTransformation != null) {
-                    tagNode.transformAttributes(tagTransformation);
+                if (transformations != null) {
+                    tagNode.setAttributes(transformations.transformAttributes(originalTagName, tagNode.getAttributes()));
                 }
                 addToken(_currentTagToken);
             }

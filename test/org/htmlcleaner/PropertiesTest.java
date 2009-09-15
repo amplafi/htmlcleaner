@@ -147,10 +147,14 @@ public class PropertiesTest extends TestCase {
         assertTrue( getXmlString(true).indexOf("<div") < 0 );
         assertTrue( getXmlString(true).indexOf("<mytag") < 0 );
         properties.setPruneTags("");
-        assertTrue( getXmlString(true).indexOf("<div") >= 0 );
-        assertTrue( getXmlString(true).indexOf("<mytag") >= 0 );
+        properties.setAllowTags("html,body,div");
+        xmlString = getXmlString(true);
+        assertTrue( xmlString.indexOf("<div") >= 0 );
+        assertTrue( getXmlString(true).indexOf("<mytag") < 0 );
 
-        assertTrue( getXmlString(true).indexOf("<input checked=\"checked\" />") >= 0 );
+        properties.reset();
+        xmlString = getXmlString(true);
+        assertTrue( xmlString.indexOf("<input checked=\"checked\" />") >= 0 );
         properties.setBooleanAttributeValues("empty");
         assertTrue( getXmlString(true).indexOf("<input checked=\"\" />") >= 0 );
         properties.setBooleanAttributeValues("true");
