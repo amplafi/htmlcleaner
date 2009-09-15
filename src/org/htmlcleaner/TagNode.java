@@ -153,7 +153,7 @@ public class TagNode extends TagToken {
     private transient boolean isFormed;
     
     /**
-     * Used to indicate a start tag that was auto generated because {@link TagInfo#isContinueAfter(closedTag.getName())} returned true
+     * Used to indicate a start tag that was auto generated because {@link TagInfo#isContinueAfter(String)}(closedTag.getName()) returned true
      * For example, 
      * <pre>
      * <b><i>foo</b>bar
@@ -191,6 +191,7 @@ public class TagNode extends TagToken {
     /**
      * Checks existence of specified attribute.
      * @param attName
+     * @return true if TagNode has attribute
      */
     public boolean hasAttribute(String attName) {
         return attName != null ? attributes.containsKey(attName.toLowerCase()) : false;
@@ -463,7 +464,7 @@ public class TagNode extends TagToken {
      * </ul>
      * </code>
      * @param xPathExpression
-     * @return
+     * @return result of XPather evaluation.
      * @throws XPatherException
      */
     public Object[] evaluateXPath(String xPathExpression) throws XPatherException {

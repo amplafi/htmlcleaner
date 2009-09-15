@@ -43,8 +43,7 @@ import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.Iterator;
+import java.util.TreeMap; 
 
 /**
  * <p>Command line usage class.</p>
