@@ -82,6 +82,16 @@ public class CleanerProperties {
     private String pruneTags;
     // comma separate list of tags allowed.
     private String allowTags;
+    /**
+     * if true then, remove html elements that have no meaningful effect:
+     * <ul>
+     * <li>empty (or encapsulates only blanks ) span, b, u, i, strong, etc. elements that are used to format text. If an element has an id or class it is not el</li>
+     * <li>br elements just before a block closing ( &lt;/div> for example ), or just after a block opening element ( &lt;body> as another example )</l>
+     *  </ul>
+     *  
+     *  TODO: Konstantin -- use TagTransformation ( you will have to do some refactoring )  
+     */
+    private CollapseHtml collapseNullHtml;
     private CleanerTransformations cleanerTransformations = new CleanerTransformations();
     /**
      * blacklist of tags
@@ -128,6 +138,10 @@ public class CleanerProperties {
         return translateSpecialEntities;
     }
 
+    /**
+     * TODO : use {@link OptionalOutput}
+     * @param translateSpecialEntities
+     */
     public void setTranslateSpecialEntities(boolean translateSpecialEntities) {
         this.translateSpecialEntities = translateSpecialEntities;
     }
