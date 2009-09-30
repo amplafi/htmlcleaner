@@ -1,5 +1,8 @@
 package org.htmlcleaner;
 
+/**
+ * COMMENTS!
+ */
 public class TagNodeInsignificantBrCondition implements ITagNodeCondition {
 
 	@Override

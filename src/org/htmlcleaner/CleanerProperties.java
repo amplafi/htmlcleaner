@@ -336,7 +336,7 @@ public class CleanerProperties {
         switch(this.collapseNullHtml) {
         case none:
             break;
-        case emptyOrBlanks:
+        case emptyOrBlankInlineElements:
             tagSet.add(new TagNodeEmptyContentCondition(this.tagInfoProvider));
             tagSet.add(new TagNodeInsignificantBrCondition());
         }

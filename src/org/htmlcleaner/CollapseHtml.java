@@ -17,7 +17,8 @@ public enum CollapseHtml {
      * remove text formatting elements with no non-blank content.
      * text formatting elements are:
      * 
-     *  KOSTYA - this list should be defined by {@link TagInfo} in some manner
+     *  KOSTYA - 'inline' elements are indicated by {@link TagInfo} in some manner ( may need to be added -- but check to see if there isn't already such a flag on TagInfo ) 
+     *  
      */
-    emptyOrBlanks;
+    emptyOrBlankInlineElements;
 }

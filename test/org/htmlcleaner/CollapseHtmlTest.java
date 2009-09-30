@@ -29,13 +29,13 @@ public class CollapseHtmlTest extends TestCase {
     }
 
     public void testCollapseSingleEmptyTag() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlanks);
+        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<u></u>");
         assertEquals("", serializer.getXmlAsString(collapsed));
     }
 
     public void testCollapseSingleTagWithBlanks() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlanks);
+        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<u>   </u>");
         assertEquals("", serializer.getXmlAsString(collapsed));
     }
@@ -44,13 +44,13 @@ public class CollapseHtmlTest extends TestCase {
      * make sure that non-breaking spaces are also collapsed away.
      */
     public void testCollapseSingleTagWithNbsp() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlanks);
+        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<u> &nbsp; </u>");
         assertEquals("", serializer.getXmlAsString(collapsed));
     }
 
     public void testCollapseMultipleEmptyTags() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlanks);
+        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<b><i><u></u></i></b>");
         assertEquals("", serializer.getXmlAsString(collapsed));
         
@@ -60,7 +60,7 @@ public class CollapseHtmlTest extends TestCase {
     }
 
     public void testCollapseInsignificantBr() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlanks);
+        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<p><br/>Some text</p>");
         assertEquals("<p>Some text</p>", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean("<p>Some text<BR/></p>");
@@ -72,22 +72,22 @@ public class CollapseHtmlTest extends TestCase {
     }
 
     public void testChainCollapseInsignificantBrs() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlanks);
+        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<p><br/><br>Some<br>text<br/><br><br></p>");
         assertEquals("<p>Some<br>text</p>", serializer.getXmlAsString(collapsed));
     }
 
     /**
      * make sure block elements are not collapsed even if empty if
-     * {@link CollapseHtml#emptyOrBlanks}
+     * {@link CollapseHtml#emptyOrBlankInlineElements}
      */
     public void testCollapseOnlyFormattingElements() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlanks);
+        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<p></p><table><tr></tr><tr><td></td></tr></table>");
         assertEquals("<p></p><table><tr></tr><tr><td></td></tr></table>", serializer.getXmlAsString(collapsed));
     }
     public void testCollapseOnlyFormattingElementsWithNoIds() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlanks);
+        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<b id=\"notme\"></b><span></span><span id=\"norme\"></span>");
         assertEquals("<b id=\"notme\"></b><span id=\"norme\"></span>", serializer.getXmlAsString(collapsed));
     }
