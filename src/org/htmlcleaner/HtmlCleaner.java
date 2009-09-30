@@ -57,7 +57,7 @@ import java.util.*;
  *   // take default cleaner properties
  *   CleanerProperties props = cleaner.getProperties();
  *
- *   // customize cleaner's behaviour with property setters
+ *   // customize cleaner's behavior with property setters
  *   props.setXXX(...);
  *
  *   // Clean HTML taken from simple string, file, URL, input stream,
@@ -236,7 +236,10 @@ public class HtmlCleaner {
     private Set<ITagNodeCondition> pruneTagSet;
 
     private Set<ITagNodeCondition> allowTagSet;
-
+    
+    
+	private Collection<ITagNodeCondition> collapseConditions;
+ 
     /**
      * Constructor - creates cleaner instance with default tag info provider and default properties.
      */
@@ -269,7 +272,11 @@ public class HtmlCleaner {
         this.tagInfoProvider = tagInfoProvider == null ? DefaultTagProvider.getInstance() : tagInfoProvider;
         this.properties = properties == null ? new CleanerProperties() : properties;
         this.properties.setTagInfoProvider(this.tagInfoProvider);
-    }
+		this.collapseConditions = Collections
+				.unmodifiableCollection(Arrays.<ITagNodeCondition> asList(
+						new TagNodeEmptyContentCondition(this.tagInfoProvider),
+						new TagNodeInsignificantBrCondition()));
+	}
 
     public TagNode clean(String htmlContent) {
         try {
@@ -338,9 +345,16 @@ public class HtmlCleaner {
 
         List nodeList = htmlTokenizer.getTokenList();
         closeAll(nodeList);
+        
+        // Some transitions on resulting html require us to have the tag tree structure.
+        // i.e. if we want to clear insignificant <br> tags. Thus this place is best for
+        // marking nodes to be pruned.
+        markNodesToPrune(nodeList);
+        
         createDocumentNodes(nodeList);
 
         calculateRootNode( htmlTokenizer.getNamespacePrefixes() );
+
 
         // if there are some nodes to prune from tree
         if ( pruneNodeSet != null && !pruneNodeSet.isEmpty() ) {
@@ -358,6 +372,19 @@ public class HtmlCleaner {
 
         return rootNode;
     }
+
+	private void markNodesToPrune(List nodeList) {
+		for (Iterator iterator = nodeList.iterator(); iterator.hasNext();) {
+			Object next = iterator.next();
+			if(!(next instanceof TagNode)){
+				continue;
+			}
+			TagNode node = (TagNode) next;
+			if(!addIfNeededToPruneSet(node)&&node.getChildren()!=null){
+				markNodesToPrune(node.getChildren());
+			}
+		}
+	}
 
     /**
      * Assigns root node to internal variable and adds neccessery xmlns
@@ -538,11 +565,6 @@ public class HtmlCleaner {
                         nodeIterator.set(null);
                         for (int i = closed.size() - 1; i >= 0; i--) {
                             TagNode closedTag = (TagNode) closed.get(i);
-
-                            // now that we are closing the tag lets see if it should be pruned.
-                            // Allows rules like: prune if tag is empty, prune based on attributes, 
-                            // for example, prune all empty span tags unless the span tag has an id attribute.
-                            addIfNeededToPruneSet(closedTag);
                             
                             if ( i > 0 && tag != null && tag.isContinueAfter(closedTag.getName()) ) {
                                 // even if pruned still want to allow a continuation.
@@ -822,6 +844,14 @@ public class HtmlCleaner {
                     return true;
                 }
             }
+        }
+        if(CollapseHtml.emptyOrBlanks.equals(properties.getCollapseNullHtml())){
+        	for (ITagNodeCondition condition : collapseConditions) {
+        		if(condition.satisfy(tagNode)){
+        			addPruneNode(tagNode);
+        			return true;
+        		}
+        	}
         }
         if ( allowTagSet != null && !allowTagSet.isEmpty() ) {
             for(ITagNodeCondition condition: allowTagSet) {

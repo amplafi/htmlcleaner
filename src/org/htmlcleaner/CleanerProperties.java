@@ -375,6 +375,7 @@ public class CleanerProperties {
      * pruneTags = null; 
      * allowTags = null;
      * booleanAttributeValues = BOOL_ATT_SELF; 
+     * collapseNullHtml = CollapseHtml.none
      * charset = "UTF-8";
      */
     public void reset() {
@@ -401,6 +402,7 @@ public class CleanerProperties {
         booleanAttributeValues = BOOL_ATT_SELF;
         charset = "UTF-8";
         cleanerTransformations.clear();
+        collapseNullHtml = CollapseHtml.none;
     }
 
     /**
