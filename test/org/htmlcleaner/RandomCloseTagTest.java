@@ -2,6 +2,9 @@ package org.htmlcleaner;
 
 import junit.framework.TestCase;
 
+/**
+ * COMMENTS???
+ */
 public class RandomCloseTagTest extends TestCase {
 	
 	public void testRandomCloseTagsRemoved(){
