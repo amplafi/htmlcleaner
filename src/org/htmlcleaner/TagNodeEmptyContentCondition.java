@@ -20,7 +20,7 @@ public class TagNodeEmptyContentCondition implements ITagNodeCondition{
 		if(tagInfo.isEmptyTag()){
 			return false;
 		}
-		return tagNode.getText().toString().trim().length() == 0;
+		return tagNode.getText().toString().trim().isEmpty();
 	}
 	
 }
