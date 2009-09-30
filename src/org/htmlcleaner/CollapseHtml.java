@@ -16,6 +16,5 @@ public enum CollapseHtml {
     /**
      * remove text formatting elements before 
      */
-    emptyOrBlanks,
-    ignoreIdsAndClass;
+    emptyOrBlanks;
 }

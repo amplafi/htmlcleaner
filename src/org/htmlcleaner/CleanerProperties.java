@@ -92,7 +92,7 @@ public class CleanerProperties {
      *  TODO: Konstantin -- use TagTransformation ( you will have to do some refactoring )  
      */
     private CollapseHtml collapseNullHtml;
-    private CleanerTransformations cleanerTransformations = new CleanerTransformations();
+	private CleanerTransformations cleanerTransformations = new CleanerTransformations();
     /**
      * blacklist of tags
      */
@@ -124,6 +124,14 @@ public class CleanerProperties {
 
     public void setAdvancedXmlEscape(boolean advancedXmlEscape) {
         this.advancedXmlEscape = advancedXmlEscape;
+    }
+
+    public CollapseHtml getCollapseNullHtml() {
+    	return collapseNullHtml;
+    }
+    
+    public void setCollapseNullHtml(CollapseHtml collapseNullHtml) {
+    	this.collapseNullHtml = collapseNullHtml;
     }
 
     public boolean isUseCdataForScriptAndStyle() {
