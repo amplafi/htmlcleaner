@@ -17,7 +17,7 @@ public enum CollapseHtml {
      * remove text formatting elements with no non-blank content.
      * text formatting elements are:
      * 
-     *  KOSTYA - this list should be defined by {@link ITagInfoProvider} in some manner
+     *  KOSTYA - this list should be defined by {@link TagInfo} in some manner
      */
     emptyOrBlanks;
 }
