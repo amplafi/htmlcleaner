@@ -18,7 +18,7 @@ public class TransformationTest extends TestCase {
         cleaner = new HtmlCleaner();
     }
 
-    public void test1() throws IOException {
+    public void test1() {
         CleanerTransformations transformations = new CleanerTransformations();
         TagTransformation tagTransformation = new TagTransformation("strong", "span", false);
         tagTransformation.addAttributeTransformation("style", "font-weight:bold");

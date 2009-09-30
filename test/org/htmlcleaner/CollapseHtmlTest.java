@@ -73,6 +73,25 @@ public class CollapseHtmlTest extends TestCase {
         collapsed = cleaner.clean("<p><br/><br/>Some text <i>look here</i></p>");
         assertEquals("<p>Some text <i>look here</i></p>", serializer.getXmlAsString(collapsed));
     }
+    
+    /**
+     * make sure TagTransformations do not interfere with collapse
+     */
+    public void testCollapseEmptyWithTagTransformations() {
+        CleanerProperties props = cleaner.getProperties();
+
+        CleanerTransformations transformations = props.getCleanerTransformations();
+        TagTransformation t = new TagTransformation("font", "span", true);
+        t.addAttributeTransformation("style", "${style};font-family:${face};font-size:${size};color:${color};");
+        t.addAttributeTransformation("face");
+        t.addAttributeTransformation("size");
+        t.addAttributeTransformation("color");
+        t.addAttributeTransformation("name", "${face}_1");
+        transformations.addTransformation(t);
+        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
+        TagNode collapsed = cleaner.clean("<b><font face=\"Ariel\"><u></u></font></b>");
+        assertEquals("", serializer.getXmlAsString(collapsed));
+    }
 
     /**
      * test to make sure that multiple <br> elements are eliminated
@@ -92,7 +111,12 @@ public class CollapseHtmlTest extends TestCase {
         assertEquals("<p>Some text</p>", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean("<p>Some text<br><span></span><BR/><u><big></big></u><BR/></p>");
         assertEquals("<p>Some text</p>", serializer.getXmlAsString(collapsed));
-        collapsed = cleaner.clean("<p><u><br/></u>Some text<br><span></span><BR/><u><big></big></u><BR/></p>");
+    }
+    /**
+     * Br nested in formating elements should be eliminated.
+     */
+    public void testInsureMeaninglessBrsStillCollapseEmptyElements() {
+        TagNode collapsed = cleaner.clean("<p><u><br/></u>Some text<br><span><BR/><u><big><BR/></big></u></p></span>");
         assertEquals("<p>Some text</p>", serializer.getXmlAsString(collapsed));
     }
 
