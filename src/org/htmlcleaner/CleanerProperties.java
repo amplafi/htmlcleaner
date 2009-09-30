@@ -106,6 +106,14 @@ public class CleanerProperties {
     public CleanerProperties() {
         reset();
     }
+    
+    /**
+     * @param tagInfoProvider
+     */
+    public CleanerProperties(ITagInfoProvider tagInfoProvider) {
+        reset();
+        this.tagInfoProvider = tagInfoProvider;
+    }
 
     /**
      * @param tagInfoProvider the tagInfoProvider to set
@@ -292,7 +300,9 @@ public class CleanerProperties {
         addTagNameConditions(pruneTagSet, pruneTags);
     }
     public Set getPruneTagSet() {
-        return pruneTagSet;
+        Set copy = new HashSet(pruneTagSet);
+        addCollapseConditions(copy);
+        return copy;
     }
     
     public String getAllowTags() {
@@ -319,6 +329,16 @@ public class CleanerProperties {
             while ( tokenizer.hasMoreTokens() ) {
                 tagSet.add( new TagNode.TagNodeNameCondition(tokenizer.nextToken().trim().toLowerCase()) );
             }
+        }
+    }
+    
+    private void addCollapseConditions(Set tagSet) {
+        switch(this.collapseNullHtml) {
+        case none:
+            break;
+        case emptyOrBlanks:
+            tagSet.add(new TagNodeEmptyContentCondition(this.tagInfoProvider));
+            tagSet.add(new TagNodeInsignificantBrCondition());
         }
     }
     public Set getAllowTagSet() {
@@ -403,6 +423,7 @@ public class CleanerProperties {
         charset = "UTF-8";
         cleanerTransformations.clear();
         collapseNullHtml = CollapseHtml.none;
+        tagInfoProvider = DefaultTagProvider.getInstance();
     }
 
     /**

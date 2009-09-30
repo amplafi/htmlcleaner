@@ -101,7 +101,7 @@ public class HtmlCleaner {
 		TagPos(int position, String name) {
 			this.position = position;
 			this.name = name;
-            this.info = tagInfoProvider.getTagInfo(name);
+            this.info = getTagInfoProvider().getTagInfo(name);
         }
 	}
 
@@ -149,7 +149,7 @@ public class HtmlCleaner {
             if (tagName != null) {
                 ListIterator it = list.listIterator(list.size());
                 String fatalTag = null;
-                TagInfo fatalInfo = tagInfoProvider.getTagInfo(tagName);
+                TagInfo fatalInfo = getTagInfoProvider().getTagInfo(tagName);
                 if (fatalInfo != null) {
                     fatalTag = fatalInfo.getFatalTag();
                 }
@@ -216,6 +216,8 @@ public class HtmlCleaner {
 
     private CleanerProperties properties;
 
+    // Seems unnecessary since CleanerProperties also has the same value ( possible confusion ).
+    @Deprecated
     private ITagInfoProvider tagInfoProvider;
 
     private CleanerTransformations transformations;
@@ -236,9 +238,6 @@ public class HtmlCleaner {
     private Set<ITagNodeCondition> pruneTagSet;
 
     private Set<ITagNodeCondition> allowTagSet;
-    
-    
-	private Collection<ITagNodeCondition> collapseConditions;
  
     /**
      * Constructor - creates cleaner instance with default tag info provider and default properties.
@@ -272,10 +271,6 @@ public class HtmlCleaner {
         this.tagInfoProvider = tagInfoProvider == null ? DefaultTagProvider.getInstance() : tagInfoProvider;
         this.properties = properties == null ? new CleanerProperties() : properties;
         this.properties.setTagInfoProvider(this.tagInfoProvider);
-		this.collapseConditions = Collections
-				.unmodifiableCollection(Arrays.<ITagNodeCondition> asList(
-						new TagNodeEmptyContentCondition(this.tagInfoProvider),
-						new TagNodeInsignificantBrCondition()));
 	}
 
     public TagNode clean(String htmlContent) {
@@ -551,7 +546,7 @@ public class HtmlCleaner {
             if (token instanceof EndTagToken) {
 				EndTagToken endTagToken = (EndTagToken) token;
 				String tagName = endTagToken.getName();
-				TagInfo tag = tagInfoProvider.getTagInfo(tagName);
+				TagInfo tag = getTagInfoProvider().getTagInfo(tagName);
 
 				if ( (tag == null && properties.isOmitUnknownTags()) || (tag != null && tag.isDeprecated() && properties.isOmitDeprecatedTags()) ) {
 					nodeIterator.set(null);
@@ -584,10 +579,10 @@ public class HtmlCleaner {
 			} else if ( isStartToken(token) ) {
                 TagNode startTagToken = (TagNode) token;
 				String tagName = startTagToken.getName();
-				TagInfo tag = tagInfoProvider.getTagInfo(tagName);
+				TagInfo tag = getTagInfoProvider().getTagInfo(tagName);
 
                 TagPos lastTagPos = _openTags.isEmpty() ? null : _openTags.getLastTagPos();
-                TagInfo lastTagInfo = lastTagPos == null ? null : tagInfoProvider.getTagInfo(lastTagPos.name);
+                TagInfo lastTagInfo = lastTagPos == null ? null : getTagInfoProvider().getTagInfo(lastTagPos.name);
 
                 // add tag to set of all tags
 				allTags.add(tagName);
@@ -699,7 +694,7 @@ public class HtmlCleaner {
 
             if (child instanceof TagNode) {
                 TagNode node = (TagNode) child;
-                TagInfo tag = tagInfoProvider.getTagInfo( node.getName() );
+                TagInfo tag = getTagInfoProvider().getTagInfo( node.getName() );
                 addPossibleHeadCandidate(tag, node);
 			} else {
 				if (child instanceof ContentToken) {
@@ -758,7 +753,7 @@ public class HtmlCleaner {
                 }
 
                 TagNode newTagNode = createTagNode(startTagToken);
-                TagInfo tag = tagInfoProvider.getTagInfo( newTagNode.getName() );
+                TagInfo tag = getTagInfoProvider().getTagInfo( newTagNode.getName() );
                 addPossibleHeadCandidate(tag, newTagNode);
                 if (tagNode != null) {
 					tagNode.addChildren(itemsToMove);
@@ -845,14 +840,7 @@ public class HtmlCleaner {
                 }
             }
         }
-        if(CollapseHtml.emptyOrBlanks.equals(properties.getCollapseNullHtml())){
-        	for (ITagNodeCondition condition : collapseConditions) {
-        		if(condition.satisfy(tagNode)){
-        			addPruneNode(tagNode);
-        			return true;
-        		}
-        	}
-        }
+
         if ( allowTagSet != null && !allowTagSet.isEmpty() ) {
             for(ITagNodeCondition condition: allowTagSet) {
                 if ( condition.satisfy(tagNode)) {
