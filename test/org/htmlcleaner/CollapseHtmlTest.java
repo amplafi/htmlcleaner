@@ -113,7 +113,7 @@ public class CollapseHtmlTest extends TestCase {
     public void testChainCollapseInsignificantBrs() {
         properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<p><br/><br>Some<br>text<br/><br><br></p>");
-        assertEquals("<p>Some<br>text</p>", serializer.getXmlAsString(collapsed));
+        assertEquals("<p>Some<br />text</p>", serializer.getXmlAsString(collapsed));
     }
 
     /**
@@ -130,6 +130,7 @@ public class CollapseHtmlTest extends TestCase {
      * Br nested in formating elements should be eliminated.
      */
     public void testInsureMeaninglessBrsStillCollapseEmptyElements() {
+    	properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<p><u><br/></u>Some text<br><span><BR/><u><big><BR/></big></u></p></span>");
         assertEquals("<p>Some text</p>", serializer.getXmlAsString(collapsed));
     }

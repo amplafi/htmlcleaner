@@ -333,13 +333,14 @@ public class CleanerProperties {
         }
     }
     
-    private void addCollapseConditions(Set tagSet) {
+    @SuppressWarnings("unchecked")
+	private void addCollapseConditions(Set tagSet) {
         switch(this.collapseNullHtml) {
         case none:
             break;
         case emptyOrBlankInlineElements:
             tagSet.add(new TagNodeEmptyContentCondition(this.tagInfoProvider));
-            tagSet.add(new TagNodeInsignificantBrCondition());
+            tagSet.add(new TagNodeInsignificantBrCondition(tagSet));
         }
     }
     public Set getAllowTagSet() {

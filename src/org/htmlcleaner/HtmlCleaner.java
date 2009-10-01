@@ -233,7 +233,7 @@ public class HtmlCleaner {
     private TagNode headNode;
     private TagNode rootNode;
     
-    private Set pruneNodeSet = new HashSet();
+    private Set<TagNode> pruneNodeSet = new HashSet<TagNode>();
 
     private Set<ITagNodeCondition> pruneTagSet;
 
