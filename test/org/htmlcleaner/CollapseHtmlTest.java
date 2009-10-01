@@ -3,7 +3,7 @@ package org.htmlcleaner;
 import junit.framework.TestCase;
 
 /**
- * COMMENTS??
+ *  Various tests for collapseNullHtml mode.
  */
 public class CollapseHtmlTest extends TestCase {
 
@@ -22,18 +22,28 @@ public class CollapseHtmlTest extends TestCase {
         serializer = new SimpleXmlSerializer(properties);
     }
 
+    
+    /**
+     * Make sure that null tags are not collapsed when set to {@link CollapseHtml#none}
+     */
     public void testNoneCollapseMode() {
         properties.setCollapseNullHtml(CollapseHtml.none);
         TagNode collapsed = cleaner.clean("<u></u>");
         assertEquals("<u></u>", serializer.getXmlAsString(collapsed));
     }
 
+    /**
+     * Make sure that single empty tag is dropped out.
+     */
     public void testCollapseSingleEmptyTag() {
         properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<u></u>");
         assertEquals("", serializer.getXmlAsString(collapsed));
     }
 
+    /**
+     * Make sure that tags with internal blanks are collapsed.
+     */
     public void testCollapseSingleTagWithBlanks() {
         properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<u>   </u>");
@@ -49,6 +59,9 @@ public class CollapseHtmlTest extends TestCase {
         assertEquals("", serializer.getXmlAsString(collapsed));
     }
 
+    /**
+     * make sure that multiple null tags are collapsed.
+     */
     public void testCollapseMultipleEmptyTags() {
         properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<b><i><u></u></i></b>");
@@ -62,6 +75,9 @@ public class CollapseHtmlTest extends TestCase {
         assertEquals("<b>notme</b>", serializer.getXmlAsString(collapsed));
     }
 
+    /**
+     *  make sure that insignificant br tags are collapsed
+     */
     public void testCollapseInsignificantBr() {
         properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<p><br/>Some text</p>");
@@ -78,9 +94,7 @@ public class CollapseHtmlTest extends TestCase {
      * make sure TagTransformations do not interfere with collapse
      */
     public void testCollapseEmptyWithTagTransformations() {
-        CleanerProperties props = cleaner.getProperties();
-
-        CleanerTransformations transformations = props.getCleanerTransformations();
+        CleanerTransformations transformations = properties.getCleanerTransformations();
         TagTransformation t = new TagTransformation("font", "span", true);
         t.addAttributeTransformation("style", "${style};font-family:${face};font-size:${size};color:${color};");
         t.addAttributeTransformation("face");

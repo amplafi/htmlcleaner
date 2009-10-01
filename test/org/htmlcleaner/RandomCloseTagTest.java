@@ -3,7 +3,7 @@ package org.htmlcleaner;
 import junit.framework.TestCase;
 
 /**
- * COMMENTS???
+ *  Simple test to check that randomly appeared end tags are dropped out.
  */
 public class RandomCloseTagTest extends TestCase {
 	
