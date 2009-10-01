@@ -48,6 +48,8 @@ public class CollapseHtmlTest extends TestCase {
         properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<u>   </u>");
         assertEquals("", serializer.getXmlAsString(collapsed));
+        collapsed = cleaner.clean("<u> &#x20;  </u>");
+        assertEquals("", serializer.getXmlAsString(collapsed));
     }
 
     /**
@@ -56,6 +58,15 @@ public class CollapseHtmlTest extends TestCase {
     public void testCollapseSingleTagWithNbsp() {
         properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<u> &nbsp; </u>");
+        assertEquals("", serializer.getXmlAsString(collapsed));
+        // check to see if this is handle
+        collapsed = cleaner.clean("<u> &nBsp; </u>");
+        assertEquals("", serializer.getXmlAsString(collapsed));
+        collapsed = cleaner.clean("<u> &#160; </u>");
+        assertEquals("", serializer.getXmlAsString(collapsed));
+        collapsed = cleaner.clean("<u> &#xA0; </u>");
+        assertEquals("", serializer.getXmlAsString(collapsed));
+        collapsed = cleaner.clean("<u> "+ new String(new char[] { 160 })+ "</u>");
         assertEquals("", serializer.getXmlAsString(collapsed));
     }
 
