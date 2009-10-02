@@ -133,6 +133,9 @@ public class CollapseHtmlTest extends TestCase {
         assertEquals("<p>Some text</p>", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean("<p>Some text<br><span></span><BR/><u><big></big></u><BR/></p>");
         assertEquals("<p>Some text</p>", serializer.getXmlAsString(collapsed));
+        collapsed = cleaner.clean("<p>Some text<br><span></span><BR/><u><big></big></u><BR/><u></u></p>");
+        assertEquals("<p>Some text</p>", serializer.getXmlAsString(collapsed));
+        
     }
     /**
      * Br nested in formating elements should be eliminated.

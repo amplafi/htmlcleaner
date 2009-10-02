@@ -817,15 +817,16 @@ public class HtmlCleaner {
         return properties;
     }
 
-    public Set getPruneTagSet() {
+    public Set<ITagNodeCondition> getPruneTagSet() {
         return pruneTagSet;
     }
 
-    public Set getAllowTagSet() {
+    public Set<ITagNodeCondition> getAllowTagSet() {
         return allowTagSet;
     }
 
     public void addPruneNode(TagNode node) {
+    	node.setPruned(true);
         this.pruneNodeSet.add(node);
     }
     

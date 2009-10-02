@@ -1,7 +1,6 @@
 package org.htmlcleaner;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Checks if node is an insignificant br tag -- is placed at the end or at the
@@ -13,25 +12,22 @@ public class TagNodeInsignificantBrCondition implements ITagNodeCondition {
 
 	private static final String BR_TAG = "br";
 	
-	private Set<ITagNodeCondition> conditions;
-
-	public TagNodeInsignificantBrCondition(Set<ITagNodeCondition> conditions) {
-		this.conditions = conditions;
+	public TagNodeInsignificantBrCondition() {
 	}
 
 	@Override
 	public boolean satisfy(TagNode tagNode) {
-		if (tagNode == null || !BR_TAG.equals(tagNode.getName())) {
+		if (!isBrNode(tagNode)) {
 			return false;
 		}
 		TagNode parent = tagNode.getParent();
 		List children = parent.getChildren();
-		int brIndex = children.indexOf(tagNode);
-		if(brIndex == 0 || brIndex == children.size() - 1){
-			return true;
-		} else{
-			return checkSublist(0, brIndex, children) || checkSublist (brIndex, children.size(), children);
-		}
+		int brIndex = children.indexOf(tagNode);		
+		return checkSublist(0, brIndex, children) || checkSublist (brIndex, children.size(), children);
+	}
+
+	private boolean isBrNode(TagNode tagNode) {
+		return tagNode != null && BR_TAG.equals(tagNode.getName());
 	}
 
 	private boolean checkSublist(int start, int end, List list) {
@@ -41,20 +37,10 @@ public class TagNodeInsignificantBrCondition implements ITagNodeCondition {
 				return false;
 			}
 			TagNode node = (TagNode) object;
-			if(!BR_TAG.equals(node.getName())&&!isPruned(node)){
+			if(!isBrNode(node)&&!node.isPruned()){
 				return false;
 			}
 		}
 		return true;
 	}
-
-	private boolean isPruned(TagNode node) {
-		for (ITagNodeCondition condition : conditions) {
-			if(condition.satisfy(node)){
-				return true;
-			}
-		}
-		return false;
-	}
-
 }
