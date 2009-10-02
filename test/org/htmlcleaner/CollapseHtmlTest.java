@@ -163,6 +163,8 @@ public class CollapseHtmlTest extends TestCase {
         properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<b id=\"notme\"></b><span></span><span id=\"norme\"></span>");
         assertEquals("<b id=\"notme\"></b><span id=\"norme\"></span>", serializer.getXmlAsString(collapsed));
+        collapsed = cleaner.clean("<b iD=\"notme\"></b><span></span><span ID=\"norme\"></span>");
+        assertEquals("<b id=\"notme\"></b><span id=\"norme\"></span>", serializer.getXmlAsString(collapsed));
     }
     // FOR FUTURE	
     //    public void testCollapseAggressively() {
