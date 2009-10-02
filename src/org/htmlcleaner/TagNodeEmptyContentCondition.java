@@ -1,16 +1,18 @@
 package org.htmlcleaner;
 
-import java.util.Set;
 
 /**
- * Checks if node has empty contents or nbsp special entities only.
+ * Checks if node has empty contents or white/non-breakable spaces only.
  * 
  * @author Konsatntin Burov
  *
  */
 public class TagNodeEmptyContentCondition implements ITagNodeCondition{
 
-	private static final String SPECIAL_SPACE = "&nbsp;";
+	private static final char WHITESPACE = 20;
+
+	private static final char NON_BREAKABLE_SPACE = 160;
+	
 	private ITagInfoProvider tagInfoProvider;
 
 	public TagNodeEmptyContentCondition(ITagInfoProvider provider) {
@@ -23,10 +25,8 @@ public class TagNodeEmptyContentCondition implements ITagNodeCondition{
 		if(tagInfo.isEmptyTag()){
 			return false;
 		}
-		String text = tagNode.getText().toString();
-		if(text.contains(SPECIAL_SPACE)){
-			text = text.replace(SPECIAL_SPACE, "");
-		}
+		String text = Utils.escapeXml(tagNode.getText().toString(), true, false, false, false);
+		text = text.replace(NON_BREAKABLE_SPACE, WHITESPACE);
         return text.trim().isEmpty();
 	}
 
