@@ -145,7 +145,7 @@ public class TagNode extends TagToken {
     }
 
     private TagNode parent;
-    private Map attributes = new LinkedHashMap();
+    private Map<String, String> attributes = new LinkedHashMap<String, String>();
     private List children = new ArrayList();
     private DoctypeToken docType;
     private List itemsToMove;
@@ -186,11 +186,11 @@ public class TagNode extends TagToken {
     /**
      * @return Map instance containing all attribute name/value pairs.
      */
-    public Map getAttributes() {
+    public Map<String, String> getAttributes() {
 		return attributes;
 	}
 
-    public void setAttributes(Map attributes) {
+    public void setAttributes(Map<String, String> attributes) {
         this.attributes= attributes;
     }
     /**
