@@ -116,12 +116,12 @@ public class TagInfo {
 
     private String name;
     private int contentType;
-    private Set mustCloseTags = new HashSet();
-    private Set higherTags = new HashSet();
-    private Set childTags = new HashSet();
-    private Set permittedTags = new HashSet();
-    private Set copyTags = new HashSet();
-    private Set continueAfterTags = new HashSet();
+    private Set<String> mustCloseTags = new HashSet<String>();
+    private Set<String> higherTags = new HashSet<String>();
+    private Set<String> childTags = new HashSet<String>();
+    private Set<String> permittedTags = new HashSet<String>();
+    private Set<String> copyTags = new HashSet<String>();
+    private Set<String> continueAfterTags = new HashSet<String>();
     private int belongsTo = BODY;
     private String requiredParent;
     private String fatalTag;
@@ -129,8 +129,9 @@ public class TagInfo {
     private boolean unique;
     private boolean ignorePermitted;
     private CloseTag closeTag;
+    private Display display;
 
-    public TagInfo(String name, int contentType, int belongsTo, boolean deprecated, boolean unique, boolean ignorePermitted, CloseTag closeTag) {
+    public TagInfo(String name, int contentType, int belongsTo, boolean deprecated, boolean unique, boolean ignorePermitted, CloseTag closeTag, Display display) {
         this.name = name;
         this.contentType = contentType;
         this.belongsTo = belongsTo;
@@ -138,6 +139,7 @@ public class TagInfo {
         this.unique = unique;
         this.ignorePermitted = ignorePermitted;
         this.closeTag = closeTag;
+        this.display = display;
     }
 
     public void defineFatalTags(String commaSeparatedListOfTags) {
@@ -208,12 +210,21 @@ public class TagInfo {
     }
 
     // getters and setters
+    
+    public Display getDisplay() {
+    	return display;
+    }
+    
+    public void setDisplay(Display display) {
+    	this.display = display;
+    }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+
+	public void setName(String name) {
         this.name = name;
     }
 
@@ -221,51 +232,51 @@ public class TagInfo {
         return contentType;
     }
 
-    public Set getMustCloseTags() {
+    public Set<String> getMustCloseTags() {
         return mustCloseTags;
     }
 
-    public void setMustCloseTags(Set mustCloseTags) {
+    public void setMustCloseTags(Set<String> mustCloseTags) {
         this.mustCloseTags = mustCloseTags;
     }
 
-    public Set getHigherTags() {
+    public Set<String> getHigherTags() {
         return higherTags;
     }
 
-    public void setHigherTags(Set higherTags) {
+    public void setHigherTags(Set<String> higherTags) {
         this.higherTags = higherTags;
     }
 
-    public Set getChildTags() {
+    public Set<String> getChildTags() {
         return childTags;
     }
 
-    public void setChildTags(Set childTags) {
+    public void setChildTags(Set<String> childTags) {
         this.childTags = childTags;
     }
 
-    public Set getPermittedTags() {
+    public Set<String> getPermittedTags() {
         return permittedTags;
     }
 
-    public void setPermittedTags(Set permittedTags) {
+    public void setPermittedTags(Set<String> permittedTags) {
         this.permittedTags = permittedTags;
     }
 
-    public Set getCopyTags() {
+    public Set<String> getCopyTags() {
         return copyTags;
     }
 
-    public void setCopyTags(Set copyTags) {
+    public void setCopyTags(Set<String> copyTags) {
         this.copyTags = copyTags;
     }
 
-    public Set getContinueAfterTags() {
+    public Set<String> getContinueAfterTags() {
         return continueAfterTags;
     }
 
-    public void setContinueAfterTags(Set continueAfterTags) {
+    public void setContinueAfterTags(Set<String> continueAfterTags) {
         this.continueAfterTags = continueAfterTags;
     }
 

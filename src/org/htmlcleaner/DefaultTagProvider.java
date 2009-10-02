@@ -49,7 +49,8 @@ import java.util.HashMap;
  * Created by: Vladimir Nikic<br/>
  * Date: April, 2008.
  */
-public class DefaultTagProvider extends HashMap implements ITagInfoProvider {
+@SuppressWarnings("serial")
+public class DefaultTagProvider extends HashMap<String, TagInfo> implements ITagInfoProvider {
 
     // singleton instance, used if no other TagInfoProvider is specified
     private static DefaultTagProvider _instance;
@@ -78,217 +79,217 @@ public class DefaultTagProvider extends HashMap implements ITagInfoProvider {
 //            "small", "span", "sub", "optgroup", "bdo", "var", "div", "object", "sup", "title", "strike", "style",
 //            "dir", "map", "applet", "dl", "del", "fieldset", "ul", "b", "acronym", "a", "blockquote",
 //            "caption", "i", "u", "s", "frameset", "tt", "address", "q", "pre", "legend", "em", "dfn")));
-        tagInfo = new TagInfo("div", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("div", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("div", tagInfo);
 
-        tagInfo = new TagInfo("span", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("span", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("span", tagInfo);
 
-        tagInfo = new TagInfo("meta", TagInfo.CONTENT_NONE, TagInfo.HEAD, false, false, false, CloseTag.forbidden);
+        tagInfo = new TagInfo("meta", TagInfo.CONTENT_NONE, TagInfo.HEAD, false, false, false, CloseTag.forbidden, Display.none);
         this.put("meta", tagInfo);
 
-        tagInfo = new TagInfo("link", TagInfo.CONTENT_NONE, TagInfo.HEAD, false, false, false, CloseTag.forbidden);
+        tagInfo = new TagInfo("link", TagInfo.CONTENT_NONE, TagInfo.HEAD, false, false, false, CloseTag.forbidden, Display.none);
         this.put("link", tagInfo);
 
-        tagInfo = new TagInfo("title",  TagInfo.CONTENT_TEXT, TagInfo.HEAD, false, true, false, CloseTag.required);
+        tagInfo = new TagInfo("title",  TagInfo.CONTENT_TEXT, TagInfo.HEAD, false, true, false, CloseTag.required, Display.none);
         this.put("title", tagInfo);
 
-        tagInfo = new TagInfo("style",  TagInfo.CONTENT_TEXT, TagInfo.HEAD, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("style",  TagInfo.CONTENT_TEXT, TagInfo.HEAD, false, false, false, CloseTag.required, Display.none);
         this.put("style", tagInfo);
 
-        tagInfo = new TagInfo("bgsound", TagInfo.CONTENT_NONE, TagInfo.HEAD, false, false, false, CloseTag.forbidden);
+        tagInfo = new TagInfo("bgsound", TagInfo.CONTENT_NONE, TagInfo.HEAD, false, false, false, CloseTag.forbidden, Display.none);
         this.put("bgsound", tagInfo);
 
-        tagInfo = new TagInfo("h1", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("h1", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("h1,h2,h3,h4,h5,h6,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("h1", tagInfo);
 
-        tagInfo = new TagInfo("h2", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("h2", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("h1,h2,h3,h4,h5,h6,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("h2", tagInfo);
 
-        tagInfo = new TagInfo("h3", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("h3", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("h1,h2,h3,h4,h5,h6,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("h3", tagInfo);
 
-        tagInfo = new TagInfo("h4", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("h4", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("h1,h2,h3,h4,h5,h6,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("h4", tagInfo);
 
-        tagInfo = new TagInfo("h5", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("h5", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("h1,h2,h3,h4,h5,h6,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("h5", tagInfo);
 
-        tagInfo = new TagInfo("h6", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("h6", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("h1,h2,h3,h4,h5,h6,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("h6", tagInfo);
 
-        tagInfo = new TagInfo("p", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional);
+        tagInfo = new TagInfo("p", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("p", tagInfo);
 
-        tagInfo = new TagInfo("strong", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("strong", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("strong", tagInfo);
 
-        tagInfo = new TagInfo("em", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("em", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("em", tagInfo);
 
-        tagInfo = new TagInfo("abbr", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("abbr", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("abbr", tagInfo);
 
-        tagInfo = new TagInfo("acronym", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("acronym", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("acronym", tagInfo);
 
-        tagInfo = new TagInfo("address", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("address", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("address", tagInfo);
 
-        tagInfo = new TagInfo("bdo", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("bdo", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("bdo", tagInfo);
 
-        tagInfo = new TagInfo("blockquote", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("blockquote", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("blockquote", tagInfo);
 
-        tagInfo = new TagInfo("cite", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("cite", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("cite", tagInfo);
 
-        tagInfo = new TagInfo("q", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("q", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("q", tagInfo);
 
-        tagInfo = new TagInfo("code", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("code", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("code", tagInfo);
 
-        tagInfo = new TagInfo("ins", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("ins", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.any);
         this.put("ins", tagInfo);
 
-        tagInfo = new TagInfo("del", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("del", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.any);
         this.put("del", tagInfo);
 
-        tagInfo = new TagInfo("dfn", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("dfn", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("dfn", tagInfo);
 
-        tagInfo = new TagInfo("kbd", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("kbd", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("kbd", tagInfo);
 
-        tagInfo = new TagInfo("pre", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("pre", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("pre", tagInfo);
 
-        tagInfo = new TagInfo("samp", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("samp", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("samp", tagInfo);
 
-        tagInfo = new TagInfo("listing", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("listing", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("listing", tagInfo);
 
-        tagInfo = new TagInfo("var", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("var", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("var", tagInfo);
 
-        tagInfo = new TagInfo("br", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden);
+        tagInfo = new TagInfo("br", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden, Display.none);
         this.put("br", tagInfo);
 
-        tagInfo = new TagInfo("wbr", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden);
+        tagInfo = new TagInfo("wbr", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden, Display.none);
         this.put("wbr", tagInfo);
 
-        tagInfo = new TagInfo("nobr", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("nobr", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         tagInfo.defineCloseBeforeTags("nobr");
         this.put("nobr", tagInfo);
 
-        tagInfo = new TagInfo("xmp",  TagInfo.CONTENT_TEXT, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("xmp",  TagInfo.CONTENT_TEXT, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("xmp", tagInfo);
 
-        tagInfo = new TagInfo("a", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("a", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         tagInfo.defineCloseBeforeTags("a");
         this.put("a", tagInfo);
 
-        tagInfo = new TagInfo("base", TagInfo.CONTENT_NONE, TagInfo.HEAD, false, false, false, CloseTag.forbidden);
+        tagInfo = new TagInfo("base", TagInfo.CONTENT_NONE, TagInfo.HEAD, false, false, false, CloseTag.forbidden, Display.none);
         this.put("base", tagInfo);
 
-        tagInfo = new TagInfo("img", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden);
+        tagInfo = new TagInfo("img", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden, Display.inline);
         this.put("img", tagInfo);
 
-        tagInfo = new TagInfo("area", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden);
+        tagInfo = new TagInfo("area", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden, Display.none);
         tagInfo.defineFatalTags("map");
         tagInfo.defineCloseBeforeTags("area");
         this.put("area", tagInfo);
 
-        tagInfo = new TagInfo("map", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("map", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.any);
         tagInfo.defineCloseBeforeTags("map");
         this.put("map", tagInfo);
 
-        tagInfo = new TagInfo("object", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("object", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.any);
         this.put("object", tagInfo);
 
-        tagInfo = new TagInfo("param", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden);
+        tagInfo = new TagInfo("param", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden, Display.none);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("param", tagInfo);
 
-        tagInfo = new TagInfo("applet", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required);
+        tagInfo = new TagInfo("applet", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required, Display.any);
         this.put("applet", tagInfo);
 
-        tagInfo = new TagInfo("xml", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("xml", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.none);
         this.put("xml", tagInfo);
 
-        tagInfo = new TagInfo("ul", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("ul", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("ul", tagInfo);
 
-        tagInfo = new TagInfo("ol", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("ol", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("ol", tagInfo);
 
-        tagInfo = new TagInfo("li", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional);
+        tagInfo = new TagInfo("li", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("li,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("li", tagInfo);
 
-        tagInfo = new TagInfo("dl", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("dl", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("dl", tagInfo);
 
-        tagInfo = new TagInfo("dt", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional);
+        tagInfo = new TagInfo("dt", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional, Display.block);
         tagInfo.defineCloseBeforeTags("dt,dd");
         this.put("dt", tagInfo);
 
-        tagInfo = new TagInfo("dd", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional);
+        tagInfo = new TagInfo("dd", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional, Display.block);
         tagInfo.defineCloseBeforeTags("dt,dd");
         this.put("dd", tagInfo);
 
-        tagInfo = new TagInfo("menu", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required);
+        tagInfo = new TagInfo("menu", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("menu", tagInfo);
 
-        tagInfo = new TagInfo("dir", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required);
+        tagInfo = new TagInfo("dir", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("dir", tagInfo);
 
-        tagInfo = new TagInfo("table", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("table", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineAllowedChildrenTags("tr,tbody,thead,tfoot,colgroup,caption,tr");
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("tr,thead,tbody,tfoot,caption,colgroup,table,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("table", tagInfo);
 
-        tagInfo = new TagInfo("tr", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional);
+        tagInfo = new TagInfo("tr", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional, Display.block);
         tagInfo.defineFatalTags("table");
         tagInfo.defineRequiredEnclosingTags("tbody");
         tagInfo.defineAllowedChildrenTags("td,th");
@@ -296,179 +297,179 @@ public class DefaultTagProvider extends HashMap implements ITagInfoProvider {
         tagInfo.defineCloseBeforeTags("tr,td,th,caption,colgroup");
         this.put("tr", tagInfo);
 
-        tagInfo = new TagInfo("td", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional);
+        tagInfo = new TagInfo("td", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional, Display.block);
         tagInfo.defineFatalTags("table");
         tagInfo.defineRequiredEnclosingTags("tr");
         tagInfo.defineCloseBeforeTags("td,th,caption,colgroup");
         this.put("td", tagInfo);
 
-        tagInfo = new TagInfo("th", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional);
+        tagInfo = new TagInfo("th", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional, Display.block);
         tagInfo.defineFatalTags("table");
         tagInfo.defineRequiredEnclosingTags("tr");
         tagInfo.defineCloseBeforeTags("td,th,caption,colgroup");
         this.put("th", tagInfo);
 
-        tagInfo = new TagInfo("tbody", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional);
+        tagInfo = new TagInfo("tbody", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional, Display.block);
         tagInfo.defineFatalTags("table");
         tagInfo.defineAllowedChildrenTags("tr,form");
         tagInfo.defineCloseBeforeTags("td,th,tr,tbody,thead,tfoot,caption,colgroup");
         this.put("tbody", tagInfo);
 
-        tagInfo = new TagInfo("thead", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional);
+        tagInfo = new TagInfo("thead", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional, Display.block);
         tagInfo.defineFatalTags("table");
         tagInfo.defineAllowedChildrenTags("tr,form");
         tagInfo.defineCloseBeforeTags("td,th,tr,tbody,thead,tfoot,caption,colgroup");
         this.put("thead", tagInfo);
 
-        tagInfo = new TagInfo("tfoot", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional);
+        tagInfo = new TagInfo("tfoot", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional, Display.block);
         tagInfo.defineFatalTags("table");
         tagInfo.defineAllowedChildrenTags("tr,form");
         tagInfo.defineCloseBeforeTags("td,th,tr,tbody,thead,tfoot,caption,colgroup");
         this.put("tfoot", tagInfo);
 
-        tagInfo = new TagInfo("col", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden);
+        tagInfo = new TagInfo("col", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden, Display.block);
         tagInfo.defineFatalTags("colgroup");
         this.put("col", tagInfo);
 
-        tagInfo = new TagInfo("colgroup", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional);
+        tagInfo = new TagInfo("colgroup", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.optional, Display.block);
         tagInfo.defineFatalTags("table");
         tagInfo.defineAllowedChildrenTags("col");
         tagInfo.defineCloseBeforeTags("td,th,tr,tbody,thead,tfoot,caption,colgroup");
         this.put("colgroup", tagInfo);
 
-        tagInfo = new TagInfo("caption", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("caption", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         tagInfo.defineFatalTags("table");
         tagInfo.defineCloseBeforeTags("td,th,tr,tbody,thead,tfoot,caption,colgroup");
         this.put("caption", tagInfo);
 
-        tagInfo = new TagInfo("form", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, true, CloseTag.required);
+        tagInfo = new TagInfo("form", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, true, CloseTag.required, Display.block);
         tagInfo.defineForbiddenTags("form");
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("option,optgroup,textarea,select,fieldset,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("form", tagInfo);
 
-        tagInfo = new TagInfo("input", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden);
+        tagInfo = new TagInfo("input", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden, Display.inline);
         tagInfo.defineCloseBeforeTags("select,optgroup,option");
         this.put("input", tagInfo);
 
-        tagInfo = new TagInfo("textarea", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("textarea", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         tagInfo.defineCloseBeforeTags("select,optgroup,option");
         this.put("textarea", tagInfo);
 
-        tagInfo = new TagInfo("select", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, true, CloseTag.required);
+        tagInfo = new TagInfo("select", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, true, CloseTag.required, Display.inline);
         tagInfo.defineAllowedChildrenTags("option,optgroup");
         tagInfo.defineCloseBeforeTags("option,optgroup,select");
         this.put("select", tagInfo);
 
-        tagInfo = new TagInfo("option",  TagInfo.CONTENT_TEXT, TagInfo.BODY, false, false, true, CloseTag.optional);
+        tagInfo = new TagInfo("option",  TagInfo.CONTENT_TEXT, TagInfo.BODY, false, false, true, CloseTag.optional, Display.inline);
         tagInfo.defineFatalTags("select");
         tagInfo.defineCloseBeforeTags("option");
         this.put("option", tagInfo);
 
-        tagInfo = new TagInfo("optgroup", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, true, CloseTag.required);
+        tagInfo = new TagInfo("optgroup", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, true, CloseTag.required, Display.inline);
         tagInfo.defineFatalTags("select");
         tagInfo.defineAllowedChildrenTags("option");
         tagInfo.defineCloseBeforeTags("optgroup");
         this.put("optgroup", tagInfo);
 
-        tagInfo = new TagInfo("button", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("button", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.any);
         tagInfo.defineCloseBeforeTags("select,optgroup,option");
         this.put("button", tagInfo);
 
-        tagInfo = new TagInfo("label", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("label", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("label", tagInfo);
 
-        tagInfo = new TagInfo("fieldset", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("fieldset", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("fieldset", tagInfo);
 
-        tagInfo = new TagInfo("isindex", TagInfo.CONTENT_NONE, TagInfo.BODY, true, false, false, CloseTag.forbidden);
+        tagInfo = new TagInfo("isindex", TagInfo.CONTENT_NONE, TagInfo.BODY, true, false, false, CloseTag.forbidden, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("isindex", tagInfo);
 
-        tagInfo = new TagInfo("script", TagInfo.CONTENT_ALL, TagInfo.HEAD_AND_BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("script", TagInfo.CONTENT_ALL, TagInfo.HEAD_AND_BODY, false, false, false, CloseTag.required, Display.none);
         this.put("script", tagInfo);
 
-        tagInfo = new TagInfo("noscript", TagInfo.CONTENT_ALL, TagInfo.HEAD_AND_BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("noscript", TagInfo.CONTENT_ALL, TagInfo.HEAD_AND_BODY, false, false, false, CloseTag.required, Display.block);
         this.put("noscript", tagInfo);
 
-        tagInfo = new TagInfo("b", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("b", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         tagInfo.defineCloseInsideCopyAfterTags("u,i,tt,sub,sup,big,small,strike,blink,s");
         this.put("b", tagInfo);
 
-        tagInfo = new TagInfo("i", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("i", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         tagInfo.defineCloseInsideCopyAfterTags("b,u,tt,sub,sup,big,small,strike,blink,s");
         this.put("i", tagInfo);
 
-        tagInfo = new TagInfo("u", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required);
+        tagInfo = new TagInfo("u", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required, Display.inline);
         tagInfo.defineCloseInsideCopyAfterTags("b,i,tt,sub,sup,big,small,strike,blink,s");
         this.put("u", tagInfo);
 
-        tagInfo = new TagInfo("tt", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("tt", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         tagInfo.defineCloseInsideCopyAfterTags("b,u,i,sub,sup,big,small,strike,blink,s");
         this.put("tt", tagInfo);
 
-        tagInfo = new TagInfo("sub", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("sub", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         tagInfo.defineCloseInsideCopyAfterTags("b,u,i,tt,sup,big,small,strike,blink,s");
         this.put("sub", tagInfo);
 
-        tagInfo = new TagInfo("sup", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("sup", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         tagInfo.defineCloseInsideCopyAfterTags("b,u,i,tt,sub,big,small,strike,blink,s");
         this.put("sup", tagInfo);
 
-        tagInfo = new TagInfo("big", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("big", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         tagInfo.defineCloseInsideCopyAfterTags("b,u,i,tt,sub,sup,small,strike,blink,s");
         this.put("big", tagInfo);
 
-        tagInfo = new TagInfo("small", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("small", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         tagInfo.defineCloseInsideCopyAfterTags("b,u,i,tt,sub,sup,big,strike,blink,s");
         this.put("small", tagInfo);
 
-        tagInfo = new TagInfo("strike", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required);
+        tagInfo = new TagInfo("strike", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required, Display.inline);
         tagInfo.defineCloseInsideCopyAfterTags("b,u,i,tt,sub,sup,big,small,blink,s");
         this.put("strike", tagInfo);
 
-        tagInfo = new TagInfo("blink", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("blink", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.inline);
         tagInfo.defineCloseInsideCopyAfterTags("b,u,i,tt,sub,sup,big,small,strike,s");
         this.put("blink", tagInfo);
 
-        tagInfo = new TagInfo("marquee", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("marquee", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("marquee", tagInfo);
 
-        tagInfo = new TagInfo("s", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required);
+        tagInfo = new TagInfo("s", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required, Display.inline);
         tagInfo.defineCloseInsideCopyAfterTags("b,u,i,tt,sub,sup,big,small,strike,blink");
         this.put("s", tagInfo);
 
-        tagInfo = new TagInfo("hr", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden);
+        tagInfo = new TagInfo("hr", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("hr", tagInfo);
 
-        tagInfo = new TagInfo("font", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required);
+        tagInfo = new TagInfo("font", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required, Display.inline);
         this.put("font", tagInfo);
 
-        tagInfo = new TagInfo("basefont", TagInfo.CONTENT_NONE, TagInfo.BODY, true, false, false, CloseTag.forbidden);
+        tagInfo = new TagInfo("basefont", TagInfo.CONTENT_NONE, TagInfo.BODY, true, false, false, CloseTag.forbidden, Display.none);
         this.put("basefont", tagInfo);
 
-        tagInfo = new TagInfo("center", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required);
+        tagInfo = new TagInfo("center", TagInfo.CONTENT_ALL, TagInfo.BODY, true, false, false, CloseTag.required, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("center", tagInfo);
 
-        tagInfo = new TagInfo("comment", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("comment", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.none);
         this.put("comment", tagInfo);
 
-        tagInfo = new TagInfo("server", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("server", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.none);
         this.put("server", tagInfo);
 
-        tagInfo = new TagInfo("iframe", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required);
+        tagInfo = new TagInfo("iframe", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false, CloseTag.required, Display.any);
         this.put("iframe", tagInfo);
 
-        tagInfo = new TagInfo("embed", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden);
+        tagInfo = new TagInfo("embed", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false, CloseTag.forbidden, Display.block);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("embed", tagInfo);

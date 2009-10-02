@@ -51,7 +51,6 @@ public class SpecialEntities {
 
     public static final SpecialEntities INSTANCE = new SpecialEntities(true, true) {
         @Override
-        @SuppressWarnings("unused") 
         public void put(SpecialEntity specialEntity) {
             throw new UnsupportedOperationException("cannot add to this instance");
         }
@@ -60,18 +59,20 @@ public class SpecialEntities {
     /**
      * key is the {@link SpecialEntity#getKey()} ( i.e. "quot" )
      */
-	private Map entities = new HashMap();
+	private Map<String, SpecialEntity> entities = new HashMap<String, SpecialEntity>();
 	/**
 	 * Key is the Integer returned by {@link SpecialEntity#intValue()}
 	 */
-	private Map entitiesByUnicodeCharcode = new HashMap();
+	private Map<Integer, SpecialEntity> entitiesByUnicodeCharcode = new HashMap<Integer, SpecialEntity>();
 	private boolean greek;
 	private boolean math;
+
+	public static final char NON_BREAKABLE_SPACE = 160;
 	
 	public SpecialEntities(boolean greek, boolean math) {
 	    this.greek = greek;
 	    this.math = math;
-		_put(new SpecialEntity("nbsp",	160, null, true));
+		_put(new SpecialEntity("nbsp",	NON_BREAKABLE_SPACE, null, true));
 		_put(new SpecialEntity("iexcl",	161, null, true));
 		_put(new SpecialEntity("cent",	162, null, true));
 		_put(new SpecialEntity("pound",	163, null, true));

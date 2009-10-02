@@ -153,7 +153,7 @@ public class CollapseHtmlTest extends TestCase {
     public void testCollapseOnlyFormattingElements() {
         properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<p></p><table><tr></tr><tr><td></td></tr></table>");
-        assertEquals("<p></p><table><tr></tr><tr><td></td></tr></table>", serializer.getXmlAsString(collapsed));
+        assertEquals("<p /><table><tbody><tr /><tr><td /></tr></tbody></table>", serializer.getXmlAsString(collapsed));
     }
     
     /**
