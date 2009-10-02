@@ -15,8 +15,6 @@ public class TagNodeEmptyContentCondition implements ITagNodeCondition {
 
 	private static final String ID_ATTRIBUTE_NAME = "id";
 
-	private static final char WHITESPACE = 20;
-
 	private ITagInfoProvider tagInfoProvider;
 
 	public TagNodeEmptyContentCondition(ITagInfoProvider provider) {
@@ -30,9 +28,9 @@ public class TagNodeEmptyContentCondition implements ITagNodeCondition {
 				|| Display.inline != tagInfo.getDisplay()) {
 			return false;
 		}
-		String text = Utils.escapeXml(tagNode.getText().toString(), true,
-				false, false, false);
-		text = text.replace(SpecialEntities.NON_BREAKABLE_SPACE, WHITESPACE);
+		String contentString = tagNode.getText().toString();
+        String text = Utils.escapeXml(contentString, true, false, false, false);
+		text = text.replace(SpecialEntities.NON_BREAKABLE_SPACE, ' ');
 		return isEmptyString(text);
 	}
 
