@@ -40,6 +40,9 @@ public class CollapseHtmlTest extends TestCase {
         assertEquals("", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean("<u> &#x20;  </u>");
         assertEquals("", serializer.getXmlAsString(collapsed));
+        //Srange msword insert
+        collapsed = cleaner.clean("<span style='mso-spacerun:yes'>  </span>");
+        assertEquals("", serializer.getXmlAsString(collapsed));
     }
 
     /**
@@ -147,12 +150,13 @@ public class CollapseHtmlTest extends TestCase {
         collapsed = cleaner.clean("<b iD=\"notme\"></b><span></span><span ID=\"norme\"></span>");
         assertEquals("<b id=\"notme\"></b><span id=\"norme\"></span>", serializer.getXmlAsString(collapsed));
     }
-    // FOR FUTURE	
-    //    public void testCollapseAggressively() {
-    //        properties.setCollapseNullHtml(CollapseHtml.aggressively);
-    //        TagNode collapsed = cleaner.clean("<p></p><table><tr></tr><tr><td></td></tr></table>");
-    //        assertEquals("", serializer.getXmlAsString(collapsed));      
-    //        collapsed = cleaner.clean("<p id=\"notme\"></p><table><tr></tr><tr><td>Nor me</td></tr></table>");
-    //        assertEquals("<p id=\"notme\"></p><table><tr><td>Nor me</td></tr></table>", serializer.getXmlAsString(collapsed));      
-    //    }
+
+    public void testCollapseAggressively() {
+        properties.addPruneTagNodeCondition(new TagNodeEmptyBlockElementCondition(properties.getTagInfoProvider()));
+        TagNode collapsed = cleaner.clean("<p></p><table><tr></tr><tr><td></td></tr></table>");
+        assertEquals("", serializer.getXmlAsString(collapsed));
+        collapsed = cleaner.clean("<p id=\"notme\"></p><table><tr></tr><tr><td>Nor me</td></tr></table>");
+        assertEquals("<p id=\"notme\" /><table><tbody><tr><td>Nor me</td></tr></tbody></table>", serializer
+                .getXmlAsString(collapsed));
+    }
 }
