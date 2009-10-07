@@ -34,7 +34,7 @@ public class TagNodeEmptyBlockElementCondition implements ITagNodeCondition {
     public boolean satisfy(TagNode tagNode) {
         String name = tagNode.getName();
         TagInfo tagInfo = tagInfoProvider.getTagInfo(name);
-        if (hasIdAttributeSet(tagNode) || Display.block != tagInfo.getDisplay() || unsafeBlockElements.contains(name)) {
+        if (tagInfo == null || hasIdAttributeSet(tagNode) || Display.block != tagInfo.getDisplay() || unsafeBlockElements.contains(name)) {
             return false;
         }
         String contentString = tagNode.getText().toString();

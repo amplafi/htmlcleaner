@@ -24,7 +24,7 @@ public class TagNodeEmptyContentCondition implements ITagNodeCondition {
 	@Override
 	public boolean satisfy(TagNode tagNode) {
 		TagInfo tagInfo = tagInfoProvider.getTagInfo(tagNode.getName());
-		if (tagInfo.isEmptyTag() || hasIdAttributeSet(tagNode)
+		if (tagInfo==null || tagInfo.isEmptyTag() || hasIdAttributeSet(tagNode)
 				|| Display.inline != tagInfo.getDisplay()) {
 			return false;
 		}
