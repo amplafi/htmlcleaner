@@ -20,23 +20,14 @@ public class CollapseHtmlTest extends TestCase {
         properties.setOmitHtmlEnvelope(true);
         properties.setOmitXmlDeclaration(true);
         serializer = new SimpleXmlSerializer(properties);
-    }
-
-    
-    /**
-     * Make sure that null tags are not collapsed when set to {@link CollapseHtml#none}
-     */
-    public void testNoneCollapseMode() {
-        properties.setCollapseNullHtml(CollapseHtml.none);
-        TagNode collapsed = cleaner.clean("<u></u>");
-        assertEquals("<u></u>", serializer.getXmlAsString(collapsed));
+        properties.addPruneTagNodeCondition(new TagNodeEmptyContentCondition(properties.getTagInfoProvider()));
+        properties.addPruneTagNodeCondition(new TagNodeInsignificantBrCondition());
     }
 
     /**
      * Make sure that single empty tag is dropped out.
      */
     public void testCollapseSingleEmptyTag() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<u></u>");
         assertEquals("", serializer.getXmlAsString(collapsed));
     }
@@ -45,7 +36,6 @@ public class CollapseHtmlTest extends TestCase {
      * Make sure that tags with internal blanks are collapsed.
      */
     public void testCollapseSingleTagWithBlanks() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<u>   </u>");
         assertEquals("", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean("<u> &#x20;  </u>");
@@ -56,7 +46,6 @@ public class CollapseHtmlTest extends TestCase {
      * make sure that non-breaking spaces are also collapsed away.
      */
     public void testCollapseSingleTagWithNbsp() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<u> &nbsp; </u>");
         assertEquals("", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean("<u> &#160; </u>");
@@ -71,7 +60,6 @@ public class CollapseHtmlTest extends TestCase {
      * make sure that multiple null tags are collapsed.
      */
     public void testCollapseMultipleEmptyTags() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<b><i><u></u></i></b>");
         assertEquals("", serializer.getXmlAsString(collapsed));
         
@@ -87,7 +75,6 @@ public class CollapseHtmlTest extends TestCase {
      *  make sure that insignificant br tags are collapsed
      */
     public void testCollapseInsignificantBr() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<p><br/>Some text</p>");
         assertEquals("<p>Some text</p>", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean("<p>Some text<BR/></p>");
@@ -110,7 +97,6 @@ public class CollapseHtmlTest extends TestCase {
         t.addAttributeTransformation("color");
         t.addAttributeTransformation("name", "${face}_1");
         transformations.addTransformation(t);
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<b><font face=\"Ariel\"><u></u></font></b>");
         assertEquals("", serializer.getXmlAsString(collapsed));
     }
@@ -119,7 +105,6 @@ public class CollapseHtmlTest extends TestCase {
      * test to make sure that multiple <br> elements are eliminated
      */
     public void testChainCollapseInsignificantBrs() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<p><br/><br>Some<br>text<br/><br><br></p>");
         assertEquals("<p>Some<br />text</p>", serializer.getXmlAsString(collapsed));
     }
@@ -128,7 +113,6 @@ public class CollapseHtmlTest extends TestCase {
      * make sure that intervening empty elements still cause unneeded <br> s to be eliminated.
      */
     public void testCollapseInsignificantBrWithEmptyElements() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<p><span></span><br/>Some text</p>");
         assertEquals("<p>Some text</p>", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean("<p>Some text<br><span></span><BR/><u><big></big></u><BR/></p>");
@@ -141,7 +125,6 @@ public class CollapseHtmlTest extends TestCase {
      * Br nested in formating elements should be eliminated.
      */
     public void testInsureMeaninglessBrsStillCollapseEmptyElements() {
-    	properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<p><u><br/></u>Some text<br><span><BR/><u><big><BR/></big></u></p></span>");
         assertEquals("<p>Some text</p>", serializer.getXmlAsString(collapsed));
     }
@@ -151,7 +134,6 @@ public class CollapseHtmlTest extends TestCase {
      * {@link CollapseHtml#emptyOrBlankInlineElements}
      */
     public void testCollapseOnlyFormattingElements() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<p></p><table><tr></tr><tr><td></td></tr></table>");
         assertEquals("<p /><table><tbody><tr /><tr><td /></tr></tbody></table>", serializer.getXmlAsString(collapsed));
     }
@@ -160,7 +142,6 @@ public class CollapseHtmlTest extends TestCase {
      * because elements with ids can be referred to by javascript, don't assume that such elements can be eliminated.
      */
     public void testCollapseOnlyFormattingElementsWithNoIds() {
-        properties.setCollapseNullHtml(CollapseHtml.emptyOrBlankInlineElements);
         TagNode collapsed = cleaner.clean("<b id=\"notme\"></b><span></span><span id=\"norme\"></span>");
         assertEquals("<b id=\"notme\"></b><span id=\"norme\"></span>", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean("<b iD=\"notme\"></b><span></span><span ID=\"norme\"></span>");
