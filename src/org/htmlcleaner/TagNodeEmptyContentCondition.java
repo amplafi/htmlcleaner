@@ -22,6 +22,7 @@ public class TagNodeEmptyContentCondition implements ITagNodeCondition {
     @Override
     public boolean satisfy(TagNode tagNode) {
         TagInfo tagInfo = tagInfoProvider.getTagInfo(tagNode.getName());
+      //Only _inline_ elements can match.
         if (tagInfo != null && !tagInfo.isEmptyTag() && !hasIdAttributeSet(tagNode) && inline == tagInfo.getDisplay()) {
             String contentString = tagNode.getText().toString();
             String text = Utils.escapeXml(contentString, true, false, false, false);

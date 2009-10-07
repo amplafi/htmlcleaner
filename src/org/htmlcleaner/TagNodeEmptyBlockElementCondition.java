@@ -35,6 +35,7 @@ public class TagNodeEmptyBlockElementCondition implements ITagNodeCondition {
     public boolean satisfy(TagNode tagNode) {
         String name = tagNode.getName();
         TagInfo tagInfo = tagInfoProvider.getTagInfo(name);
+        //Only _block_ elements can match.
         if (tagInfo != null && !hasIdAttributeSet(tagNode) && block == tagInfo.getDisplay() && !unsafeBlockElements.contains(name)) {
             String contentString = tagNode.getText().toString();
             String text = Utils.escapeXml(contentString, true, false, false, false);
