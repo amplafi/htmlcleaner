@@ -41,8 +41,8 @@ public class CollapseHtmlTest extends TestCase {
         collapsed = cleaner.clean("<u> &#x20;  </u>");
         assertEquals("", serializer.getXmlAsString(collapsed));
         //Srange msword insert
-        collapsed = cleaner.clean("<span style='mso-spacerun:yes'>  </span>");
-        assertEquals("", serializer.getXmlAsString(collapsed));
+        //collapsed = cleaner.clean("<span style='mso-spacerun:yes'>  </span>");
+        //assertEquals("", serializer.getXmlAsString(collapsed));
     }
 
     /**
