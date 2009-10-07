@@ -34,13 +34,5 @@ public enum Display {
 	 * Elements that are not actually inline or block, usually such elements are
 	 * not rendered at all rendered.
 	 */
-	none;
-	
-	/**
-	 * @param tag
-	 * @return true if the constant is equal to the tag's display type.
-	 */
-	public boolean matchesTagDisplay(TagInfo tag){
-	    return this == tag.getDisplay();
-	}
+	none
 }

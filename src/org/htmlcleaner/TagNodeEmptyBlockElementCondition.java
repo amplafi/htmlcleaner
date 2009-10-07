@@ -35,13 +35,13 @@ public class TagNodeEmptyBlockElementCondition implements ITagNodeCondition {
     public boolean satisfy(TagNode tagNode) {
         String name = tagNode.getName();
         TagInfo tagInfo = tagInfoProvider.getTagInfo(name);
-        if (tagInfo == null || hasIdAttributeSet(tagNode) || !block.matchesTagDisplay(tagInfo) || unsafeBlockElements.contains(name)) {
-            return false;
+        if (tagInfo != null && !hasIdAttributeSet(tagNode) && block == tagInfo.getDisplay() && !unsafeBlockElements.contains(name)) {
+            String contentString = tagNode.getText().toString();
+            String text = Utils.escapeXml(contentString, true, false, false, false);
+            text = text.replace(SpecialEntities.NON_BREAKABLE_SPACE, ' ');
+            return isEmptyString(text);
         }
-        String contentString = tagNode.getText().toString();
-        String text = Utils.escapeXml(contentString, true, false, false, false);
-        text = text.replace(SpecialEntities.NON_BREAKABLE_SPACE, ' ');
-        return isEmptyString(text);
+        return false;
     }
 
     private boolean hasIdAttributeSet(TagNode tagNode) {
