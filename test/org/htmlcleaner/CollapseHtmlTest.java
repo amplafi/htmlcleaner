@@ -86,6 +86,8 @@ public class CollapseHtmlTest extends TestCase {
         assertEquals("<p>Some<br /> text</p>", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean("<p><br/><br/>Some text <i>look here</i></p>");
         assertEquals("<p>Some text <i>look here</i></p>", serializer.getXmlAsString(collapsed));
+        collapsed = cleaner.clean("Some text<BR/>");
+        assertEquals("Some text", serializer.getXmlAsString(collapsed));
     }
     
     /**

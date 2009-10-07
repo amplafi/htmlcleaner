@@ -342,15 +342,13 @@ public class HtmlCleaner {
         List nodeList = htmlTokenizer.getTokenList();
         closeAll(nodeList);
         
+        createDocumentNodes(nodeList);
+        calculateRootNode( htmlTokenizer.getNamespacePrefixes() );
+
         // Some transitions on resulting html require us to have the tag tree structure.
         // i.e. if we want to clear insignificant <br> tags. Thus this place is best for
         // marking nodes to be pruned.
         while(markNodesToPrune(nodeList));
-        
-        createDocumentNodes(nodeList);
-
-        calculateRootNode( htmlTokenizer.getNamespacePrefixes() );
-
 
         // if there are some nodes to prune from tree
         if ( pruneNodeSet != null && !pruneNodeSet.isEmpty() ) {
