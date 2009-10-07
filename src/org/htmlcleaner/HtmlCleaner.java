@@ -40,6 +40,7 @@ package org.htmlcleaner;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Main HtmlCleaner class.
@@ -110,9 +111,9 @@ public class HtmlCleaner {
      * but unhandled tags.
      */
     private class OpenTags {
-        private List list = new ArrayList();
+        private List<TagPos> list = new ArrayList<TagPos>();
         private TagPos last;
-        private Set set = new HashSet();
+        private Set<String> set = new HashSet<String>();
 
         private boolean isEmpty() {
             return list.isEmpty();
@@ -125,9 +126,9 @@ public class HtmlCleaner {
         }
 
         private void removeTag(String tagName) {
-            ListIterator it = list.listIterator( list.size() );
+            ListIterator<TagPos> it = list.listIterator( list.size() );
             while ( it.hasPrevious() ) {
-                TagPos currTagPos = (TagPos) it.previous();
+                TagPos currTagPos = it.previous();
                 if (tagName.equals(currTagPos.name)) {
                     it.remove();
                     break;
@@ -147,7 +148,7 @@ public class HtmlCleaner {
 
         private TagPos findTag(String tagName) {
             if (tagName != null) {
-                ListIterator it = list.listIterator(list.size());
+                ListIterator<TagPos> it = list.listIterator(list.size());
                 String fatalTag = null;
                 TagInfo fatalInfo = getTagInfoProvider().getTagInfo(tagName);
                 if (fatalInfo != null) {
@@ -155,7 +156,7 @@ public class HtmlCleaner {
                 }
 
                 while (it.hasPrevious()) {
-                    TagPos currTagPos = (TagPos) it.previous();
+                    TagPos currTagPos = it.previous();
                     if (tagName.equals(currTagPos.name)) {
                         return currTagPos;
                     } else if (fatalTag != null && fatalTag.equals(currTagPos.name)) {
@@ -177,9 +178,9 @@ public class HtmlCleaner {
             TagPos result = null, prev = null;
 
             if ( !isEmpty() ) {
-                ListIterator it = list.listIterator( list.size() );
+                ListIterator<TagPos> it = list.listIterator( list.size() );
                 while ( it.hasPrevious() ) {
-                    result = (TagPos) it.previous();
+                    result = it.previous();
                     if ( result.info == null || result.info.allowsAnything() ) {
                     	if (prev != null) {
                             return prev;
@@ -200,8 +201,8 @@ public class HtmlCleaner {
          * Checks if any of tags specified in the set are already open.
          * @param tags
          */
-        private boolean someAlreadyOpen(Set tags) {
-        	Iterator it = list.iterator();
+        private boolean someAlreadyOpen(Set<String> tags) {
+        	Iterator<TagPos> it = list.iterator();
             while ( it.hasNext() ) {
             	TagPos curr = (TagPos) it.next();
             	if ( tags.contains(curr.name) ) {
@@ -225,8 +226,8 @@ public class HtmlCleaner {
     private transient OpenTags _openTags;
     private transient boolean _headOpened;
     private transient boolean _bodyOpened;
-    private transient Set _headTags = new LinkedHashSet();
-    private Set allTags = new TreeSet();
+    private transient Set<TagNode> _headTags = new LinkedHashSet<TagNode>();
+    private Set<String> allTags = new TreeSet<String>();
 
     private TagNode htmlNode;
     private TagNode bodyNode;
@@ -322,8 +323,8 @@ public class HtmlCleaner {
         _bodyOpened = false;
         _headTags.clear();
         allTags.clear();
-        this.pruneTagSet = new HashSet(this.properties.getPruneTagSet());
-        this.allowTagSet = new HashSet(this.properties.getAllowTagSet());
+        this.pruneTagSet = new HashSet<ITagNodeCondition>(this.properties.getPruneTagSet());
+        this.allowTagSet = new HashSet<ITagNodeCondition>(this.properties.getAllowTagSet());
         this.transformations = this.properties.getCleanerTransformations();
         this.pruneNodeSet.clear();
 
@@ -353,9 +354,9 @@ public class HtmlCleaner {
 
         // if there are some nodes to prune from tree
         if ( pruneNodeSet != null && !pruneNodeSet.isEmpty() ) {
-            Iterator iterator = pruneNodeSet.iterator();
+            Iterator<TagNode> iterator = pruneNodeSet.iterator();
             while (iterator.hasNext()) {
-                TagNode tagNode = (TagNode) iterator.next();
+                TagNode tagNode = iterator.next();
                 TagNode parent = tagNode.getParent();
                 if (parent != null) {
                     parent.removeChild(tagNode);
@@ -392,7 +393,7 @@ public class HtmlCleaner {
      *
      * @param namespacePrefixes
      */
-    private void calculateRootNode(Set namespacePrefixes) {
+    private void calculateRootNode(Set<String> namespacePrefixes) {
         this.rootNode =  this.htmlNode;
 // original behavior -- just take the first html element ignoring all other content, or later html elements.
 //        if (properties.isOmitHtmlEnvelope()) {
@@ -419,10 +420,10 @@ public class HtmlCleaner {
                 }
             }
         }
-        Map atts = this.rootNode.getAttributes();
+        Map<String, String> atts = this.rootNode.getAttributes();
 
         if (properties.isNamespacesAware() && namespacePrefixes != null) {
-            Iterator iterator = namespacePrefixes.iterator();
+            Iterator<String> iterator = namespacePrefixes.iterator();
             while (iterator.hasNext()) {
                 String prefix = (String) iterator.next();
                 String xmlnsAtt = "xmlns:" + prefix;
@@ -439,12 +440,12 @@ public class HtmlCleaner {
      * @param tag
      * @param attributes
      */
-	private void addAttributesToTag(TagNode tag, Map attributes) {
+	private void addAttributesToTag(TagNode tag, Map<String, String> attributes) {
 		if (attributes != null) {
-			Map tagAttributes = tag.getAttributes();
-			Iterator it = attributes.entrySet().iterator();
+			Map<String, String> tagAttributes = tag.getAttributes();
+			Iterator<Entry < String, String >> it = attributes.entrySet().iterator();
 			while (it.hasNext()) {
-				Map.Entry currEntry = (Map.Entry) it.next();
+				Map.Entry<String, String> currEntry = (Map.Entry<String, String>) it.next();
 				String attName = (String) currEntry.getKey();
 				if ( !tagAttributes.containsKey(attName) ) {
 					String attValue = (String) currEntry.getValue();
@@ -852,7 +853,7 @@ public class HtmlCleaner {
         return false;
     }
 
-    public Set getAllTags() {
+    public Set<String> getAllTags() {
 		return allTags;
 	}
 

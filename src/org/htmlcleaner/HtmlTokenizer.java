@@ -66,8 +66,8 @@ public class HtmlTokenizer {
     private transient boolean _isLateForDoctype;
     private transient DoctypeToken _docType;
     private transient TagToken _currentTagToken;
-    private transient List _tokenList = new ArrayList();
-    private transient Set _namespacePrefixes = new HashSet();
+    private transient List<BaseToken> _tokenList = new ArrayList<BaseToken>();
+    private transient Set<String> _namespacePrefixes = new HashSet<String>();
 
     private boolean _asExpected = true;
 
@@ -127,11 +127,11 @@ public class HtmlTokenizer {
         }
     }
 
-    List getTokenList() {
+    List<BaseToken> getTokenList() {
     	return this._tokenList;
     }
 
-    Set getNamespacePrefixes() {
+    Set<String> getNamespacePrefixes() {
         return _namespacePrefixes;
     }
 

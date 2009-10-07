@@ -119,9 +119,9 @@ public class CleanerTransformations {
             updateTagTransformations(tag, value);
         }
     }
-    public Map transformAttributes(String originalTagName, Map attributes) {
+    public Map<String, String> transformAttributes(String originalTagName, Map<String, String> attributes) {
         TagTransformation tagTrans = getTransformation(originalTagName);
-        Map results;
+        Map<String, String> results;
         if ( tagTrans != null ) {
             results = tagTrans.applyTagTransformations(attributes);
         } else {

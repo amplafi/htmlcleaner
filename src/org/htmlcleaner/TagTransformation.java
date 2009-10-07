@@ -53,7 +53,7 @@ public class TagTransformation {
     private String sourceTag;
     private String destTag;
     private boolean preserveSourceAttributes;
-    private Map<String, String> attributeTransformations = new LinkedHashMap();
+    private Map<String, String> attributeTransformations = new LinkedHashMap<String, String>();
     private List<AttributeTransformation> attributePatternTransformations = new ArrayList<AttributeTransformation>();
     public TagTransformation() {
         this.preserveSourceAttributes = true;
@@ -146,22 +146,22 @@ public class TagTransformation {
         return preserveSourceAttributes;
     }
 
-    Map getAttributeTransformations() {
+    Map<String, String> getAttributeTransformations() {
         return attributeTransformations;
     }
     /**
      * @param attributes
      */
-    public Map applyTagTransformations(Map<String, String> attributes) {
+    public Map<String, String> applyTagTransformations(Map<String, String> attributes) {
         boolean isPreserveSourceAtts = isPreserveSourceAttributes();
         boolean hasAttTransforms = hasAttributeTransformations();
         if ( hasAttTransforms || !isPreserveSourceAtts) {
-            Map newAttributes = isPreserveSourceAtts ? new LinkedHashMap(attributes) : new LinkedHashMap();
+            Map<String, String> newAttributes = isPreserveSourceAtts ? new LinkedHashMap<String, String>(attributes) : new LinkedHashMap<String, String>();
             if (hasAttTransforms) {
-                Map map = getAttributeTransformations();
-                Iterator iterator = map.entrySet().iterator();
+                Map<String, String> map = getAttributeTransformations();
+                Iterator<Map.Entry<String, String>> iterator = map.entrySet().iterator();
                 while (iterator.hasNext()) {
-                    Map.Entry entry = (Map.Entry) iterator.next();
+                    Map.Entry<String, String> entry = iterator.next();
                     String attName = (String) entry.getKey();
                     String template = (String) entry.getValue();
                     if (template == null) {
@@ -201,7 +201,7 @@ public class TagTransformation {
      * @param variables Map of variables (can be null)
      * @return Evaluated string
      */
-    public String evaluateTemplate(String template, Map variables) {
+    public String evaluateTemplate(String template, Map<String, String> variables) {
         if (template == null) {
             return template;
         }
