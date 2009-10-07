@@ -2,14 +2,13 @@ package org.htmlcleaner;
 
 import java.util.Map;
 import static org.htmlcleaner.Utils.isEmptyString;
+import static org.htmlcleaner.Display.inline;
 
 /**
- * Checks if node has empty contents or white/non-breakable spaces only. Nodes
- * that have non-empty id attribute are considered to be non-empty, since they
- * can be used in javascript scenarios.
- * 
+ * Checks if node is an <b>inline</b> element and has empty contents or white/non-breakable spaces only. Nodes that have
+ * non-empty id attribute are considered to be non-empty, since they can be used in javascript scenarios.
+ *
  * @author Konsatntin Burov
- * 
  */
 public class TagNodeEmptyContentCondition implements ITagNodeCondition {
 
@@ -25,7 +24,7 @@ public class TagNodeEmptyContentCondition implements ITagNodeCondition {
 	public boolean satisfy(TagNode tagNode) {
 		TagInfo tagInfo = tagInfoProvider.getTagInfo(tagNode.getName());
 		if (tagInfo==null || tagInfo.isEmptyTag() || hasIdAttributeSet(tagNode)
-				|| Display.inline != tagInfo.getDisplay()) {
+				|| inline.matchesTagDisplay(tagInfo)) {
 			return false;
 		}
 		String contentString = tagNode.getText().toString();
