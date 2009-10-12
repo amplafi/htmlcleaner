@@ -80,17 +80,11 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
                         }
 
                         if (content.length() != 0) {
+                            content = content.replaceAll("[ ]+", " ");
                             writer.write(content);
                             if (endsWithSpace) {
                                 writer.write(' ');
                             }
-                        }
-
-                        if (childrenIt.hasNext()) {
-                            if ( !Utils.isWhitespaceString(childrenIt.next()) ) {
-                                writer.write("\n");
-                            }
-                            childrenIt.previous();
                         }
                     } else if (item instanceof CommentToken) {
                     	String content = ((CommentToken) item).getCommentedContent().trim();
