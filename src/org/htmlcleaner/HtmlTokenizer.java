@@ -664,12 +664,16 @@ public class HtmlTokenizer {
             saveCurrent();
             go();
 
-            if ( isChar('<') ) {
+            if ( isChar('<') && isTagStartOrEnd()) {
                 break;
             }
         }
 
         return addSavedAsContent();
+    }
+
+    private boolean isTagStartOrEnd() throws IOException {
+        return startsWith("</") || startsWith("<!") || startsWith("<?") || ((startsWith("<") && isIdentifierStartChar(_pos+1)));
     }
 
     private void ignoreUntil(char ch) throws IOException {
