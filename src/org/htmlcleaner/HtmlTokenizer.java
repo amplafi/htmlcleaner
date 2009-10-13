@@ -663,7 +663,7 @@ public class HtmlTokenizer {
         while ( !isAllRead() ) {
             saveCurrent();
             go();
-            if ( isChar('<') && isTagStartOrEnd()) {
+            if (isTagStartOrEnd()) {
                 break;
             }
         }
