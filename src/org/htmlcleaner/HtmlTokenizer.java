@@ -663,7 +663,6 @@ public class HtmlTokenizer {
         while ( !isAllRead() ) {
             saveCurrent();
             go();
-
             if ( isChar('<') && isTagStartOrEnd()) {
                 break;
             }
@@ -672,6 +671,15 @@ public class HtmlTokenizer {
         return addSavedAsContent();
     }
 
+    /**
+     * Not all '<' (lt) symbols mean tag start or end. For example '<' can be part of 
+     * mathematical expression. To avoid false breaks of content tags use this method to
+     * determine content tag end.     
+     * 
+     * @return true if current position is tag start or end. 
+     * 
+     * @throws IOException
+     */
     private boolean isTagStartOrEnd() throws IOException {
         return startsWith("</") || startsWith("<!") || startsWith("<?") || ((startsWith("<") && isIdentifierStartChar(_pos+1)));
     }
