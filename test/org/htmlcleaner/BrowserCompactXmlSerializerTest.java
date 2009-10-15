@@ -18,11 +18,9 @@ public class BrowserCompactXmlSerializerTest extends TestCase {
         properties.setOmitHtmlEnvelope(true);
         properties.setOmitXmlDeclaration(true);
         BrowserCompactXmlSerializer compactXmlSerializer = new BrowserCompactXmlSerializer(properties);
-        String cleaned = compactXmlSerializer.getXmlAsString(properties, "<u>text here,</u>    <b>some       text</b>", "UTF-8");
-        assertEquals("<u>text here,</u> <b>some text</b>", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString(properties, "<p><font color=\"#ff0000\" size=\"1\">First test reply</font></p><p>  </p><hr/><p></p>", "UTF-8");
-        assertEquals("<p><font color=\"#ff0000\" size=\"1\">First test reply</font></p><p> </p><hr /><p />", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString(properties, "<div class=\"foo\">2 roots < here ></div>", "UTF-8");
-        assertEquals("<div class=\"foo\">2 roots &lt; here &gt;</div>", cleaned);
+        String cleaned = compactXmlSerializer.getXmlAsString(properties, "        <u>text here, </u><b>some text</b>      ", "UTF-8");
+        assertEquals(" <u>text here, </u><b>some text</b> ", cleaned);
+        cleaned = compactXmlSerializer.getXmlAsString(properties, "    <div class=\"foo\">2 roots < here ></div>", "UTF-8");
+        assertEquals(" <div class=\"foo\">2 roots &lt; here &gt;</div>\n", cleaned);
     }
 }

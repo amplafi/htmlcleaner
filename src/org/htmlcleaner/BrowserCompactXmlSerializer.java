@@ -80,7 +80,7 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
                         }
 
                         if (content.length() != 0) {
-                            content = content.replaceAll("[ ]+", " ");
+                            content = content.replace('\n', ' ').replace('\r', ' ');
                             writer.write(content);
                             if (endsWithSpace) {
                                 writer.write(' ');
@@ -94,8 +94,9 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
                     }
                 }
             }
-
-            serializeEndTag(tagNode, writer, false);
+            
+            TagInfo tagInfo = props.getTagInfoProvider().getTagInfo(tagNode.getName());
+            serializeEndTag(tagNode, writer, tagInfo!=null&&tagInfo.getDisplay().isAfterTagLineBreakNeeded());
         }
 	}
 
