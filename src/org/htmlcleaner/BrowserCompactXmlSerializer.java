@@ -57,6 +57,7 @@ import java.util.StringTokenizer;
  */
 public class BrowserCompactXmlSerializer extends XmlSerializer {
 
+    private static final String PRE_TAG = "pre";
     private static final String BR_TAG = "<br />";
     private static final String LINE_BREAK = "\n";
 
@@ -67,15 +68,15 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
     @Override
     protected void serialize(TagNode tagNode, Writer writer) throws IOException {
         serializeOpenTag(tagNode, writer, false);
-
         TagInfo tagInfo = props.getTagInfoProvider().getTagInfo(tagNode.getName());
+        String tagName = tagInfo!=null? tagInfo.getName() : null;
         List tagChildren = new ArrayList (tagNode.getChildren());
         if (!isMinimizedTagSyntax(tagNode)) {
             ListIterator childrenIt = tagChildren.listIterator();
             while (childrenIt.hasNext()) {
                 Object item = childrenIt.next();
                 if (item != null) {
-                    if (item instanceof ContentToken) {
+                    if (item instanceof ContentToken && !PRE_TAG.equals(tagName)) {
                         String content = ((ContentToken) item).getContent();
                         boolean whitespaceAllowed = tagInfo != null && tagInfo.getDisplay().isLeadingAndEndWhitespacesAllowed();
                         boolean writeLeadingSpace = content.length() > 0 && Character.isWhitespace(content.charAt(0)) && whitespaceAllowed;
@@ -121,6 +122,9 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
                         } else{
                             childrenIt.remove();
                         }
+                    } else if(item instanceof ContentToken){
+                        String content = ((ContentToken) item).getContent();
+                        writer.write(content);
                     } else if (item instanceof CommentToken) {
                     	String content = ((CommentToken) item).getCommentedContent().trim();
                     	writer.write(content);
