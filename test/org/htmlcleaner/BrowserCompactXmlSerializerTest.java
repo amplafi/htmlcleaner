@@ -19,8 +19,10 @@ public class BrowserCompactXmlSerializerTest extends TestCase {
         properties.setOmitXmlDeclaration(true);
         BrowserCompactXmlSerializer compactXmlSerializer = new BrowserCompactXmlSerializer(properties);
         String cleaned = compactXmlSerializer.getXmlAsString(properties, "        <u>text here, </u><b>some text</b>      ", "UTF-8");
-        assertEquals(" <u>text here, </u><b>some text</b> ", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString(properties, "    <div class=\"foo\">2 roots < here ></div>", "UTF-8");
-        assertEquals(" <div class=\"foo\">2 roots &lt; here &gt;</div>\n", cleaned);
+        assertEquals("<u>text here, </u><b>some text</b>", cleaned);
+        cleaned = compactXmlSerializer.getXmlAsString(properties, "    <div class=\"foo\">2 roots < here >  </div>", "UTF-8");
+        assertEquals("<div class=\"foo\">2 roots &lt; here &gt;</div>", cleaned);
+        cleaned = compactXmlSerializer.getXmlAsString(properties, "    <div class=\"foo\">2 roots \n    < here >  </div>", "UTF-8");
+        assertEquals("<div class=\"foo\">2 roots\n&lt; here &gt;</div>\n", cleaned);
     }
 }
