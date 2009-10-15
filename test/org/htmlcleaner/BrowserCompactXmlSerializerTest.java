@@ -23,6 +23,8 @@ public class BrowserCompactXmlSerializerTest extends TestCase {
         cleaned = compactXmlSerializer.getXmlAsString(properties, "    <div class=\"foo\">2 roots < here >  </div>", "UTF-8");
         assertEquals("<div class=\"foo\">2 roots &lt; here &gt;</div>", cleaned);
         cleaned = compactXmlSerializer.getXmlAsString(properties, "    <div class=\"foo\">2 roots \n    < here >  </div>", "UTF-8");
-        assertEquals("<div class=\"foo\">2 roots\n&lt; here &gt;</div>", cleaned);
+        assertEquals("<div class=\"foo\">2 roots &lt; here &gt;</div>", cleaned);
+        cleaned = compactXmlSerializer.getXmlAsString(properties, "    <div class=\"foo\">2 roots \n\n    < here >  </div>", "UTF-8");
+        assertEquals("<div class=\"foo\">2 roots <br />&lt; here &gt;</div>", cleaned);
     }
 }
