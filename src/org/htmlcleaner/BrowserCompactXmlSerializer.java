@@ -37,10 +37,12 @@
 
 package org.htmlcleaner;
 
-import java.io.Writer;
 import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.StringTokenizer;
 
 /**
  * <p>
@@ -55,36 +57,69 @@ import java.util.ListIterator;
  */
 public class BrowserCompactXmlSerializer extends XmlSerializer {
 
-	public BrowserCompactXmlSerializer(CleanerProperties props) {
-		super(props);
-	}
+    private static final String BR_TAG = "<br />";
+    private static final String LINE_BREAK = "\n";
+
+    public BrowserCompactXmlSerializer(CleanerProperties props) {
+        super(props);
+    }
 
     @Override
     protected void serialize(TagNode tagNode, Writer writer) throws IOException {
         serializeOpenTag(tagNode, writer, false);
 
-        List tagChildren = tagNode.getChildren();
-        if ( !isMinimizedTagSyntax(tagNode) ) {
+        TagInfo tagInfo = props.getTagInfoProvider().getTagInfo(tagNode.getName());
+        List tagChildren = new ArrayList (tagNode.getChildren());
+        if (!isMinimizedTagSyntax(tagNode)) {
             ListIterator childrenIt = tagChildren.listIterator();
-            while ( childrenIt.hasNext() ) {
+            while (childrenIt.hasNext()) {
                 Object item = childrenIt.next();
                 if (item != null) {
-                    if ( item instanceof ContentToken ) {
+                    if (item instanceof ContentToken) {
                         String content = ((ContentToken) item).getContent();
-                        boolean startsWithSpace = content.length() > 0 && Character.isWhitespace( content.charAt(0) );
-                        boolean endsWithSpace = content.length() > 1 && Character.isWhitespace( content.charAt(content.length() - 1) );
+                        boolean whitespaceAllowed = tagInfo != null && tagInfo.getDisplay().isLeadingAndEndWhitespacesAllowed();
+                        boolean writeLeadingSpace = content.length() > 0 && Character.isWhitespace(content.charAt(0)) && whitespaceAllowed;
+                        boolean writeEndingSpace = content.length() > 1 && Character.isWhitespace(content.charAt(content.length() - 1)) && whitespaceAllowed;
                         content = dontEscape(tagNode) ? content.trim().replaceAll("]]>", "]]&gt;") : escapeXml(content.trim());
-
-                        if (startsWithSpace) {
-                            writer.write(' ');
-                        }
-
                         if (content.length() != 0) {
-                            content = content.replace('\n', ' ').replace('\r', ' ');
-                            writer.write(content);
-                            if (endsWithSpace) {
+                            boolean hasPrevContent = false;
+                            int order = tagChildren.indexOf(item);
+                            if (order >= 2 && childrenIt.hasNext()) {
+                                Object prev = tagChildren.get(order-1);
+                                hasPrevContent = isContentOrInline(prev);
+                            }
+
+                            if (writeLeadingSpace || hasPrevContent) {
                                 writer.write(' ');
                             }
+
+                            StringTokenizer tokenizer = new StringTokenizer(content, LINE_BREAK, true);
+                            String prevToken = "";
+                            while (tokenizer.hasMoreTokens()) {
+                                String token = tokenizer.nextToken();
+                                if (prevToken.equals(token) && prevToken.equals(LINE_BREAK)) {
+                                    writer.write(BR_TAG);
+                                    prevToken = "";
+                                } else if (LINE_BREAK.equals(token)) {
+                                    writer.write(' ');
+                                } else {
+                                    writer.write(token.trim());
+                                }
+                                prevToken = token;
+                            }
+
+                            boolean hasFollowingContent = false;
+                            if (childrenIt.hasNext()) {
+                                Object next = childrenIt.next();
+                                hasFollowingContent = isContentOrInline(next);
+                                childrenIt.previous();
+                            }
+
+                            if (writeEndingSpace || hasFollowingContent) {
+                                writer.write(' ');
+                            }
+                        } else{
+                            childrenIt.remove();
                         }
                     } else if (item instanceof CommentToken) {
                     	String content = ((CommentToken) item).getCommentedContent().trim();
@@ -94,10 +129,20 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
                     }
                 }
             }
-            
-            TagInfo tagInfo = props.getTagInfoProvider().getTagInfo(tagNode.getName());
-            serializeEndTag(tagNode, writer, tagInfo!=null&&tagInfo.getDisplay().isAfterTagLineBreakNeeded());
+
+            serializeEndTag(tagNode, writer, tagInfo != null && tagInfo.getDisplay().isAfterTagLineBreakNeeded());
         }
-	}
+    }
+
+    private boolean isContentOrInline(Object node) {
+        boolean result = false;
+        if (node instanceof ContentToken) {
+            result = true;
+        } else if (node instanceof TagNode) {
+            TagInfo nextInfo = props.getTagInfoProvider().getTagInfo(((TagNode) node).getName());
+            result = nextInfo != null && nextInfo.getDisplay() == Display.inline;
+        }
+        return result;
+    }
 
 }

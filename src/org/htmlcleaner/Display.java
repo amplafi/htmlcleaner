@@ -14,13 +14,13 @@ public enum Display {
 	 * block-level elements. When rendered visually, block-level elements
 	 * usually begin on a new line.
 	 */
-	block(true),
+	block(true, false),
 	/**
 	 * Inline elements typically may only contain text and other inline
 	 * elements. When rendered visually, inline elements do not usually begin on
 	 * a new line.
 	 */
-	inline(false),
+	inline(false, true),
 
 	/**
 	 * The following elements may be used as either block-level elements or
@@ -28,18 +28,20 @@ public enum Display {
 	 * element or a P), these elements should not contain any block-level
 	 * elements.
 	 */
-	any(true),
+	any(true, false),
 
 	/**
 	 * Elements that are not actually inline or block, usually such elements are
 	 * not rendered at all rendered.
 	 */
-	none(true);
+	none(true, false);
 
     private boolean afterTagLineBreakNeeded;
+    private boolean leadingAndEndWhitespacesAllowed;
 
-    private Display(boolean afterTagLineBreakNeeded) {
+    private Display(boolean afterTagLineBreakNeeded, boolean leadingAndEndWhitespacesAllowed) {
         this.afterTagLineBreakNeeded = afterTagLineBreakNeeded;
+        this.leadingAndEndWhitespacesAllowed = leadingAndEndWhitespacesAllowed;
     }
 	
     /**
@@ -48,4 +50,13 @@ public enum Display {
     public boolean isAfterTagLineBreakNeeded() {
         return afterTagLineBreakNeeded;
     }
+
+    /**
+     * @return true if tag contents can have single leading or end whitespace
+     */
+    public boolean isLeadingAndEndWhitespacesAllowed() {
+        return leadingAndEndWhitespacesAllowed;
+    }
+    
+    
 }
