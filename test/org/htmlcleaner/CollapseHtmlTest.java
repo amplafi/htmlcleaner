@@ -55,7 +55,7 @@ public class CollapseHtmlTest extends TestCase {
         assertEquals("", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean("<u> &#xA0; </u>");
         assertEquals("", serializer.getXmlAsString(collapsed));
-        collapsed = cleaner.clean("<u> "+((char)160)+" </u>");
+        collapsed = cleaner.clean("<u> "+SpecialEntities.NON_BREAKABLE_SPACE+" </u>");
         assertEquals("", serializer.getXmlAsString(collapsed));
     }
 

@@ -78,10 +78,13 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
                 if (item != null) {
                     if (item instanceof ContentToken && !PRE_TAG.equals(tagName)) {
                         String content = ((ContentToken) item).getContent();
+                        content = dontEscape(tagNode) ? content.replaceAll("]]>", "]]&gt;") : escapeXml(content);
+                        content = content.replaceAll("^"+SpecialEntities.NON_BREAKABLE_SPACE+"+", " ");
+                        content = content.replaceAll(SpecialEntities.NON_BREAKABLE_SPACE+"+$", " ");
                         boolean whitespaceAllowed = tagInfo != null && tagInfo.getDisplay().isLeadingAndEndWhitespacesAllowed();
-                        boolean writeLeadingSpace = content.length() > 0 && Character.isWhitespace(content.charAt(0)) && whitespaceAllowed;
+                        boolean writeLeadingSpace = content.length() > 0 && (Character.isWhitespace(content.charAt(0))) && whitespaceAllowed;
                         boolean writeEndingSpace = content.length() > 1 && Character.isWhitespace(content.charAt(content.length() - 1)) && whitespaceAllowed;
-                        content = dontEscape(tagNode) ? content.trim().replaceAll("]]>", "]]&gt;") : escapeXml(content.trim());
+                        content = content.trim();
                         if (content.length() != 0) {
                             boolean hasPrevContent = false;
                             int order = tagChildren.indexOf(item);
