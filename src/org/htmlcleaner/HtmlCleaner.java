@@ -575,6 +575,33 @@ public class HtmlCleaner {
                     } else if ( !isAllowedInLastOpenTag(token) ) {
                         saveToLastOpenTag(nodeList, token);
                         nodeIterator.set(null);
+                    } else if (tag != null && Display.block == tag.getDisplay()) {
+                        nodeIterator.previous();
+                        if(!nodeIterator.hasPrevious()){
+                            nodeIterator.next();
+                            continue;
+                        }
+                        Object previous = nodeIterator.previous();
+                        while (nodeIterator.hasPrevious() && (previous instanceof ContentToken || previous == null)) {
+                            previous = nodeIterator.previous();
+                        }
+                        if (previous instanceof TagToken) {
+                            TagToken prevToken = (TagToken) previous;
+                            TagInfo prevInfo = getTagInfoProvider().getTagInfo(prevToken.getName());
+                            if (prevInfo.isMustCloseTag(tag)) {
+                                nodeIterator.next();
+                                TagNode newStart = new TagNode(tagName);
+                                nodeIterator.add(newStart);
+                                _openTags.addTag(tag.getName(), nodeIterator.previousIndex());
+                                closeSnippet(nodeList, _openTags.findTag(tagName), token);
+                                while (nodeIterator.next() != token);
+                                nodeIterator.set(null);
+                            } else {
+                                while (nodeIterator.next() != token);
+                            }
+                        } else {
+                            while (nodeIterator.next() != token);
+                        }
                     }
                 }
 			} else if ( isStartToken(token) ) {
