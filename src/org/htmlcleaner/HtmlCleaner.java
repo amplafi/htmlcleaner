@@ -539,6 +539,12 @@ public class HtmlCleaner {
     	return (o instanceof TagNode) && !((TagNode)o).isFormed();
     }
 
+	/**
+	 * This method generally mutates flattened list of tokens into tree structure.
+	 * 
+	 * @param nodeList
+	 * @param nodeIterator
+	 */
 	void makeTree(List nodeList, ListIterator nodeIterator) {
 		// process while not reach the end of the list
 		while ( nodeIterator.hasNext() ) {
@@ -550,13 +556,18 @@ public class HtmlCleaner {
 				TagInfo tag = getTagInfoProvider().getTagInfo(tagName);
 
 				if ( (tag == null && properties.isOmitUnknownTags()) || (tag != null && tag.isDeprecated() && properties.isOmitDeprecatedTags()) ) {
-					nodeIterator.set(null);
+				    //tag is either unknown or deprecated, so we just prune the end token out
+				    nodeIterator.set(null);
 				} else if ( tag != null && !tag.allowsBody() ) {
+				        //tag doesn't allow body, so end token is not needed
 					nodeIterator.set(null);
 				} else {
+				        //trying to find corresponding opened tag for the end token
 					TagPos matchingPosition = _openTags.findTag(tagName);
 
                     if (matchingPosition != null) {
+                        //open tag found.. closing the node.. this will add all 
+                        //the nodes between open and end tokens to the childen list of the tag node. 
                         List closed = closeSnippet(nodeList, matchingPosition, endTagToken);
                         nodeIterator.set(null);
                         for (int i = closed.size() - 1; i >= 0; i--) {
@@ -572,35 +583,43 @@ public class HtmlCleaner {
                                 nodeIterator.previous();
                             }
                         }
-                    } else if ( !isAllowedInLastOpenTag(token) ) {
-                        saveToLastOpenTag(nodeList, token);
-                        nodeIterator.set(null);
-                    } else if (tag != null && Display.block == tag.getDisplay()) {
+                    } else if (tag != null) {
+                        //no open tags found for the ending. Possibly the open tag was closed due to one
+                        //of his breaking children (i.e. table placed into p tag).
                         nodeIterator.previous();
+                        
+                        //going back until start or any tag node, skipping all the content nodes and null elements
+                        //since they're cannot break our tag.
                         if(!nodeIterator.hasPrevious()){
+                            //start of list reached -- no breaking tag exist, falling back.
                             nodeIterator.next();
                             continue;
                         }
                         Object previous = nodeIterator.previous();
+                        //skipping all the content
                         while (nodeIterator.hasPrevious() && (previous instanceof ContentToken || previous == null)) {
                             previous = nodeIterator.previous();
                         }
                         if (previous instanceof TagToken) {
+                            //tag node found
                             TagToken prevToken = (TagToken) previous;
                             TagInfo prevInfo = getTagInfoProvider().getTagInfo(prevToken.getName());
                             if (prevInfo.isMustCloseTag(tag)) {
+                                //current tag was closed due to the node found, thus we need to reopen it
+                                //after the node..
                                 nodeIterator.next();
                                 TagNode newStart = new TagNode(tagName);
                                 nodeIterator.add(newStart);
                                 _openTags.addTag(tag.getName(), nodeIterator.previousIndex());
+                                //..and the properly close to form correct tree
                                 closeSnippet(nodeList, _openTags.findTag(tagName), token);
-                                while (nodeIterator.next() != token);
+                                skipTillToken(nodeIterator, token);
                                 nodeIterator.set(null);
                             } else {
-                                while (nodeIterator.next() != token);
+                                skipTillToken(nodeIterator, token);
                             }
                         } else {
-                            while (nodeIterator.next() != token);
+                            skipTillToken(nodeIterator, token);
                         }
                     }
                 }
@@ -707,6 +726,10 @@ public class HtmlCleaner {
 				}
 			}
 		}
+    }
+
+    private void skipTillToken(ListIterator nodeIterator, BaseToken token) {
+        while (nodeIterator.next() != token);
     }
 
 	private void createDocumentNodes(List listNodes) {
