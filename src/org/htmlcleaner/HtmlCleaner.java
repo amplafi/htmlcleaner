@@ -601,6 +601,27 @@ public class HtmlCleaner {
                             previous = nodeIterator.previous();
                         }
                         if (previous instanceof TagToken) {
+                            // TODO: pull out into a method to make it easier to document.
+                            /* Tests that tag closed due to one of its children (when the child tag is not allowed to be inside parent) is then
+                            * reopened.
+                            * Examples:
+                            * <pre>
+                            * <div><p>text1<table><tr><td>text2</td></tr></table>text3</p></div>
+                            * </pre>
+                            * table is not allowed inside a <p> most browsers handle this by placing the table close to line before and line after and in general allowing it.
+                            * 
+                            * Cleaning here normally would result in :
+                            * <pre>
+                            * <div><p>text1<table><tr><td>text2</td></tr></table>text3</div>
+                            * </pre>
+                            * 'text3' is no longer inside the original element type ( 'p' ). Instead 'text3' is now within a 'div'. 
+                            * text3 would no longer be styled correctly.
+                            * 
+                            * A more correct result is:
+                            * <pre>
+                            * <div><p>text1<table><tr><td>text2</td></tr></table><p>text3</p></div>
+                            * </pre>
+                            */ 
                             //tag node found
                             TagToken prevToken = (TagToken) previous;
                             TagInfo prevInfo = getTagInfoProvider().getTagInfo(prevToken.getName());
