@@ -107,6 +107,50 @@ public class HtmlCleaner {
 	}
 
     /**
+     * Contains information about nodes that were closed due to their child nodes.
+     * i.e. if 'p' tag was closed due to 'table' child tag. 
+     * 
+     * @author Konstantin Burov
+     *
+     */
+    private class ChildBreaks{
+        private Stack < TagPos> closedByChildBreak = new Stack < TagPos >();
+        private Stack < String > breakingTags = new Stack < String >();
+        
+        /**
+         * Adds the break info to the top of the stacks.
+         * 
+         * @param tagPos
+         * @param tagName
+         */
+        public void addBreak(TagPos tagPos, String tagName){
+            closedByChildBreak.add(tagPos);
+            breakingTags.add(tagName);
+        }
+
+        public boolean isEmpty() {
+            return closedByChildBreak.isEmpty();
+        }
+
+        /**
+         * @return name of the last children tag that has broken its parent.
+         */
+        public String getLastBreakingTag() {
+            return breakingTags.peek();
+        }
+
+        /**
+         * pops out latest broken tag position.
+         * 
+         * @return tag pos of the last parent that was broken.
+         */
+        public TagPos pop() {
+            breakingTags.pop();
+            return closedByChildBreak.pop();
+        }
+    }
+    
+    /**
      * Class that contains information and methods for managing list of open,
      * but unhandled tags.
      */
@@ -224,6 +268,7 @@ public class HtmlCleaner {
     private CleanerTransformations transformations;
 
     private transient OpenTags _openTags;
+    private transient ChildBreaks _childBreaks;
     private transient boolean _headOpened;
     private transient boolean _bodyOpened;
     private transient Set<TagNode> _headTags = new LinkedHashSet<TagNode>();
@@ -319,6 +364,7 @@ public class HtmlCleaner {
      */
     public TagNode clean(Reader reader) throws IOException {
         _openTags = new OpenTags();
+        _childBreaks = new ChildBreaks();
         _headOpened = false;
         _bodyOpened = false;
         _headTags.clear();
@@ -567,7 +613,7 @@ public class HtmlCleaner {
 
                     if (matchingPosition != null) {
                         //open tag found.. closing the node.. this will add all 
-                        //the nodes between open and end tokens to the childen list of the tag node. 
+                        //the nodes between open and end tokens to the children list of the tag node. 
                         List closed = closeSnippet(nodeList, matchingPosition, endTagToken);
                         nodeIterator.set(null);
                         for (int i = closed.size() - 1; i >= 0; i--) {
@@ -583,64 +629,14 @@ public class HtmlCleaner {
                                 nodeIterator.previous();
                             }
                         }
-                    } else if (tag != null) {
-                        //no open tags found for the ending. Possibly the open tag was closed due to one
-                        //of his breaking children (i.e. table placed into p tag).
-                        nodeIterator.previous();
-                        
-                        //going back until start or any tag node, skipping all the content nodes and null elements
-                        //since they're cannot break our tag.
-                        if(!nodeIterator.hasPrevious()){
-                            //start of list reached -- no breaking tag exist, falling back.
-                            nodeIterator.next();
-                            continue;
-                        }
-                        Object previous = nodeIterator.previous();
-                        //skipping all the content
-                        while (nodeIterator.hasPrevious() && (previous instanceof ContentToken || previous == null)) {
-                            previous = nodeIterator.previous();
-                        }
-                        if (previous instanceof TagToken) {
-                            // TODO: pull out into a method to make it easier to document.
-                            /* Tests that tag closed due to one of its children (when the child tag is not allowed to be inside parent) is then
-                            * reopened.
-                            * Examples:
-                            * <pre>
-                            * <div><p>text1<table><tr><td>text2</td></tr></table>text3</p></div>
-                            * </pre>
-                            * table is not allowed inside a <p> most browsers handle this by placing the table close to line before and line after and in general allowing it.
-                            * 
-                            * Cleaning here normally would result in :
-                            * <pre>
-                            * <div><p>text1<table><tr><td>text2</td></tr></table>text3</div>
-                            * </pre>
-                            * 'text3' is no longer inside the original element type ( 'p' ). Instead 'text3' is now within a 'div'. 
-                            * text3 would no longer be styled correctly.
-                            * 
-                            * A more correct result is:
-                            * <pre>
-                            * <div><p>text1<table><tr><td>text2</td></tr></table><p>text3</p></div>
-                            * </pre>
-                            */ 
-                            //tag node found
-                            TagToken prevToken = (TagToken) previous;
-                            TagInfo prevInfo = getTagInfoProvider().getTagInfo(prevToken.getName());
-                            if (prevInfo.isMustCloseTag(tag)) {
-                                //current tag was closed due to the node found, thus we need to reopen it
-                                //after the node..
-                                nodeIterator.next();
-                                TagNode newStart = new TagNode(tagName);
-                                nodeIterator.add(newStart);
-                                _openTags.addTag(tag.getName(), nodeIterator.previousIndex());
-                                //..and the properly close to form correct tree
-                                closeSnippet(nodeList, _openTags.findTag(tagName), token);
-                                skipTillToken(nodeIterator, token);
-                                nodeIterator.set(null);
-                            } else {
-                                skipTillToken(nodeIterator, token);
-                            }
-                        } else {
-                            skipTillToken(nodeIterator, token);
+                        if( !_childBreaks.isEmpty() && tagName.equals(_childBreaks.getLastBreakingTag())){
+                            //this tag has broken it's parent, thus the parent tag should be reopened.
+                            TagNode closedByPresidence = (TagNode) nodeList.get(_childBreaks.pop().position);
+                            TagNode copy = closedByPresidence.makeCopy();
+                            copy.setAutoGenerated(true);
+                            copy.removeAttribute("id");
+                            nodeIterator.add(copy);
+                            _openTags.addTag(closedByPresidence.getName(), nodeIterator.previousIndex());
                         }
                     }
                 }
@@ -694,6 +690,10 @@ public class HtmlCleaner {
 					nodeIterator.previous();
                 // if last open tag has lower presidence then this, it must be closed
                 } else if ( tag != null && lastTagPos != null && tag.isMustCloseTag(lastTagInfo) ) {
+                                        //since tag is closed earlier due to incorrect child tag, we store this info
+                                        //to reopen it later, on the child close.
+                                        _childBreaks.addBreak(lastTagPos, tagName);
+                                        
 					List closed = closeSnippet(nodeList, lastTagPos, startTagToken);
 					int closedCount = closed.size();
 
@@ -749,9 +749,6 @@ public class HtmlCleaner {
 		}
     }
 
-    private void skipTillToken(ListIterator nodeIterator, BaseToken token) {
-        while (nodeIterator.next() != token);
-    }
 
 	private void createDocumentNodes(List listNodes) {
 		Iterator it = listNodes.iterator();
