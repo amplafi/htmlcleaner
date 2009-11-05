@@ -442,7 +442,8 @@ public class SpecialEntities {
         _put(new SpecialEntity("gt",  '>', null, false));
         _put(new SpecialEntity("quot",  '"', null, false));
         // this is xml only -- apos appearing in html needs to be converted to ' or maybe &#39; to be universally safe
-        _put(new SpecialEntity("apos",  '\'', "&#39;", false));
+        // may need to special case for html attributes that use ' as surrounding delimeter on attribute value (instead of " ) : <a href='javascript:foo("bar'")' >wierd link</a>
+        _put(new SpecialEntity("apos",  '\'', "'", false));
 }
 
 	/**
