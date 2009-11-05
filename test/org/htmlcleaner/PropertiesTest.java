@@ -192,7 +192,9 @@ public class PropertiesTest extends TestCase {
         // then test when generating html
         String domString = simpleXmlSerializer.getXmlAsString(node, "UTF-8" );
         assertEquals("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n" +
-                "<html><head /><body><div> &amp;&quot;&#39;&#39;&lt;&gt;&nbsp;&amp;garbage;&amp;</div></body></html>", domString.trim());
+//            "<html><head /><body><div> &amp;&quot;&#39;&#39;&lt;&gt;&nbsp;&amp;garbage;&amp;</div></body></html>", 
+            "<html><head /><body><div> &amp;&quot;''&lt;&gt;&nbsp;&amp;garbage;&amp;</div></body></html>", 
+                domString.trim());
     }
 
     /**
