@@ -52,4 +52,17 @@ public class AuditTest extends TestCase{
         assertEquals(1, issueCount);
         assertEquals(ModificationType.BAD_HTML, modifications.get(0).getType());
     }
+    
+    public void testRequiredParentTagsAdded(){
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        properties.setOmitXmlDeclaration(true);
+        cleaner.clean("<html><head/><body><table><td>some</td></table></body></html>");
+        int issueCount = cleaner.getHtmlModificationManager().getModificationCount(null, null);
+        List < HtmlModification > modifications = cleaner.getHtmlModificationManager().getModifications(null, null);
+        assertEquals(2, issueCount);
+        assertEquals(ModificationType.BAD_HTML, modifications.get(0).getType());
+        assertEquals("tr", modifications.get(0).getTagName());
+        assertEquals("tbody", modifications.get(1).getTagName());
+    }
 }

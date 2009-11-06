@@ -458,11 +458,10 @@ public class CleanerProperties {
     public HtmlModification createModification(ITagNodeCondition condition, TagNode tagNode){
         HtmlModification modification = htmlModificationRegistry.getModification(condition);
         if(modification == null) {
-            modification = new HtmlModification(ModificationType.USER_DEFINED, Certainty.CERTAIN, tagNode.toString(), "User defined prune condition applied");
+            modification = new HtmlModification(ModificationType.USER_DEFINED, Certainty.CERTAIN, tagNode.getName(), "User defined prune condition applied");
         } else{
-            modification.setXpath(tagNode.toString());
+            modification.setTagName(tagNode.getName());
         }
-        modification.setTagNode(tagNode);
         return modification;
     }
 }

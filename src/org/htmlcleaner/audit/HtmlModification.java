@@ -3,7 +3,6 @@
  */
 package org.htmlcleaner.audit;
 
-import org.htmlcleaner.TagNode;
 
 /**
  * Represents any html problem/optimization/change that cleaner
@@ -25,25 +24,20 @@ public class HtmlModification implements Cloneable{
     private Certainty certainty;
     
     /**
-     * Xpath to the node that was source of the issue.
+     * TagName of the node that was source of the issue.
      */
-    private String xpath;
+    private String tagName;
     
     /**
      * Human readable message describing the problem.
      */
     private String message;
     
-    /**
-     * Problematic node.
-     */
-    private transient TagNode tagNode;
-
-    public HtmlModification(ModificationType type, Certainty certainty, String xpath, String message) {
+    public HtmlModification(ModificationType type, Certainty certainty, String tagName, String message) {
         super();
         this.type = type;
         this.certainty = certainty;
-        this.xpath = xpath;
+        this.tagName = tagName;
         this.message = message;
     }
 
@@ -63,12 +57,12 @@ public class HtmlModification implements Cloneable{
         this.certainty = certainty;
     }
 
-    public String getXpath() {
-        return xpath;
+    public String getTagName() {
+        return tagName;
     }
 
-    public void setXpath(String xpath) {
-        this.xpath = xpath;
+    public void setTagName(String tagName) {
+        this.tagName = tagName;
     }
 
     public String getMessage() {
@@ -78,16 +72,8 @@ public class HtmlModification implements Cloneable{
     public void setMessage(String message) {
         this.message = message;
     }
-
-    public TagNode getTagNode() {
-        return tagNode;
-    }
-
-    public void setTagNode(TagNode tagNode) {
-        this.tagNode = tagNode;
-    }
     
     public HtmlModification clone(){
-        return new HtmlModification(type, certainty, xpath, message);
+        return new HtmlModification(type, certainty, tagName, message);
     }
 }
