@@ -47,7 +47,6 @@ import org.htmlcleaner.audit.HtmlModification;
 import org.htmlcleaner.audit.HtmlModificationManager;
 import org.htmlcleaner.audit.HtmlModificationManagerImpl;
 import org.htmlcleaner.audit.ModificationType;
-import org.omg.CORBA._PolicyStub;
 
 /**
  * Main HtmlCleaner class.
