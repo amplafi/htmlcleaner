@@ -41,6 +41,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.htmlcleaner.audit.Certainty;
+import org.htmlcleaner.audit.HtmlModification;
+import org.htmlcleaner.audit.HtmlModificationRegistry;
+import org.htmlcleaner.audit.HtmlModificationRegistryImpl;
+import org.htmlcleaner.audit.ModificationType;
+
 /**
  * Properties defining cleaner's behaviour
  *
@@ -84,6 +90,12 @@ public class CleanerProperties {
     private String allowTags;
 
     private CleanerTransformations cleanerTransformations = new CleanerTransformations();
+    
+    /**
+     * TODO
+     */
+    private HtmlModificationRegistry htmlModificationRegistry;
+    
     /**
      * blacklist of tags
      */
@@ -294,6 +306,18 @@ public class CleanerProperties {
         pruneTagSet.add(condition);
     }
     
+    /**
+     * Same as {@link #addPruneTagNodeCondition(ITagNodeCondition)} but also 
+     * lets client to provide audit info for matched elements.
+     * 
+     * @param condition
+     * @param issue
+     */
+    public void addPruneTagNodeCondition(ITagNodeCondition condition, HtmlModification modification){
+        pruneTagSet.add(condition);
+        htmlModificationRegistry.addModificationCondition(condition, modification);
+    }
+    
     
     public Set<ITagNodeCondition> getPruneTagSet() {
         return pruneTagSet;
@@ -409,6 +433,7 @@ public class CleanerProperties {
         cleanerTransformations.clear();
         resetPruneTagSet();
         tagInfoProvider = DefaultTagProvider.getInstance();
+        htmlModificationRegistry = new HtmlModificationRegistryImpl();
     }
 
     private void resetPruneTagSet() {
@@ -428,5 +453,16 @@ public class CleanerProperties {
         } else {
             this.cleanerTransformations = cleanerTransformations;
         }
+    }
+    
+    public HtmlModification createModification(ITagNodeCondition condition, TagNode tagNode){
+        HtmlModification modification = htmlModificationRegistry.getModification(condition);
+        if(modification == null) {
+            modification = new HtmlModification(ModificationType.USER_DEFINED, Certainty.CERTAIN, tagNode.toString(), "User defined prune condition applied");
+        } else{
+            modification.setXpath(tagNode.toString());
+        }
+        modification.setTagNode(tagNode);
+        return modification;
     }
 }
