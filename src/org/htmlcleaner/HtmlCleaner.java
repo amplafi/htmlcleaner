@@ -37,16 +37,25 @@
 
 package org.htmlcleaner;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+import java.util.TreeSet;
 import java.util.Map.Entry;
-
-import org.htmlcleaner.audit.Certainty;
-import org.htmlcleaner.audit.HtmlModification;
-import org.htmlcleaner.audit.HtmlModificationManager;
-import org.htmlcleaner.audit.HtmlModificationManagerImpl;
-import org.htmlcleaner.audit.ModificationType;
 
 /**
  * Main HtmlCleaner class.
@@ -278,7 +287,6 @@ public class HtmlCleaner {
     private transient boolean _headOpened;
     private transient boolean _bodyOpened;
     private transient Set<TagNode> _headTags = new LinkedHashSet<TagNode>();
-    private transient HtmlModificationManager _htmlModificationManager;
     private Set<String> allTags = new TreeSet<String>();
 
     private TagNode htmlNode;
@@ -372,7 +380,6 @@ public class HtmlCleaner {
     public TagNode clean(Reader reader) throws IOException {
         _openTags = new OpenTags();
         _childBreaks = new ChildBreaks();
-        _htmlModificationManager = new HtmlModificationManagerImpl();
         _headOpened = false;
         _bodyOpened = false;
         _headTags.clear();
@@ -676,7 +683,7 @@ public class HtmlCleaner {
                 // unknown HTML tag and unknown tags are not allowed
                 } else if ( (tag == null && properties.isOmitUnknownTags()) || (tag != null && tag.isDeprecated() && properties.isOmitDeprecatedTags()) ) {
                     nodeIterator.set(null);
-                    _htmlModificationManager.add(new HtmlModification(ModificationType.YECKY_HTML, Certainty.CERTAIN, tagName, "Removed since tag is unknown or deprecated."));
+                    properties.fireUglyHtml(true, startTagToken, "Removed since tag is unknown or deprecated.");
                 // if current tag is unknown and last open tag doesn't allow any other tags in its body
                 } else if ( tag == null && lastTagInfo != null && !lastTagInfo.allowsAnything() ) {
                     closeSnippet(nodeList, lastTagPos, startTagToken);
@@ -686,14 +693,12 @@ public class HtmlCleaner {
                 // if tag that must be unique, ignore this occurence
                 } else if ( tag != null && tag.isUnique() && _openTags.tagEncountered(tagName) ) {
                     nodeIterator.set(null);
-                    _htmlModificationManager.add(new HtmlModification(ModificationType.BAD_HTML, Certainty.CERTAIN,
-                            tagName, "Second entry for unique tag detected, removed."));
+                    properties.fireHtmlError(true, startTagToken, "Second entry for unique tag detected, removed.");
                     // if there is no required outer tag without that this open tag is ignored
                 } else if ( !isFatalTagSatisfied(tag) ) {
                     nodeIterator.set(null);
-                    _htmlModificationManager.add(new HtmlModification(ModificationType.BAD_HTML, Certainty.CERTAIN,
-                            tagName, "Improperly placed tag detected: " + tagName + " without outer"
-                                    + tag.getFatalTag() + ". Removed."));
+                    properties.fireHtmlError(true, startTagToken, "Improperly placed tag detected: " + tagName + " without outer"
+                                    + tag.getFatalTag() + ". Removed.");
                     // if there is no required parent tag - it must be added before this open tag
                 } else if (mustAddRequiredParent(tag)) {
                     String requiredParent = tag.getRequiredParent();
@@ -702,17 +707,14 @@ public class HtmlCleaner {
                     nodeIterator.previous();
                     nodeIterator.add(requiredParentStartToken);
                     nodeIterator.previous();
-                    _htmlModificationManager.add(new HtmlModification(ModificationType.BAD_HTML, Certainty.CERTAIN,
-                            requiredParent, "Required " + requiredParent + " parent was missing for " + tagName
-                                    + ". Added."));
+                    properties.fireHtmlError(true, startTagToken,"Required " + requiredParent + " parent was missing for " + tagName + ". Added.");
                     // if last open tag has lower presidence then this, it must be closed
                 } else if ( tag != null && lastTagPos != null && tag.isMustCloseTag(lastTagInfo) ) {
                                         //since tag is closed earlier due to incorrect child tag, we store this info
                                         //to reopen it later, on the child close.
                                         _childBreaks.addBreak(lastTagPos, tagName);
-                                        Certainty certainty = startTagToken.hasAttribute("id") ? Certainty.UNCERTAIN : Certainty.CERTAIN;
-                                        _htmlModificationManager.add(new HtmlModification(ModificationType.BAD_HTML,
-                                                certainty, lastTagInfo.getName(), "Unpermitted child found:" +startTagToken.name+ " within "+lastTagInfo.getName()+". Parent was closed automatically"));
+                                        boolean certainty = startTagToken.hasAttribute("id") ? false : true;
+                                        properties.fireHtmlError(certainty, (TagNode)nodeList.get(lastTagPos.position), "Unpermitted child found:" +startTagToken.name+ " within "+lastTagInfo.getName()+". Parent was closed automatically");
                                         List closed = closeSnippet(nodeList, lastTagPos, startTagToken);
 					int closedCount = closed.size();
 
@@ -882,7 +884,7 @@ public class HtmlCleaner {
     private void closeAll(List nodeList) {
         TagPos firstTagPos = _openTags.findFirstTagPos();
         for (TagPos pos : _openTags.list) {
-            _htmlModificationManager.add(new HtmlModification(ModificationType.BAD_HTML, Certainty.CERTAIN, pos.name, "Uclosed tag closed automatically"));
+            properties.fireHtmlError(true, (TagNode)nodeList.get(pos.position), "Uclosed tag closed automatically");
         }
         if (firstTagPos != null) {
             closeSnippet(nodeList, firstTagPos, null);
@@ -924,9 +926,7 @@ public class HtmlCleaner {
             for(ITagNodeCondition condition: pruneTagSet) {
                 if ( condition.satisfy(tagNode)) {
                     addPruneNode(tagNode);
-                    if(!tagNode.isAutoGenerated()){
-                        _htmlModificationManager.add(getProperties().createModification(condition, tagNode));
-                    }
+                    properties.fireConditionModification(condition, tagNode);
                     return true;
                 }
             }
@@ -939,8 +939,7 @@ public class HtmlCleaner {
                 }
             }
             if (!tagNode.isAutoGenerated()) {
-                _htmlModificationManager.add(new HtmlModification(ModificationType.USER_DEFINED, Certainty.CERTAIN, tagNode.toString(),
-                        "Node removed since it wasn't found on allowed tagset."));
+                properties.fireUserDefinedModification(true, tagNode, "Node removed since it wasn't found on allowed tagset.");
             }
             addPruneNode(tagNode);
             return true;
@@ -1016,15 +1015,5 @@ public class HtmlCleaner {
      */
     public void initCleanerTransformations(Map transInfos) {
         transformations = new CleanerTransformations(transInfos);
-    }
-    
-    /**
-     * 
-     * TODO
-     * 
-     * @return
-     */
-    public HtmlModificationManager getHtmlModificationManager(){
-        return _htmlModificationManager;
     }
 }

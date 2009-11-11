@@ -37,15 +37,13 @@
 
 package org.htmlcleaner;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.htmlcleaner.audit.Certainty;
-import org.htmlcleaner.audit.HtmlModification;
-import org.htmlcleaner.audit.HtmlModificationRegistry;
-import org.htmlcleaner.audit.HtmlModificationRegistryImpl;
-import org.htmlcleaner.audit.ModificationType;
+import org.htmlcleaner.audit.HtmlModificationListener;
 
 /**
  * Properties defining cleaner's behaviour
@@ -53,7 +51,7 @@ import org.htmlcleaner.audit.ModificationType;
  * Created by: Vladimir Nikic<br/>
  * Date: March, 2008.
  */
-public class CleanerProperties {
+public class CleanerProperties implements HtmlModificationListener{
 
 //    public static final String DEFAULT_CHARSET = System.getProperty("file.encoding");
     public static final String DEFAULT_CHARSET = "UTF-8";
@@ -91,10 +89,7 @@ public class CleanerProperties {
 
     private CleanerTransformations cleanerTransformations = new CleanerTransformations();
     
-    /**
-     * TODO
-     */
-    private HtmlModificationRegistry htmlModificationRegistry;
+    private List < HtmlModificationListener > htmlModificationListeners;
     
     /**
      * blacklist of tags
@@ -304,20 +299,7 @@ public class CleanerProperties {
      */
     public void addPruneTagNodeCondition(ITagNodeCondition condition){
         pruneTagSet.add(condition);
-    }
-    
-    /**
-     * Same as {@link #addPruneTagNodeCondition(ITagNodeCondition)} but also 
-     * lets client to provide audit info for matched elements.
-     * 
-     * @param condition
-     * @param issue
-     */
-    public void addPruneTagNodeCondition(ITagNodeCondition condition, HtmlModification modification){
-        pruneTagSet.add(condition);
-        htmlModificationRegistry.addModificationCondition(condition, modification);
-    }
-    
+    }    
     
     public Set<ITagNodeCondition> getPruneTagSet() {
         return pruneTagSet;
@@ -433,7 +415,7 @@ public class CleanerProperties {
         cleanerTransformations.clear();
         resetPruneTagSet();
         tagInfoProvider = DefaultTagProvider.getInstance();
-        htmlModificationRegistry = new HtmlModificationRegistryImpl();
+        htmlModificationListeners = new ArrayList < HtmlModificationListener >();
     }
 
     private void resetPruneTagSet() {
@@ -447,6 +429,7 @@ public class CleanerProperties {
     public CleanerTransformations getCleanerTransformations() {
         return cleanerTransformations;
     }
+    
     public void setCleanerTransformations(CleanerTransformations cleanerTransformations) {
         if ( cleanerTransformations == null ) {
             this.cleanerTransformations.clear();
@@ -455,13 +438,42 @@ public class CleanerProperties {
         }
     }
     
-    public HtmlModification createModification(ITagNodeCondition condition, TagNode tagNode){
-        HtmlModification modification = htmlModificationRegistry.getModification(condition);
-        if(modification == null) {
-            modification = new HtmlModification(ModificationType.USER_DEFINED, Certainty.CERTAIN, tagNode.getName(), "User defined prune condition applied");
-        } else{
-            modification.setTagName(tagNode.getName());
+    /**
+     * Adds a listener to the list of objects that will be notified about changes that 
+     * cleaner does during cleanup process.
+     * 
+     * @param listener -- listener object to be notified of the changes.
+     */
+    public void addHtmlModificationListener(HtmlModificationListener listener){
+        htmlModificationListeners.add(listener);
+    }
+
+    @Override
+    public void fireConditionModification(ITagNodeCondition condition, TagNode tagNode) {
+        for (HtmlModificationListener listener : htmlModificationListeners) {
+            listener.fireConditionModification(condition, tagNode);
         }
-        return modification;
+    }
+
+    @Override
+    public void fireHtmlError(boolean certainty, TagNode startTagToken, String message) {
+        for (HtmlModificationListener listener : htmlModificationListeners) {
+            listener.fireHtmlError(certainty, startTagToken, message);
+        }
+        
+    }
+
+    @Override
+    public void fireUglyHtml(boolean certainty, TagNode startTagToken, String message) {
+        for (HtmlModificationListener listener : htmlModificationListeners) {
+            listener.fireUglyHtml(certainty, startTagToken, message);
+        }
+    }
+
+    @Override
+    public void fireUserDefinedModification(boolean certainty, TagNode tagNode, String message) {
+        for (HtmlModificationListener listener : htmlModificationListeners) {
+            listener.fireUserDefinedModification(certainty, tagNode, message);
+        }
     }
 }
