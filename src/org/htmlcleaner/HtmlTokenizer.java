@@ -113,14 +113,6 @@ public class HtmlTokenizer {
             do {
                 charsRead = _reader.read(_working, offset, expected);
                 if (charsRead >= 0) {
-//                    for (int i = offset; i < offset + charsRead; i++) {
-//                        if(_working[i] == '\n'){
-//                            _row++;
-//                            _col = 0;
-//                        }else{
-//                            _col++;
-//                        }
-//                    }
                     size += charsRead;
                     offset += charsRead;
                     expected -= charsRead;
@@ -274,13 +266,23 @@ public class HtmlTokenizer {
      * @param ch
      */
     private void save(char ch) {
+        updateCoordinates(ch);
+        _saved.append(ch);
+    }
+
+    /**
+     * Looks onto the char passed and updates current position coordinates. 
+     * If char is a line break, increments row coordinate, if not -- col coordinate. 
+     * 
+     * @param ch - char to analyze.
+     */
+    private void updateCoordinates(char ch) {
         if(ch == '\n'){
             _row++;
             _col = 1;
         }else{
             _col++;
         }
-        _saved.append(ch);
     }
 
     /**
@@ -708,12 +710,7 @@ public class HtmlTokenizer {
     private void ignoreUntil(char ch) throws IOException {
         while ( !isAllRead() ) {
         	go();
-        	if(isChar('\n')){
-        	    _row++;
-        	    _col = 1;
-        	}else{
-        	    _col++;
-        	}
+        	updateCoordinates(_working[_pos]);
             if ( isChar(ch) ) {
                 break;
             }
