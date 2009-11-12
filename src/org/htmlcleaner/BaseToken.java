@@ -52,4 +52,24 @@ public interface BaseToken {
 	
 	public void serialize(XmlSerializer xmlSerializer, Writer writer) throws IOException;
 	
+	/**
+	 * @return row in source html where the token was found
+	 */
+	public int getRow();
+	
+	/**
+	 * @param row
+	 */
+	public void setRow(int row);
+	
+	/**
+	 * @return col in source html where the token was found
+	 */
+	public int getCol();
+	
+	/**
+	 * @param col
+	 */
+	public void setCol(int col);
+	
 }

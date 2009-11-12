@@ -44,7 +44,7 @@ package org.htmlcleaner;
  * Created by: Vladimir Nikic<br/>
  * Date: November, 2006.
  */
-public abstract class TagToken implements BaseToken {
+public abstract class TagToken extends BaseTokenImpl {
 
     protected String name;
 

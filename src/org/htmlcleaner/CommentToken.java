@@ -40,15 +40,13 @@ package org.htmlcleaner;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.htmlcleaner.BaseToken;
-
 /**
  * <p>HTML comment token.</p>
  *
  * Created by: Vladimir Nikic<br/>
  * Date: November, 2006.
  */
-public class CommentToken implements BaseToken {
+public class CommentToken extends BaseTokenImpl {
 
     private String content;
 

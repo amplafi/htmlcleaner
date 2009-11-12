@@ -40,15 +40,13 @@ package org.htmlcleaner;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.htmlcleaner.BaseToken;
-
 /**
  * <p>HTML doctype token.</p>
  *
  * Created by: Vladimir Nikic<br/>
  * Date: November, 2006.
  */
-public class DoctypeToken implements BaseToken {
+public class DoctypeToken extends BaseTokenImpl {
 
     private String part1;
     private String part2;

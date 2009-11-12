@@ -60,6 +60,9 @@ public class HtmlTokenizer {
 
     private transient int _pos;
     private transient int _len = -1;
+    private transient int _row = 1;
+    private transient int _col = 1;
+    
 
     private transient StringBuffer _saved = new StringBuffer(512);
 
@@ -77,6 +80,7 @@ public class HtmlTokenizer {
     private CleanerProperties props;
     private CleanerTransformations transformations;
 
+
     /**
      * Constructor - creates instance of the parser with specified content.
      * @param cleaner
@@ -90,6 +94,8 @@ public class HtmlTokenizer {
     }
 
     private void addToken(BaseToken token) {
+        token.setRow(_row);
+        token.setCol(_col);
         _tokenList.add(token);
         cleaner.makeTree( _tokenList, _tokenList.listIterator(_tokenList.size() - 1) );
     }
@@ -98,7 +104,7 @@ public class HtmlTokenizer {
         if (_len == -1 && _pos + neededChars >= WORKING_BUFFER_SIZE) {
             int numToCopy = WORKING_BUFFER_SIZE - _pos;
             System.arraycopy(_working, _pos, _working, 0, numToCopy);
-    		_pos = 0;
+            _pos = 0;
 
             int expected = WORKING_BUFFER_SIZE - numToCopy;
             int size = 0;
@@ -107,6 +113,14 @@ public class HtmlTokenizer {
             do {
                 charsRead = _reader.read(_working, offset, expected);
                 if (charsRead >= 0) {
+//                    for (int i = offset; i < offset + charsRead; i++) {
+//                        if(_working[i] == '\n'){
+//                            _row++;
+//                            _col = 0;
+//                        }else{
+//                            _col++;
+//                        }
+//                    }
                     size += charsRead;
                     offset += charsRead;
                     expected -= charsRead;
@@ -114,7 +128,8 @@ public class HtmlTokenizer {
             } while (charsRead >= 0 && expected > 0);
 
             if (expected > 0) {
-    			_len = size + numToCopy;
+    		_len = size + numToCopy;
+    		
             }
 
             // convert invalid XML characters to spaces
@@ -136,8 +151,7 @@ public class HtmlTokenizer {
     }
 
     private void go() throws IOException {
-    	_pos++;
-    	readIfNeeded(0);
+    	go(1);
     }
 
     private void go(int step) throws IOException {
@@ -260,6 +274,12 @@ public class HtmlTokenizer {
      * @param ch
      */
     private void save(char ch) {
+        if(ch == '\n'){
+            _row++;
+            _col = 1;
+        }else{
+            _col++;
+        }
         _saved.append(ch);
     }
 
@@ -460,6 +480,7 @@ public class HtmlTokenizer {
     private void tagEnd() throws IOException {
         saveCurrent(2);
         go(2);
+        _col += 2;
 
         if ( isAllRead() ) {
             return;
@@ -687,6 +708,12 @@ public class HtmlTokenizer {
     private void ignoreUntil(char ch) throws IOException {
         while ( !isAllRead() ) {
         	go();
+        	if(isChar('\n')){
+        	    _row++;
+        	    _col = 1;
+        	}else{
+        	    _col++;
+        	}
             if ( isChar(ch) ) {
                 break;
             }
