@@ -63,7 +63,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.4</version>
+            <version>4.7</version>
             <scope>test</scope>
         </dependency>        
     </dependencies>
@@ -124,6 +124,26 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <!-- eclipse:configure-workspace adds M2_REPO to eclipse -->
+                <!--
+                    workspaceActiveCodeStyleProfileName Name of a profile in workspaceCodeStylesURL to activate. Default is
+                    the first profile name in the code style file in workspaceCodeStylesURL
+                -->
+                <!-- workspaceCodeStylesURL    String      Point to a URL containing code styles content.
+                      -->
+                <configuration>
+                    <!-- 
+                  <workspaceCodeStylesURL></workspaceCodeStylesURL>
+                   -->
+                    <buildOutputDirectory>bin</buildOutputDirectory>
+
+                </configuration>
+
+            </plugin>            
         </plugins>
     </build>
     <distributionManagement>
