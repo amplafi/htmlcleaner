@@ -19,7 +19,7 @@ public interface HtmlModificationListener {
      * @param tagNode - problematic node.
      * @param message - human-readable message about the change.
      */
-    void fireHtmlError(boolean certainty, TagNode tagNode, String message);
+    void fireHtmlError(boolean certainty, TagNode tagNode, ErrorType type);
 
     /**
      * Fired when cleaner fixes ugly html -- when syntax was correct but task was implemented by weird code.
@@ -29,7 +29,7 @@ public interface HtmlModificationListener {
      * @param tagNode - problematic node.
      * @param message - human-readable message about the change.
      */
-    void fireUglyHtml(boolean certainty, TagNode tagNode, String message);
+    void fireUglyHtml(boolean certainty, TagNode tagNode, ErrorType errorType);
 
     /**
      * Fired when cleaner modifies html due to {@link ITagNodeCondition} match.
@@ -46,6 +46,6 @@ public interface HtmlModificationListener {
      * @param tagNode - problematic node.
      * @param message - human-readable message about the change.
      */
-    void fireUserDefinedModification(boolean certainty, TagNode tagNode, String message);
+    void fireUserDefinedModification(boolean certainty, TagNode tagNode, ErrorType errorType);
 
 }

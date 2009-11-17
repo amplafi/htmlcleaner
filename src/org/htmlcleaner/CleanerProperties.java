@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.htmlcleaner.audit.ErrorType;
 import org.htmlcleaner.audit.HtmlModificationListener;
 
 /**
@@ -456,24 +457,24 @@ public class CleanerProperties implements HtmlModificationListener{
     }
 
     @Override
-    public void fireHtmlError(boolean certainty, TagNode startTagToken, String message) {
+    public void fireHtmlError(boolean certainty, TagNode startTagToken, ErrorType type) {
         for (HtmlModificationListener listener : htmlModificationListeners) {
-            listener.fireHtmlError(certainty, startTagToken, message);
+            listener.fireHtmlError(certainty, startTagToken, type);
         }
         
     }
 
     @Override
-    public void fireUglyHtml(boolean certainty, TagNode startTagToken, String message) {
+    public void fireUglyHtml(boolean certainty, TagNode startTagToken, ErrorType errorType) {
         for (HtmlModificationListener listener : htmlModificationListeners) {
-            listener.fireUglyHtml(certainty, startTagToken, message);
+            listener.fireUglyHtml(certainty, startTagToken, errorType);
         }
     }
 
     @Override
-    public void fireUserDefinedModification(boolean certainty, TagNode tagNode, String message) {
+    public void fireUserDefinedModification(boolean certainty, TagNode tagNode, ErrorType errorType) {
         for (HtmlModificationListener listener : htmlModificationListeners) {
-            listener.fireUserDefinedModification(certainty, tagNode, message);
+            listener.fireUserDefinedModification(certainty, tagNode, errorType);
         }
     }
 }
