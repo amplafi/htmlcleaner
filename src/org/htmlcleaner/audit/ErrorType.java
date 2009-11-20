@@ -10,6 +10,13 @@ public enum ErrorType {
 
     /**
      * Tag which existence is critical for the current is missing. Most likely, current tag was pruned.
+     * <p>
+     * <b>Example:</b>
+     * <ul>
+     *  <li>&lt;option> tag without parent select
+     *  <li>&lt;tr> tag without parent &lt;table>
+     *  <li>...
+     * </ul>
      */
     FatalTagMissing,
     /**
@@ -22,23 +29,63 @@ public enum ErrorType {
     RequiredParentMissing,
     /**
      * No matching close token was found for the open tag. Tag was closed automatically.
+     * <p>
+     * <b>Example:</b>
+     * <p>
+     * &lt;p>Some text..
+     * <p>
+     * Unclosed &lt;p> tag.
      */
     UnclosedTag,
     /**
-     * Second instance of an unique tag was found (i.e. second head), most likely it was removed.
+     * Second instance of an unique tag was found, most likely it was removed.
+     * <p>
+     * <b>Example:</b>
+     * <p>
+     * <pre>
+     * &lt;head>
+     *    &lt;title>Some text&lt;/title>
+     *    &lt;title>Some more text&lt;/title>
+     * &lt;/head>
+     * <p>
+     * </pre>
+     * 
      */
     UniqueTagDuplicated,
     /**
      * The tag was deprecated and current cleaner mode doesn't allows this. The tag was removed.
+     * <p>
+     * <b>Example:</b>
+     * <ul>
+     *  <li>&lt;u>
+     *  <li>&lt;s>
+     *  <li>&lt;srtike>
+     *  <li>....
+     * </ul>
      */
     Deprecated,
     /**
-     * This tag have bad child that shouldn't be here. Thus the tag is closed automatically to avoid such inclusion.
+     * This tag have bad child that shouldn't be here. Thus the tag is closed automatically 
+     * to avoid such inclusion.
+     * <p>
+     * <b>Example:</b>
+     * <p>
+     * &lt;p>Some text &lt;table>...&lt;/table>&lt;p>
+     * <p>
+     * &lt;table> is not allowed to be child of &lt;p>, thus &lt;p> is closed before the &lt;table>
+     * 
      */
     UnpermittedChild, 
     
     /**
      * The tag is unknown and current cleaner mode doesn't allows this. The tag was removed.
+     * <p>
+     * <b>Example:</b>
+     * <ul>
+     *  <li>&lt;any>
+     *  <li>&lt;tag>
+     *  <li>....
+     * </ul>
      */
     Unknown
 }
