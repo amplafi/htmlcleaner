@@ -29,11 +29,16 @@ public enum ErrorType {
      */
     UniqueTagDuplicated,
     /**
-     * The tag was unknown or deprecated and current cleaner mode doesn't allows this. The tag was removed.
+     * The tag was deprecated and current cleaner mode doesn't allows this. The tag was removed.
      */
-    UnknownOrDeprecated,
+    Deprecated,
     /**
      * This tag have bad child that shouldn't be here. Thus the tag is closed automatically to avoid such inclusion.
      */
-    UnpermittedChild
+    UnpermittedChild, 
+    
+    /**
+     * The tag is unknown and current cleaner mode doesn't allows this. The tag was removed.
+     */
+    Unknown
 }

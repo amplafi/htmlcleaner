@@ -683,9 +683,12 @@ public class HtmlCleaner {
                     addAttributesToTag(headNode, startTagToken.getAttributes());
 					nodeIterator.set(null);
                 // unknown HTML tag and unknown tags are not allowed
-                } else if ( (tag == null && properties.isOmitUnknownTags()) || (tag != null && tag.isDeprecated() && properties.isOmitDeprecatedTags()) ) {
+                } else if ( tag == null && properties.isOmitUnknownTags()) {
                     nodeIterator.set(null);
-                    properties.fireUglyHtml(true, startTagToken, ErrorType.UnknownOrDeprecated);
+                    properties.fireUglyHtml(true, startTagToken, ErrorType.Unknown);
+                } else if ( tag != null && tag.isDeprecated() && properties.isOmitDeprecatedTags()) {
+                    nodeIterator.set(null);
+                    properties.fireUglyHtml(true, startTagToken, ErrorType.Deprecated);
                 // if current tag is unknown and last open tag doesn't allow any other tags in its body
                 } else if ( tag == null && lastTagInfo != null && !lastTagInfo.allowsAnything() ) {
                     closeSnippet(nodeList, lastTagPos, startTagToken);
