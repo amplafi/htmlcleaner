@@ -9,6 +9,7 @@ package org.htmlcleaner.audit;
 public enum ErrorType {
 
     /**
+     * TO_KONSTANTIN: confusion here -- how is this different from RequiredParentMissing ????
      * Tag which existence is critical for the current is missing. Most likely, current tag was pruned.
      * <p>
      * <b>Example:</b>
