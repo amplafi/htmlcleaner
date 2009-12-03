@@ -132,17 +132,17 @@ public class HtmlCleaner {
      */
     private class ChildBreaks{
         private Stack < TagPos> closedByChildBreak = new Stack < TagPos >();
-        private Stack < String > breakingTags = new Stack < String >();
+        private Stack < TagPos > breakingTags = new Stack < TagPos >();
         
         /**
          * Adds the break info to the top of the stacks.
-         * 
-         * @param tagPos
-         * @param tagName
+         *
+         * @param closedPos - position of the tag that was closed due to incorrect child
+         * @param breakPos - position of the child that has broken its parent
          */
-        public void addBreak(TagPos tagPos, String tagName){
-            closedByChildBreak.add(tagPos);
-            breakingTags.add(tagName);
+        public void addBreak(TagPos closedPos, TagPos breakPos){
+            closedByChildBreak.add(closedPos);
+            breakingTags.add(breakPos);
         }
 
         public boolean isEmpty() {
@@ -153,7 +153,7 @@ public class HtmlCleaner {
          * @return name of the last children tag that has broken its parent.
          */
         public String getLastBreakingTag() {
-            return breakingTags.peek();
+            return breakingTags.peek().name;
         }
 
         /**
@@ -164,6 +164,13 @@ public class HtmlCleaner {
         public TagPos pop() {
             breakingTags.pop();
             return closedByChildBreak.pop();
+        }
+
+        /**
+         * @return position of the last tag that has broken its parent. -1 if no such tag found.
+         */
+        public int getLastBreakingTagPosition() {
+            return breakingTags.isEmpty()?-1:breakingTags.peek().position;
         }
     }
     
@@ -646,6 +653,13 @@ public class HtmlCleaner {
                                 nodeIterator.previous();
                             }
                         }
+                        if(!_childBreaks.isEmpty()){
+                            while(matchingPosition.position < _childBreaks.getLastBreakingTagPosition()){
+                                //We're closing tag that is parent for the last closed by childbreak,
+                                //thus we no longer need this info.
+                                _childBreaks.pop();
+                            }
+                        }
                         if( !_childBreaks.isEmpty() && tagName.equals(_childBreaks.getLastBreakingTag())){
                             //this tag has broken it's parent, thus the parent tag should be reopened.
                             TagNode closedByPresidence = (TagNode) nodeList.get(_childBreaks.pop().position);
@@ -716,7 +730,7 @@ public class HtmlCleaner {
                 } else if ( tag != null && lastTagPos != null && tag.isMustCloseTag(lastTagInfo) ) {
                                         //since tag is closed earlier due to incorrect child tag, we store this info
                                         //to reopen it later, on the child close.
-                                        _childBreaks.addBreak(lastTagPos, tagName);
+                                        _childBreaks.addBreak(lastTagPos, new TagPos(nodeIterator.previousIndex(), tag.getName()));
                                         boolean certainty = startTagToken.hasAttribute("id") ? false : true;
                                         properties.fireHtmlError(certainty, (TagNode)nodeList.get(lastTagPos.position), ErrorType.UnpermittedChild);
                                         List closed = closeSnippet(nodeList, lastTagPos, startTagToken);
