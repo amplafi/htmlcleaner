@@ -30,3 +30,9 @@ XmlSerializer/HtmlCleaner -- remove IOException being thrown when reading from s
  * additional documentation
  
 * add greek and math symbols
+
+* cleanup change - if tag was closed due to improperly placed child it will be reopened after the child.
+  See ClosedTagReopenTest.java for examples
+  
+* added audit code - now it is possible to hook in code that will be notified about changes that htmlcleaner does.
+  See CleanerProperties#addHtmlModificationListener.
