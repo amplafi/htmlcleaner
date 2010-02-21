@@ -74,7 +74,10 @@ public abstract class XmlSerializer {
     }
 
     public void writeXmlToStream(TagNode tagNode, OutputStream out, String charset) throws IOException {
-         writeXml( tagNode, new OutputStreamWriter(out, charset), charset );
+         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, charset));
+         writeXml( tagNode, writer, charset );
+         writer.flush();
+         writer.close();
     }
 
     public void writeXmlToStream(TagNode tagNode, OutputStream out) throws IOException {
@@ -111,7 +114,6 @@ public abstract class XmlSerializer {
     }
 
     public void writeXml(TagNode tagNode, Writer writer, String charset) throws IOException {
-        writer = new BufferedWriter(writer);
         if ( !props.isOmitXmlDeclaration() ) {
             String declaration = "<?xml version=\"1.0\"";
             if (charset != null) {
@@ -129,9 +131,6 @@ public abstract class XmlSerializer {
 		}
 
 		serialize(tagNode, writer);
-
-        writer.flush();
-        writer.close();
     }
 
 	protected String escapeXml(String xmlContent) {
@@ -161,10 +160,8 @@ public abstract class XmlSerializer {
     }
 
     protected void serializeOpenTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
-        String tagName = tagNode.getName();
-        // null tagName when rootNode is a dummy node.
-        // this happens when omitting the html envelope elements ( <html>, <head>, <body> elements )         
-        if ( tagName != null ) {
+        if ( !isForbiddenTag(tagNode)) {
+            String tagName = tagNode.getName();
             Map tagAtttributes = tagNode.getAttributes();
     
             writer.write("<" + tagName);
@@ -173,12 +170,7 @@ public abstract class XmlSerializer {
                 Map.Entry entry = (Map.Entry) it.next();
                 String attName = (String) entry.getKey();
                 String attValue = (String) entry.getValue();
-    
-                if ( !props.isNamespacesAware() && ("xmlns".equals(attName) || attName.startsWith("xmlns:")) ) {
-                	continue;
-                }
-    
-                writer.write(" " + attName + "=\"" + escapeXml(attValue) + "\"");
+                serializeAttribute(tagNode, writer, attName, attValue);
             }
     
             if ( isMinimizedTagSyntax(tagNode) ) {
@@ -187,23 +179,50 @@ public abstract class XmlSerializer {
             		writer.write("\n");
             	}
             } else if (dontEscape(tagNode)) {
-            	writer.write("><![CDATA[");
+                // because we are not considering if the file is xhtml or html,
+                // we need to put a javascript comment in front of the CDATA in case this is NOT xhtml
+                writer.write(">\n//<![CDATA[\n");
             } else {
             	writer.write(">");
             }
         }
     }
     protected void serializeOpenTag(TagNode tagNode, Writer writer) throws IOException {
-    	serializeOpenTag(tagNode, writer, true);
+        serializeOpenTag(tagNode, writer, true);
+    }
+    /**
+     * @param tagNode
+     * @return
+     */
+    protected boolean isForbiddenTag(TagNode tagNode) {
+        // null tagName when rootNode is a dummy node.
+        // this happens when omitting the html envelope elements ( <html>, <head>, <body> elements ) 
+        String tagName = tagNode.getName();
+        return tagName == null;
+    }
+    /**
+     * This allows overriding to eliminate forbidden attributes (for example javascript attributes onclick, onblur, etc. ) 
+     * @param writer
+     * @param attName
+     * @param attValue
+     * @throws IOException
+     */
+    protected void serializeAttribute(TagNode tagNode, Writer writer, String attName, String attValue) throws IOException {
+        if (!isForbiddenAttribute(tagNode, attName, attValue)) {
+            writer.write(" " + attName + "=\"" + escapeXml(attValue) + "\"");
+        }
+    }
+    protected boolean isForbiddenAttribute(TagNode tagNode, String attName, String value) {
+        return !props.isNamespacesAware() && ("xmlns".equals(attName) || attName.startsWith("xmlns:"));
     }
 
     protected void serializeEndTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
-    	String tagName = tagNode.getName();
-    	// null tagName when rootNode is a dummy node.
-    	// this happens when omitting the html envelope elements ( <html>, <head>, <body> elements ) 
-    	if ( tagName != null) {
+    	if ( !isForbiddenTag(tagNode)) {
+    	    String tagName = tagNode.getName();
         	if (dontEscape(tagNode)) {
-        		writer.write("]]>");
+                // because we are not considering if the file is xhtml or html,
+                // we need to put a javascript comment in front of the CDATA in case this is NOT xhtml
+        		writer.write("\n//]]>\n");
         	}
     
         	writer.write( "</" + tagName + ">" );
