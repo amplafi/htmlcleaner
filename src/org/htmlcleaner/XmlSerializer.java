@@ -49,7 +49,19 @@ import java.util.Map;
  */
 public abstract class XmlSerializer {
 
-	protected CleanerProperties props;
+	/**
+     * 
+     */
+    public static final String XMLNS_NAMESPACE = "xmlns";
+    /**
+     * 
+     */
+    public static final String SAFE_BEGIN_CDATA = "/*<![CDATA[*/";
+    /**
+     * 
+     */
+    public static final String SAFE_END_CDATA = "/* ]]> */";
+    protected CleanerProperties props;
 	private boolean creatingHtmlDom;
 
     protected XmlSerializer() {
@@ -181,7 +193,7 @@ public abstract class XmlSerializer {
             } else if (dontEscape(tagNode)) {
                 // because we are not considering if the file is xhtml or html,
                 // we need to put a javascript comment in front of the CDATA in case this is NOT xhtml
-                writer.write(">\n//<![CDATA[\n");
+                writer.write(">"+SAFE_BEGIN_CDATA);
             } else {
             	writer.write(">");
             }
@@ -213,7 +225,7 @@ public abstract class XmlSerializer {
         }
     }
     protected boolean isForbiddenAttribute(TagNode tagNode, String attName, String value) {
-        return !props.isNamespacesAware() && ("xmlns".equals(attName) || attName.startsWith("xmlns:"));
+        return !props.isNamespacesAware() && (XMLNS_NAMESPACE.equals(attName) || attName.startsWith(XMLNS_NAMESPACE +":"));
     }
 
     protected void serializeEndTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
@@ -222,7 +234,7 @@ public abstract class XmlSerializer {
         	if (dontEscape(tagNode)) {
                 // because we are not considering if the file is xhtml or html,
                 // we need to put a javascript comment in front of the CDATA in case this is NOT xhtml
-        		writer.write("\n//]]>\n");
+        		writer.write(SAFE_END_CDATA);
         	}
     
         	writer.write( "</" + tagName + ">" );

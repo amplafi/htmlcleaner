@@ -19,8 +19,6 @@ public class PropertiesTest extends TestCase {
         cleaner = new HtmlCleaner();
         properties = cleaner.getProperties();
     }
-    private static final String CDATA_PREFIX = "\n//<![CDATA[\n";
-    private static final String CDATA_SUFFIX = "\n//]]>\n";
 
     public void testProperties() throws Exception {
         properties.setNamespacesAware(false);
@@ -35,9 +33,9 @@ public class PropertiesTest extends TestCase {
 
         properties.setUseCdataForScriptAndStyle(true);
         xmlString = getXmlString();
-        String expected = "<script>"+CDATA_PREFIX+"var x=y&&z;"+CDATA_SUFFIX+"</script>";
+        String expected = "<script>"+XmlSerializer.SAFE_BEGIN_CDATA+"var x=y&&z;"+XmlSerializer.SAFE_END_CDATA+"</script>";
         assertTrue("looking for :\""+expected+"\" in :\n"+ xmlString,  xmlString.indexOf(expected) >= 0 );
-        expected = "<style>"+CDATA_PREFIX+".test{font-size:10;}"+CDATA_SUFFIX+"</style>";
+        expected = "<style>"+XmlSerializer.SAFE_BEGIN_CDATA+".test{font-size:10;}"+XmlSerializer.SAFE_END_CDATA+"</style>";
         assertTrue("looking for :\""+expected+"\" in :\n"+ xmlString, xmlString.indexOf(expected) >= 0);
         assertTrue( xmlString.indexOf("<script></script>") >= 0 );
         assertTrue( xmlString.indexOf("<style></style>") >= 0 );
