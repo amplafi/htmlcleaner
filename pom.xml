@@ -47,6 +47,9 @@
      <scm>
         <developerConnection>scm:svn:https://svn1.hosted-projects.com/transparentpolitics/modified-opensource/${artifactId}/trunk</developerConnection>
     </scm>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
