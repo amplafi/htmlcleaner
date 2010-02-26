@@ -60,7 +60,7 @@ public abstract class XmlSerializer {
     /**
      * 
      */
-    public static final String SAFE_END_CDATA = "/* ]]> */";
+    public static final String SAFE_END_CDATA = "/*]]>*/";
     protected CleanerProperties props;
 	private boolean creatingHtmlDom;
 
@@ -224,6 +224,13 @@ public abstract class XmlSerializer {
             writer.write(" " + attName + "=\"" + escapeXml(attValue) + "\"");
         }
     }
+    /**
+     * Override to add additional conditions.
+     * @param tagNode
+     * @param attName
+     * @param value
+     * @return true if the attribute should not be outputed.
+     */
     protected boolean isForbiddenAttribute(TagNode tagNode, String attName, String value) {
         return !props.isNamespacesAware() && (XMLNS_NAMESPACE.equals(attName) || attName.startsWith(XMLNS_NAMESPACE +":"));
     }

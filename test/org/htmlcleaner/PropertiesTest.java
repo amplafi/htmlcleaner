@@ -300,5 +300,17 @@ public class PropertiesTest extends TestCase {
         String output = new SimpleXmlSerializer().getXmlAsString(cleanerProperties, "<h3><u><strong>President’s Message</strong></u><div> </h3>", "UTF-8");
         assertEquals("<h3><u><strong>President’s Message</strong></u><div> </div></h3>", output);
     }
+    
+    /**
+     * Test conversion of former ( now bad practice ) of:
+     * <pre>
+     * &lt;style>&lt;!-- style info -->&lt;/style>
+     * </pre>
+     * into
+     * 
+     */
+    //public void testConvertOldStyleComments() {
+        
+    //}
 
 }
