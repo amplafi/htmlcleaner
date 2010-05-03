@@ -32,7 +32,7 @@ public enum Display {
 
 	/**
 	 * Elements that are not actually inline or block, usually such elements are
-	 * not rendered at all rendered.
+	 * not rendered at all.
 	 */
 	none(true, false);
 

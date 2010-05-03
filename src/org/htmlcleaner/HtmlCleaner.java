@@ -445,7 +445,7 @@ public class HtmlCleaner {
     			TagNode node = (TagNode) next;
     			if(addIfNeededToPruneSet(node)) {
 			        nodesPruned = true;
-    			} else if (node.getChildren()!=null){
+    			} else if (!node.isEmpty()){
     				nodesPruned |= markNodesToPrune(node.getChildren());
     			}
     		}

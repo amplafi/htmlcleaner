@@ -7,6 +7,22 @@ import junit.framework.TestCase;
  */
 public class CollapseHtmlTest extends TestCase {
 
+    /**
+     * 
+     */
+    private static final String IMAGE = "<img src=\"http://localhost:8080/img/foo.jpg\" />";
+
+    /**
+     * 
+     */
+    private static final String DONT_COLLAPSE =
+        "<span>" + IMAGE  +"</span>" +
+        "<p>" + IMAGE +"</p>" +
+    		"<p>bar<table><tr><td></td><td>"+IMAGE+"</td><td> </td></tr></table>foo</p>";
+    private static final String DONT_COLLAPSE_OUTPUT = 
+    "<span>" + IMAGE +"</span>" +
+    "<p>" +IMAGE +"</p>" +
+    "<p>bar</p><table><tbody><tr><td /><td>"+IMAGE+"</td><td /></tr></tbody></table><p>foo</p>";
     private HtmlCleaner cleaner;
 
     private CleanerProperties properties;
@@ -40,7 +56,7 @@ public class CollapseHtmlTest extends TestCase {
         assertEquals("", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean("<u> &#x20;  </u>");
         assertEquals("", serializer.getXmlAsString(collapsed));
-        //Srange msword insert
+        //Strange msword insert
         //collapsed = cleaner.clean("<span style='mso-spacerun:yes'>  </span>");
         //assertEquals("", serializer.getXmlAsString(collapsed));
     }
@@ -118,7 +134,7 @@ public class CollapseHtmlTest extends TestCase {
      * make sure that intervening empty elements still cause unneeded <br> s to be eliminated.
      */
     public void testCollapseInsignificantBrWithEmptyElements() {
-        TagNode collapsed = cleaner.clean("<p><span></span><br/>Some text</p>");
+        TagNode collapsed = cleaner.clean("<p><span>&nbsp;</span><br/>Some text</p>");
         assertEquals("<p>Some text</p>", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean("<p>Some text<br><span></span><BR/><u><big></big></u><BR/></p>");
         assertEquals("<p>Some text</p>", serializer.getXmlAsString(collapsed));
@@ -133,15 +149,6 @@ public class CollapseHtmlTest extends TestCase {
         TagNode collapsed = cleaner.clean("<p><u><br/></u>Some text<br><span><BR/><u><big><BR/></big></u></p></span>");
         assertEquals("<p>Some text</p>", serializer.getXmlAsString(collapsed));
     }
-
-    /**
-     * make sure block elements are not collapsed even if empty if
-     * {@link CollapseHtml#emptyOrBlankInlineElements}
-     */
-    public void testCollapseOnlyFormattingElements() {
-        TagNode collapsed = cleaner.clean("<p></p><table><tr></tr><tr><td></td></tr></table>");
-        assertEquals("<p /><table><tbody><tr /><tr><td /></tr></tbody></table>", serializer.getXmlAsString(collapsed));
-    }
     
     /**
      * because elements with ids can be referred to by javascript, don't assume that such elements can be eliminated.
@@ -154,9 +161,12 @@ public class CollapseHtmlTest extends TestCase {
     }
 
     public void testCollapseAggressively() {
-        properties.addPruneTagNodeCondition(new TagNodeEmptyBlockElementCondition(properties.getTagInfoProvider()));
-        TagNode collapsed = cleaner.clean("<p></p><table><tr></tr><tr><td></td></tr></table>");
+        properties.addPruneTagNodeCondition(new TagNodeEmptyContentCondition(properties.getTagInfoProvider()));
+        TagNode collapsed;
+        collapsed = cleaner.clean("<p><table><tr></tr><tr><td></td></tr></table></p>");
         assertEquals("", serializer.getXmlAsString(collapsed));
+        collapsed = cleaner.clean(DONT_COLLAPSE);
+        assertEquals(DONT_COLLAPSE_OUTPUT, serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean("<p id=\"notme\"></p><table><tr></tr><tr><td>Nor me</td></tr></table>");
         assertEquals("<p id=\"notme\" /><table><tbody><tr><td>Nor me</td></tr></tbody></table>", serializer
                 .getXmlAsString(collapsed));

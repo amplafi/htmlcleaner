@@ -268,14 +268,14 @@ public class TagNode extends TagToken {
     /**
      * @return Text content of this node and it's subelements.
      */
-    public StringBuffer getText() {
+    public CharSequence getText() {
         StringBuffer text = new StringBuffer();
         for (int i = 0; i < children.size(); i++) {
             Object item = children.get(i);
             if (item instanceof ContentToken) {
                 text.append( ((ContentToken)item).getContent() );
             } else if (item instanceof TagNode) {
-                StringBuffer subtext = ((TagNode)item).getText();
+                CharSequence subtext = ((TagNode)item).getText();
                 text.append(subtext);
             }
         }
@@ -547,7 +547,25 @@ public class TagNode extends TagToken {
 	}
     
     public boolean isEmpty() {
-        return this.children.isEmpty();
+        if ( !isPruned()) {
+            for(Object child: this.children) {
+                if(child instanceof TagNode) {
+                    if (!((TagNode)child).isPruned()) {
+                        return false;
+                    }
+                } else if( child instanceof ContentToken ) {
+                    if ( !((ContentToken)child).isBlank()) {
+                        return false;
+                    }
+                } else if ( child instanceof CommentToken) {
+                    // ideally could be discarded - however standard practice is to include browser specific commands in comments. :-(
+                    return false;
+                } else {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public void serialize(XmlSerializer xmlSerializer, Writer writer) throws IOException {

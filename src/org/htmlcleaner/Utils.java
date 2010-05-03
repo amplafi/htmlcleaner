@@ -318,7 +318,13 @@ public class Utils {
      * @return True if specified string is null of contains only whitespace characters
      */
     public static boolean isEmptyString(Object o) {
-        return o == null || "".equals(o.toString().trim());
+        if ( o == null ) {
+            return true;
+        }
+        String s = o.toString();
+        String text = escapeXml(s, true, false, false, false);
+        String last = text.replace(SpecialEntities.NON_BREAKABLE_SPACE, ' ').trim();
+        return last.isEmpty();
     }
 
     public static String[] tokenize(String s, String delimiters) {

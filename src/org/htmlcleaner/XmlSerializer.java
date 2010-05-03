@@ -157,7 +157,7 @@ public abstract class XmlSerializer {
 	protected boolean dontEscape(TagNode tagNode) {
 	    // make sure <script src=..></script> doesn't get turned into <script src=..><[CDATA[]]></script>
 	    // TODO check for blank content as well.
-		return props.isUseCdataForScriptAndStyle() && isScriptOrStyle(tagNode) && !tagNode.getChildren().isEmpty();
+		return props.isUseCdataForScriptAndStyle() && isScriptOrStyle(tagNode) && !tagNode.isEmpty();
 	}
 
 	protected boolean isScriptOrStyle(TagNode tagNode) {
@@ -167,7 +167,7 @@ public abstract class XmlSerializer {
 
     protected boolean isMinimizedTagSyntax(TagNode tagNode) {
         final TagInfo tagInfo = props.getTagInfoProvider().getTagInfo(tagNode.getName());
-        return tagNode.getChildren().isEmpty() && (tagInfo == null || tagInfo.isMinimizedTagPermitted()) &&
+        return tagNode.isEmpty() && (tagInfo == null || tagInfo.isMinimizedTagPermitted()) &&
                ( props.isUseEmptyElementTags() || (tagInfo != null && tagInfo.isEmptyTag()) );
     }
 

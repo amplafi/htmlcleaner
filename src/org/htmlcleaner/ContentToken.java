@@ -48,22 +48,27 @@ import java.io.Writer;
  */
 public class ContentToken extends BaseTokenImpl {
 
-    private StringBuffer content;
+    private final String content;
+    private final boolean blank;
 
     public ContentToken(String content) {
-        this.content = new StringBuffer(content);
+        this.content = content;
+        this.blank = Utils.isEmptyString(this.content);
     }
 
     public String getContent() {
-        return content.toString();
+        return content;
     }
 
     public String toString() {
-        return content.toString();
+        return getContent();
     }
 
     public void serialize(XmlSerializer xmlSerializer, Writer writer) throws IOException {
-    	writer.write( content.toString() );
+    	writer.write( content );
     }
 
+    public boolean isBlank() {
+        return this.blank;
+    }
 }

@@ -111,6 +111,9 @@ public class TagInfo {
 	protected static final int BODY = 2;
 
 	protected static final int CONTENT_ALL = 0;
+	/**
+	 * elements that have no children or content ( for example <img> ). For these elements, the check for null elements must be more than must a children/ content check.
+	 */
 	protected static final int CONTENT_NONE = 1;
 	protected static final int CONTENT_TEXT = 2;
 
