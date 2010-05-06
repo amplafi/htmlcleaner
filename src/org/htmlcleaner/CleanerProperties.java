@@ -415,7 +415,7 @@ public class CleanerProperties implements HtmlModificationListener{
         charset = "UTF-8";
         cleanerTransformations.clear();
         resetPruneTagSet();
-        tagInfoProvider = DefaultTagProvider.getInstance();
+        tagInfoProvider = DefaultTagProvider.INSTANCE;
         htmlModificationListeners = new ArrayList < HtmlModificationListener >();
     }
 

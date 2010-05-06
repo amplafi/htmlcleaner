@@ -106,26 +106,15 @@ import java.util.*;
  */
 public class TagInfo {
 
-    protected static final int HEAD_AND_BODY = 0;
-	protected static final int HEAD = 1;
-	protected static final int BODY = 2;
-
-	protected static final int CONTENT_ALL = 0;
-	/**
-	 * elements that have no children or content ( for example <img> ). For these elements, the check for null elements must be more than must a children/ content check.
-	 */
-	protected static final int CONTENT_NONE = 1;
-	protected static final int CONTENT_TEXT = 2;
-
     private String name;
-    private int contentType;
+    private ContentType contentType;
     private Set<String> mustCloseTags = new HashSet<String>();
     private Set<String> higherTags = new HashSet<String>();
     private Set<String> childTags = new HashSet<String>();
     private Set<String> permittedTags = new HashSet<String>();
     private Set<String> copyTags = new HashSet<String>();
     private Set<String> continueAfterTags = new HashSet<String>();
-    private int belongsTo = BODY;
+    private BelongsTo belongsTo = BelongsTo.BODY;
     private String requiredParent;
     private String fatalTag;
     private boolean deprecated;
@@ -134,7 +123,7 @@ public class TagInfo {
     private CloseTag closeTag;
     private Display display;
 
-    public TagInfo(String name, int contentType, int belongsTo, boolean deprecated, boolean unique, boolean ignorePermitted, CloseTag closeTag, Display display) {
+    public TagInfo(String name, ContentType contentType, BelongsTo belongsTo, boolean deprecated, boolean unique, boolean ignorePermitted, CloseTag closeTag, Display display) {
         this.name = name;
         this.contentType = contentType;
         this.belongsTo = belongsTo;
@@ -231,7 +220,7 @@ public class TagInfo {
         this.name = name;
     }
 
-    public int getContentType() {
+    public ContentType getContentType() {
         return contentType;
     }
 
@@ -291,11 +280,11 @@ public class TagInfo {
         this.requiredParent = requiredParent;
     }
 
-    public int getBelongsTo() {
+    public BelongsTo getBelongsTo() {
         return belongsTo;
     }
 
-    public void setBelongsTo(int belongsTo) {
+    public void setBelongsTo(BelongsTo belongsTo) {
         this.belongsTo = belongsTo;
     }
 
@@ -328,7 +317,7 @@ public class TagInfo {
     }
 
     public boolean isEmptyTag() {
-        return CONTENT_NONE == contentType;
+        return ContentType.none == contentType;
     }
 
     public void setIgnorePermitted(boolean ignorePermitted) {
@@ -338,7 +327,7 @@ public class TagInfo {
     // other functionality
 
     boolean allowsBody() {
-    	return CONTENT_NONE != contentType;
+    	return ContentType.none != contentType;
     }
 
     boolean isHigher(String tagName) {
@@ -362,23 +351,23 @@ public class TagInfo {
     }
 
     boolean isHeadTag() {
-    	return belongsTo == HEAD;
+    	return belongsTo == BelongsTo.HEAD;
     }
 
     boolean isHeadAndBodyTag() {
-    	return belongsTo == HEAD || belongsTo == HEAD_AND_BODY;
+    	return belongsTo == BelongsTo.HEAD || belongsTo == BelongsTo.HEAD_AND_BODY;
     }
 
     boolean isMustCloseTag(TagInfo tagInfo) {
         if (tagInfo != null) {
-            return mustCloseTags.contains( tagInfo.getName() ) || tagInfo.contentType == CONTENT_TEXT;
+            return mustCloseTags.contains( tagInfo.getName() ) || tagInfo.contentType == ContentType.text;
         }
 
         return false;
     }
 
     boolean allowsItem(BaseToken token) {
-        if ( contentType != CONTENT_NONE && token instanceof TagToken ) {
+        if ( contentType != ContentType.none && token instanceof TagToken ) {
             TagToken tagToken = (TagToken) token;
             String tagName = tagToken.getName();
             if ( "script".equals(tagName) ) {
@@ -386,14 +375,14 @@ public class TagInfo {
             }
         }
 
-        if (CONTENT_ALL == contentType) {
+        if (ContentType.all == contentType) {
             if ( !childTags.isEmpty() ) {
             	return token instanceof TagToken ? childTags.contains( ((TagToken)token).getName() ) : false;
     		} else if ( !permittedTags.isEmpty() ) {
     			return token instanceof TagToken ? !permittedTags.contains( ((TagToken)token).getName() ) : true;
     		}
             return true;
-        } else if ( CONTENT_TEXT == contentType ) {
+        } else if ( ContentType.text == contentType ) {
     		return !(token instanceof TagToken);
     	}
 
@@ -401,7 +390,7 @@ public class TagInfo {
     }
 
     boolean allowsAnything() {
-    	return CONTENT_ALL == contentType && childTags.isEmpty();
+    	return ContentType.all == contentType && childTags.isEmpty();
     }
 
     /**

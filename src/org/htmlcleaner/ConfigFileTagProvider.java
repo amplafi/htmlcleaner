@@ -128,6 +128,9 @@ public class ConfigFileTagProvider extends HashMap implements ITagInfoProvider {
         System.out.println("package " + packagePath + ";");
         System.out.println("import java.util.HashMap;");
         System.out.println("public class " + className + " extends HashMap implements ITagInfoProvider {");
+        System.out.println("private ConcurrentMap<String, TagInfo> tagInfoMap = new ConcurrentHashMap<String, TagInfo>();");
+        System.out.println("// singleton instance, used if no other TagInfoProvider is specified");
+        System.out.println("public final static DefaultTagProvider INSTANCE= new DefaultTagProvider();");
         System.out.println("public " + className + "() {");
         System.out.println("TagInfo tagInfo;");
         parser.parse( new InputSource(new FileReader(configFile)) );
@@ -208,17 +211,18 @@ public class ConfigFileTagProvider extends HashMap implements ITagInfoProvider {
                 String deprecated = attributes.getValue("deprecated");
                 String unique = attributes.getValue("unique");
                 String ignorePermitted = attributes.getValue("ignore-permitted");
-                tagInfo = new TagInfo(name,
-                                      "all".equals(content) ? TagInfo.CONTENT_ALL : ("none".equals(content) ? TagInfo.CONTENT_NONE : TagInfo.CONTENT_TEXT),
-                                      "all".equals(section) ? TagInfo.HEAD_AND_BODY : ("head".equals(section) ? TagInfo.HEAD : TagInfo.BODY),
+                ContentType contentType = ContentType.toValue(content);
+                BelongsTo belongsTo = BelongsTo.toValue(section);
+                tagInfo = new TagInfo(name, contentType,
+                                      belongsTo,
                                       deprecated != null && "true".equals(deprecated),
                                       unique != null && "true".equals(unique),
                                       ignorePermitted != null && "true".equals(ignorePermitted), CloseTag.required, Display.any );
                 if (generateCode) {
                     String s = "tagInfo = new TagInfo(\"#1\", #2, #3, #4, #5, #6);";
                     s = s.replaceAll("#1", name);
-                    s = s.replaceAll("#2", "all".equals(content) ? "TagInfo.CONTENT_ALL" : ("none".equals(content) ? "TagInfo.CONTENT_NONE" : " TagInfo.CONTENT_TEXT"));
-                    s = s.replaceAll("#3", "all".equals(section) ? "TagInfo.HEAD_AND_BODY" : ("head".equals(section) ? "TagInfo.HEAD" : "TagInfo.BODY"));
+                    s = s.replaceAll("#2", ContentType.class.getCanonicalName()+"."+contentType.name());
+                    s = s.replaceAll("#3", BelongsTo.class.getCanonicalName()+"."+belongsTo.name());
                     s = s.replaceAll("#4", Boolean.toString(deprecated != null && "true".equals(deprecated)));
                     s = s.replaceAll("#5", Boolean.toString(unique != null && "true".equals(unique)));
                     s = s.replaceAll("#6", Boolean.toString(ignorePermitted != null && "true".equals(ignorePermitted)));

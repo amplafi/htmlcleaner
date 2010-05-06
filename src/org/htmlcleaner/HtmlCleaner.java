@@ -338,7 +338,7 @@ public class HtmlCleaner {
 	 * @param properties Properties used during parsing and serializing
 	 */
 	public HtmlCleaner(ITagInfoProvider tagInfoProvider, CleanerProperties properties) {
-        this.tagInfoProvider = tagInfoProvider == null ? DefaultTagProvider.getInstance() : tagInfoProvider;
+        this.tagInfoProvider = tagInfoProvider == null ? DefaultTagProvider.INSTANCE : tagInfoProvider;
         this.properties = properties == null ? new CleanerProperties() : properties;
         this.properties.setTagInfoProvider(this.tagInfoProvider);
 	}

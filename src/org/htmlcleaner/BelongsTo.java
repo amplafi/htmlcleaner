@@ -1,6 +1,4 @@
-/*
-    All rights reserved.
-
+/*  
     Redistribution and use of this software in source and binary forms,
     with or without modification, are permitted provided that the following
     conditions are met:
@@ -33,51 +31,44 @@
     You can contact Vladimir Nikic by sending e-mail to
     nikic_vladimir@yahoo.com. Please include the word "HtmlCleaner" in the
     subject line.
- 
-    Additional work by Amplafi. -- All rights released.
- */
+*/
 package org.htmlcleaner;
 
 /**
  * @author patmoore
  *
  */
-public enum CloseTag {
-    /**
-     * <div></div> is required. Minimizing to <div/> is not permitted.
-     */
-    required(false, true),
-    /**
-     * <hr> or <hr/> is permitted
-     */
-    optional(true, true),
-    /**
-     * <img/> is not permitted
-     */
-    forbidden(true, false);
-    private final boolean minimizedTagPermitted;
-    private final boolean endTagPermitted;
-    /**
-     *
-     * @param minimizedTagPermitted if true tag can be reduced to <x/>
-     * @param endTagPermitted TODO
-     */
-    private CloseTag(boolean minimizedTagPermitted, boolean endTagPermitted) {
-        this.minimizedTagPermitted = minimizedTagPermitted;
-        this.endTagPermitted =endTagPermitted;
-    }
+public enum BelongsTo {
 
-    /**
-     * @return true if <x/> form is allowed
-     */
-    public boolean isMinimizedTagPermitted() {
-        return this.minimizedTagPermitted;
+    HEAD_AND_BODY("all"),
+    HEAD("head"),
+    BODY("body");
+    private final String dbCode;
+    private BelongsTo(String dbCode) {
+        this.dbCode =dbCode;
     }
-
+    
     /**
-     * @return true if <x/> or </x> is permitted.
+     * @return the dbCode
      */
-    public boolean isEndTagPermitted() {
-        return endTagPermitted;
+    public String getDbCode() {
+        return dbCode;
+    }
+    
+    public static BelongsTo toValue(Object value) {
+        BelongsTo result = null;
+        if ( value instanceof BelongsTo) {
+            result = (BelongsTo) value;
+        } else if ( value != null ) {
+            String dbCode = value.toString().trim(); 
+            for(BelongsTo belongsTo: BelongsTo.values()) {
+                if ( belongsTo.getDbCode().equalsIgnoreCase(dbCode) || belongsTo.name().equalsIgnoreCase(dbCode)) {
+                    result = belongsTo;
+                    break;
+                }
+            }
+        }
+        
+        return result;
     }
 }

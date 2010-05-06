@@ -22,7 +22,7 @@ public class CollapseHtmlTest extends TestCase {
     private static final String DONT_COLLAPSE_OUTPUT = 
     "<span>" + IMAGE +"</span>" +
     "<p>" +IMAGE +"</p>" +
-    "<p>bar</p><table><tbody><tr><td /><td>"+IMAGE+"</td><td /></tr></tbody></table><p>foo</p>";
+    "<p>bar</p><table><tbody><tr><td></td><td>"+IMAGE+"</td><td> </td></tr></tbody></table><p>foo</p>";
     private HtmlCleaner cleaner;
 
     private CleanerProperties properties;
@@ -167,8 +167,8 @@ public class CollapseHtmlTest extends TestCase {
         assertEquals("", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean(DONT_COLLAPSE);
         assertEquals(DONT_COLLAPSE_OUTPUT, serializer.getXmlAsString(collapsed));
-        collapsed = cleaner.clean("<p id=\"notme\"></p><table><tr></tr><tr><td>Nor me</td></tr></table>");
-        assertEquals("<p id=\"notme\" /><table><tbody><tr><td>Nor me</td></tr></tbody></table>", serializer
+        collapsed = cleaner.clean("<p id=\"notme\"></p><table><tr></tr><tr><td>Nor me</td></tr><tr><td></td></tr></table>");
+        assertEquals("<p id=\"notme\"></p><table><tbody><tr><td>Nor me</td></tr></tbody></table>", serializer
                 .getXmlAsString(collapsed));
     }
 }

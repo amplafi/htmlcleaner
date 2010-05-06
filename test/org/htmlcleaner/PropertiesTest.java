@@ -99,7 +99,8 @@ public class PropertiesTest extends TestCase {
         properties.setUseEmptyElementTags(true);
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf("<a href=\"index.php\"></a>") >= 0 );
-        assertTrue(xmlString, xmlString.indexOf("<tr><td /></tr><tr />") >= 0);
+        // jericho reports that td can not be empty. so we test on <tr/> collapsing
+        assertTrue(xmlString, xmlString.indexOf("<tr><td></td></tr><tr />") >= 0);
         properties.setUseEmptyElementTags(false);
         xmlString = getXmlString(cleaner, properties);
         assertTrue(xmlString.indexOf("<table><tbody><tr><td></td></tr><tr></tr></tbody></table>") >= 0);

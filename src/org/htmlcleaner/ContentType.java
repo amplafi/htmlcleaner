@@ -1,6 +1,4 @@
-/*
-    All rights reserved.
-
+/*  
     Redistribution and use of this software in source and binary forms,
     with or without modification, are permitted provided that the following
     conditions are met:
@@ -33,51 +31,46 @@
     You can contact Vladimir Nikic by sending e-mail to
     nikic_vladimir@yahoo.com. Please include the word "HtmlCleaner" in the
     subject line.
- 
-    Additional work by Amplafi. -- All rights released.
- */
+*/
 package org.htmlcleaner;
 
 /**
  * @author patmoore
  *
  */
-public enum CloseTag {
+public enum ContentType {
+    all("all"),
     /**
-     * <div></div> is required. Minimizing to <div/> is not permitted.
+     * elements that have no children or content ( for example <img> ). For these elements, the check for null elements must be more than must a children/ content check.
      */
-    required(false, true),
-    /**
-     * <hr> or <hr/> is permitted
-     */
-    optional(true, true),
-    /**
-     * <img/> is not permitted
-     */
-    forbidden(true, false);
-    private final boolean minimizedTagPermitted;
-    private final boolean endTagPermitted;
-    /**
-     *
-     * @param minimizedTagPermitted if true tag can be reduced to <x/>
-     * @param endTagPermitted TODO
-     */
-    private CloseTag(boolean minimizedTagPermitted, boolean endTagPermitted) {
-        this.minimizedTagPermitted = minimizedTagPermitted;
-        this.endTagPermitted =endTagPermitted;
+    none("none"),
+    text("text");
+    private final String dbCode;
+    private ContentType(String dbCode) {
+        this.dbCode =dbCode;
     }
-
+    
     /**
-     * @return true if <x/> form is allowed
+     * @return the dbCode
      */
-    public boolean isMinimizedTagPermitted() {
-        return this.minimizedTagPermitted;
+    public String getDbCode() {
+        return dbCode;
     }
-
-    /**
-     * @return true if <x/> or </x> is permitted.
-     */
-    public boolean isEndTagPermitted() {
-        return endTagPermitted;
+    
+    public static ContentType toValue(Object value) {
+        ContentType result = null;
+        if ( value instanceof ContentType) {
+            result = (ContentType) value;
+        } else if ( value != null ) {
+            String dbCode = value.toString().trim(); 
+            for(ContentType contentType: ContentType.values()) {
+                if ( contentType.getDbCode().equalsIgnoreCase(dbCode) || contentType.name().equalsIgnoreCase(dbCode)) {
+                    result = contentType;
+                    break;
+                }
+            }
+        }
+        
+        return result;
     }
 }
