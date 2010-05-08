@@ -172,7 +172,8 @@ public class CollapseHtmlTest extends TestCase {
         assertEquals("", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean(DONT_COLLAPSE);
         assertEquals(DONT_COLLAPSE_OUTPUT, serializer.getXmlAsString(collapsed));
-        collapsed = cleaner.clean("<p id=\"notme\"></p><table><tr></tr><tr><td>Nor me</td></tr><tr><td></td></tr>" +
+        collapsed = cleaner.clean("<p id=\"notme\"></p><table><tr></tr><tr><td>Nor me</td></tr><tr><td></td></tr><tr> </tr>" +
+        		"<tr>&nbsp;\n</tr>" +
         		CANNOT_ELIMINATE_ANYTHING_IN_THIS_TR +
         		"</table>");
         assertEquals("<p id=\"notme\"></p><table><tbody><tr><td>Nor me</td></tr>" +
