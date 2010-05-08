@@ -10,6 +10,11 @@ public class CollapseHtmlTest extends TestCase {
     /**
      * 
      */
+    private static final String CANNOT_ELIMINATE_ANYTHING_IN_THIS_TR = "<tr><td></td><td>Cannot eliminate anything in this row</td></tr>";
+
+    /**
+     * 
+     */
     private static final String IMAGE = "<img src=\"http://localhost:8080/img/foo.jpg\" />";
 
     /**
@@ -167,8 +172,12 @@ public class CollapseHtmlTest extends TestCase {
         assertEquals("", serializer.getXmlAsString(collapsed));
         collapsed = cleaner.clean(DONT_COLLAPSE);
         assertEquals(DONT_COLLAPSE_OUTPUT, serializer.getXmlAsString(collapsed));
-        collapsed = cleaner.clean("<p id=\"notme\"></p><table><tr></tr><tr><td>Nor me</td></tr><tr><td></td></tr></table>");
-        assertEquals("<p id=\"notme\"></p><table><tbody><tr><td>Nor me</td></tr></tbody></table>", serializer
+        collapsed = cleaner.clean("<p id=\"notme\"></p><table><tr></tr><tr><td>Nor me</td></tr><tr><td></td></tr>" +
+        		CANNOT_ELIMINATE_ANYTHING_IN_THIS_TR +
+        		"</table>");
+        assertEquals("<p id=\"notme\"></p><table><tbody><tr><td>Nor me</td></tr>" +
+            CANNOT_ELIMINATE_ANYTHING_IN_THIS_TR +
+        		"</tbody></table>", serializer
                 .getXmlAsString(collapsed));
     }
 }
