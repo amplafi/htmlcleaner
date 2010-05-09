@@ -375,18 +375,20 @@ public class TagInfo {
             }
         }
 
-        if (ContentType.all == contentType) {
+        switch (contentType) {
+        case all:
             if ( !childTags.isEmpty() ) {
             	return token instanceof TagToken ? childTags.contains( ((TagToken)token).getName() ) : false;
     		} else if ( !permittedTags.isEmpty() ) {
     			return token instanceof TagToken ? !permittedTags.contains( ((TagToken)token).getName() ) : true;
     		}
             return true;
-        } else if ( ContentType.text == contentType ) {
+        case text:
     		return !(token instanceof TagToken);
-    	}
-
-    	return false;
+        case none:
+        default:
+            return false;
+        }
     }
 
     boolean allowsAnything() {
