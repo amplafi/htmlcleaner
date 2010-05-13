@@ -378,9 +378,13 @@ public class TagInfo {
         switch (contentType) {
         case all:
             if ( !childTags.isEmpty() ) {
-            	return token instanceof TagToken ? childTags.contains( ((TagToken)token).getName() ) : false;
+                if ( token instanceof TagToken) {
+                    return childTags.contains( ((TagToken)token).getName() );
+                }
     		} else if ( !permittedTags.isEmpty() ) {
-    			return token instanceof TagToken ? !permittedTags.contains( ((TagToken)token).getName() ) : true;
+                if ( token instanceof TagToken) {
+                    return !permittedTags.contains( ((TagToken)token).getName() );
+                }
     		}
             return true;
         case text:
