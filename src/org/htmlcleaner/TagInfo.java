@@ -366,6 +366,11 @@ public class TagInfo {
         return false;
     }
 
+    /**
+     * 
+     * @param token
+     * @return true if the passed token is allowed to be nested in a Tag with this TagInfo.
+     */
     boolean allowsItem(BaseToken token) {
         if ( contentType != ContentType.none && token instanceof TagToken ) {
             TagToken tagToken = (TagToken) token;
