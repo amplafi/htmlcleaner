@@ -1009,15 +1009,13 @@ public class HtmlCleaner {
     public void setInnerHtml(TagNode node, String content) {
         if (node != null) {
             String nodeName = node.getName();
-            StringBuffer html = new StringBuffer();
-            html.append("<" + nodeName + " marker=''>");
-            html.append(content);
-            html.append("</" + nodeName + ">");
+            StringBuilder html = new StringBuilder();
+            html.append("<").append(nodeName).append(" marker=''>").append(content).append("</").append(nodeName).append(">");
             TagNode parent = node.getParent();
             while (parent != null) {
                 String parentName = parent.getName();
                 html.insert(0, "<" + parentName + ">");
-                html.append("</" + parentName + ">");
+                html.append("</").append(parentName).append(">");
                 parent = parent.getParent();
             }
 
