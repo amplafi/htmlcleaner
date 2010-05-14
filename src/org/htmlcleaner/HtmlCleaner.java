@@ -109,6 +109,11 @@ import org.htmlcleaner.audit.ErrorType;
 public class HtmlCleaner {
 
     /**
+     * Marker attribute added to aid with part of the cleaning process.
+     * TODO: a non-intrusive way of doing this that does not involve modifying the source html
+     */
+    private static final String MARKER_ATTRIBUTE = "_htmlcleaner_marker";
+    /**
      * Contains information about single open tag
      */
     private class TagPos {
@@ -1010,7 +1015,7 @@ public class HtmlCleaner {
         if (node != null) {
             String nodeName = node.getName();
             StringBuilder html = new StringBuilder();
-            html.append("<").append(nodeName).append(" marker=''>").append(content).append("</").append(nodeName).append(">");
+            html.append("<").append(nodeName).append(" " +MARKER_ATTRIBUTE +"=''>").append(content).append("</").append(nodeName).append(">");
             TagNode parent = node.getParent();
             while (parent != null) {
                 String parentName = parent.getName();
@@ -1019,8 +1024,8 @@ public class HtmlCleaner {
                 parent = parent.getParent();
             }
 
-            TagNode rootNode = clean( html.toString() );
-            TagNode cleanedNode = rootNode.findElementHavingAttribute("marker", true);
+            TagNode innerRootNode = clean( html.toString() );
+            TagNode cleanedNode = innerRootNode.findElementHavingAttribute(MARKER_ATTRIBUTE, true);
             if (cleanedNode != null) {
                 node.setChildren( cleanedNode.getChildren() );
             }
