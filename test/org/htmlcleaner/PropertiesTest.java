@@ -320,9 +320,9 @@ public class PropertiesTest extends TestCase {
         // but dontEscape is used by subclasses -- need to investigate best solution.
         // maybe o.k. to have the < > be translated. That is what original test does.
         // but the ' should probably not be touched??
-        if (!enabled) {
-            return;
-        }
+//        if (!enabled) {
+//            return;
+//        }
         HtmlCleaner cleaner = new HtmlCleaner();
         CleanerProperties properties = new CleanerProperties();
         properties.setOmitXmlDeclaration(true);
@@ -365,6 +365,23 @@ public class PropertiesTest extends TestCase {
         properties.setUseCdataForScriptAndStyle(true);
         xmlString = new SimpleXmlSerializer(properties).getXmlAsString(node);
         assertEquals(testData[1], xmlString);
+    }
+    
+    public void testIgnoreClosingCData() {
+        String html = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n" + 
+        		"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta http-equiv=\"content-type\" content=\"application/xhtml+xml; charset=utf-8\" /><link href=\"aswa.css\" type=\"text/css\" rel=\"stylesheet\" /><title>ASWA - Events</title>" +
+        		"<style type=\"text/css\">/*<![CDATA[*/\r\n" + 
+        		"#ampmep_188 { }\r\n" + 
+        		"/*]]>*/</style><body></body></html>";
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = new CleanerProperties();
+        properties.setOmitXmlDeclaration(true);
+        properties.setUseCdataForScriptAndStyle(true);
+        TagNode node = cleaner.clean(html);
+        // test to make sure the no-op still works
+        properties.setUseCdataForScriptAndStyle(false);
+        String xmlString = new SimpleXmlSerializer(properties).getXmlAsString(node);
+        assertEquals(html, xmlString);
     }
 
 }
