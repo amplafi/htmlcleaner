@@ -123,6 +123,7 @@ public class PropertiesTest extends TestCase {
         HtmlCleaner cleaner = new HtmlCleaner();
         CleanerProperties properties = cleaner.getProperties();
         properties.setNamespacesAware(false);
+        properties.setAddNewlineToHeadAndBody(false);
         String xmlString;
         properties.setOmitHtmlEnvelope(true);
         xmlString = getXmlString(cleaner, properties);
@@ -207,6 +208,7 @@ public class PropertiesTest extends TestCase {
         properties.setOmitDoctypeDeclaration(false);
         properties.setOmitXmlDeclaration(true);
         properties.setAdvancedXmlEscape(true);
+        properties.setAddNewlineToHeadAndBody(false);
 
         // test first when generating xml
         TagNode node = cleaner.clean("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n" +
@@ -349,6 +351,7 @@ public class PropertiesTest extends TestCase {
         CleanerProperties properties = new CleanerProperties();
         properties.setOmitXmlDeclaration(true);
         properties.setUseCdataForScriptAndStyle(true);
+        properties.setAddNewlineToHeadAndBody(false);
         // test for positive matches to old-style comment hacks
         for(String[] testData: new String[][] {
                 // normal case - remove old-style comment out hack
@@ -399,6 +402,7 @@ public class PropertiesTest extends TestCase {
         CleanerProperties properties = new CleanerProperties();
         properties.setOmitXmlDeclaration(true);
         properties.setUseCdataForScriptAndStyle(true);
+        properties.setAddNewlineToHeadAndBody(false);
         TagNode node = cleaner.clean(html);
         // test to make sure the no-op still works
         properties.setUseCdataForScriptAndStyle(false);

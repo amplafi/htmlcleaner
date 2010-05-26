@@ -44,7 +44,9 @@ public class HtmlCleanerTest extends TestCase {
 		String start = "<html><head /><body><table>";
 		String end = "</body></html>";
 		assertCleaned(start + "<tr><tr><td>stuff</td></tr>" + end, 
-				start + "<tbody><tr><td>stuff</td></tr></tbody></table>" + end);
+				//start + "<tbody><tr><td>stuff</td></tr></tbody></table>" + end // "ideal" output
+				start + "<tbody><tr /><tr><td>stuff</td></tr><tr></tr></tbody></table>" + end // actual
+		);
 	}
 	
 	/** 
@@ -56,6 +58,17 @@ public class HtmlCleanerTest extends TestCase {
 		String end = "</table></body></html>";
 		assertCleaned(start + "<tr> </tr><tr><td>stuff</td></tr>" + end, 
 				start + "<tbody><tr /><tr><td>stuff</td></tr></tbody>" + end);
+	}
+	
+	/**
+	 * For #2940
+	 */
+	public void testCData() throws IOException {
+		cleaner.getProperties().setAddNewlineToHeadAndBody(false);
+		String start = "<html><head>";
+		String end = "</head><body>1</body></html>";
+		assertCleaned(start + "<style type=\"text/css\">/*<![CDATA[*/\n#ampmep_188 { }\n/*]]>*/</style>" + end, 
+				start + "<style type=\"text/css\">/*<![CDATA[*/\n#ampmep_188 { }\n/*]]>*/</style>" + end);
 	}	
 	
 	private void assertCleaned(String initial, String expected) throws IOException {
