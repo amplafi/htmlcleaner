@@ -90,7 +90,10 @@ public class CleanerProperties implements HtmlModificationListener{
      * More work than really wanted at this point to "preserve" the whitespace.
      */
     private boolean addNewlineToHeadAndBody;
-    private boolean keepWhitespaceInHead;    
+    /**
+     * Tries to keep inside head all whitespace and comments that were originally there
+     */
+    private boolean keepWhitespaceAndCommentsInHead;    
     private String hyphenReplacementInComment;
     // comma separate list of tags pruned.
     private String pruneTags;
@@ -286,12 +289,12 @@ public class CleanerProperties implements HtmlModificationListener{
         this.addNewlineToHeadAndBody = addNewlineToHeadAndBody;
     }       
 
-    public boolean isKeepWhitespaceInHead() {
-        return keepWhitespaceInHead;
+    public boolean isKeepWhitespaceAndCommentsInHead() {
+        return keepWhitespaceAndCommentsInHead;
     }
 
-    public void setKeepWhitespaceInHead(boolean keepHeadWhitespace) {
-        this.keepWhitespaceInHead = keepHeadWhitespace;
+    public void setKeepWhitespaceAndCommentsInHead(boolean keepHeadWhitespace) {
+        this.keepWhitespaceAndCommentsInHead = keepHeadWhitespace;
     }     
 
     public String getHyphenReplacementInComment() {
@@ -436,7 +439,7 @@ public class CleanerProperties implements HtmlModificationListener{
         ignoreQuestAndExclam = false;
         namespacesAware = true;
         addNewlineToHeadAndBody = true;
-        keepWhitespaceInHead = true;
+        keepWhitespaceAndCommentsInHead = true;
         hyphenReplacementInComment = "=";
         setPruneTags(null);
         setAllowTags(null);

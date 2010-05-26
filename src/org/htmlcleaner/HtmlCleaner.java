@@ -785,15 +785,14 @@ public class HtmlCleaner {
                     _openTags.addTag( tagName, nodeIterator.previousIndex() );
                 }
 			} else {
-				if (_headOpened && !_bodyOpened) {
+				if (_headOpened && !_bodyOpened && properties.isKeepWhitespaceAndCommentsInHead()) {
 					if (token instanceof CommentToken) {
 						if (_openTags.getLastTagPos()==null) {
 							_headTags.add(new ProxyTagNode((CommentToken)token, bodyNode));
 						}
-					}
-					if (token instanceof ContentToken) {
+					} else if (token instanceof ContentToken) {
 						ContentToken contentToken = (ContentToken)token;
-						if (properties.isKeepWhitespaceInHead() && contentToken.isBlank()) {
+						if (contentToken.isBlank()) {
 							BaseToken lastTok = (BaseToken)nodeList.get(nodeList.size()-1);
 							if (lastTok==token) {
 								_headTags.add(new ProxyTagNode(contentToken, bodyNode));
