@@ -39,7 +39,7 @@ public class HtmlCleanerTest extends TestCase {
 	 * TODO: Fails, instead of being removed, first <tr> is self closed and an additional one
 	 * is added to the end of the table.
 	 */
-	public void tes2tUselessTr() throws IOException {
+	public void testUselessTr() throws IOException {
 		cleaner.getProperties().setAddNewlineToHeadAndBody(false);
 		String start = "<html><head /><body><table>";
 		String end = "</body></html>";
@@ -50,7 +50,7 @@ public class HtmlCleanerTest extends TestCase {
 	/** 
 	 * Mentioned in #2901 - yet another collapse test. 
 	 */
-	public void te2stUselessTr2() throws IOException {
+	public void testUselessTr2() throws IOException {
 		cleaner.getProperties().setAddNewlineToHeadAndBody(false);
 		String start = "<html><head /><body><table>";
 		String end = "</table></body></html>";
