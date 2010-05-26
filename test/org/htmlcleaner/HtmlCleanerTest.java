@@ -24,13 +24,20 @@ public class HtmlCleanerTest extends TestCase {
         serializer = new SimpleXmlSerializer(cleanerProperties);
     }
     
-	public void testPage() throws IOException {
-		File file = new File("test/org/htmlcleaner/files/Real_1.html");		
-		StringBuffer content = Utils.readUrl(file.toURI().toURL(), "UTF-8");
-        TagNode node = cleaner.clean( content.toString() );
+    /* #2901 */
+	public void testWhitespaceInHead() throws IOException {
+		String initial = readFile("test/org/htmlcleaner/files/Real_1.html");
+		String expected = readFile("test/org/htmlcleaner/files/Expected_1.html");
+        TagNode node = cleaner.clean(initial);
         StringWriter writer = new StringWriter();
         serializer.serialize(node, writer);
-        assertEquals(content.toString(), writer.toString());
-	}    
+        assertEquals(expected, writer.toString());
+	}
+	
+	private String readFile(String filename) throws IOException {
+		File file = new File(filename);		
+		StringBuffer content = Utils.readUrl(file.toURI().toURL(), "UTF-8");
+		return content.toString();
+	}
 
 }
