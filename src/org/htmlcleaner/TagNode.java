@@ -304,8 +304,8 @@ public class TagNode extends TagToken {
         }
         if (child instanceof List) {
             addChildren( (List)child );
-        } else if (child instanceof WhitespaceTagNode) {
-        	children.add( ((WhitespaceTagNode)child).getContentToken() );
+        } else if (child instanceof ProxyTagNode) {
+        	children.add( ((ProxyTagNode)child).getToken() );
         } else {
             children.add(child);
             if (child instanceof TagNode) {

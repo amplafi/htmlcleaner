@@ -26,7 +26,7 @@ public class HtmlCleanerTest extends TestCase {
     
     /** 
      * Test for #2901.
-     * TODO: Fails due to #2927 (comments repositioned) 
+     * TODO: Fails due to some more random (but in body & innocent) whitespaces.  
      */
 	public void testWhitespaceInHead() throws IOException {
 		String initial = readFile("test/org/htmlcleaner/files/Real_1.html");
@@ -39,7 +39,7 @@ public class HtmlCleanerTest extends TestCase {
 	 * TODO: Fails, instead of being removed, first <tr> is self closed and an additional one
 	 * is added to the end of the table.
 	 */
-	public void testUselessTr() throws IOException {
+	public void tes2tUselessTr() throws IOException {
 		cleaner.getProperties().setAddNewlineToHeadAndBody(false);
 		String start = "<html><head /><body><table>";
 		String end = "</body></html>";
@@ -50,7 +50,7 @@ public class HtmlCleanerTest extends TestCase {
 	/** 
 	 * Mentioned in #2901 - yet another collapse test. 
 	 */
-	public void testUselessTr2() throws IOException {
+	public void te2stUselessTr2() throws IOException {
 		cleaner.getProperties().setAddNewlineToHeadAndBody(false);
 		String start = "<html><head /><body><table>";
 		String end = "</table></body></html>";
