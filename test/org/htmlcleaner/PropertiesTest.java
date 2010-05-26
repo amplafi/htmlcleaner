@@ -332,7 +332,6 @@ public class PropertiesTest extends TestCase {
     private static final String SAMPLE_JS = "var x = ['foo','bar'];";
     private static final String COMMENT_START = "<!--";
     private static final String COMMENT_END = "-->";
-    private static final boolean enabled = false;
     /**
      * Test conversion of former ( now bad practice ) of:
      * <pre>
@@ -346,9 +345,6 @@ public class PropertiesTest extends TestCase {
         // but dontEscape is used by subclasses -- need to investigate best solution.
         // maybe o.k. to have the < > be translated. That is what original test does.
         // but the ' should probably not be touched??
-//        if (!enabled) {
-//            return;
-//        }
         HtmlCleaner cleaner = new HtmlCleaner();
         CleanerProperties properties = new CleanerProperties();
         properties.setOmitXmlDeclaration(true);
