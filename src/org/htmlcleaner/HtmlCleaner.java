@@ -785,6 +785,18 @@ public class HtmlCleaner {
                     _openTags.addTag( tagName, nodeIterator.previousIndex() );
                 }
 			} else {
+				if (_headOpened && !_bodyOpened) {
+					if (token instanceof ContentToken) {
+						ContentToken contentToken = (ContentToken)token;
+						if (properties.isKeepWhitespaceInHead() && contentToken.isBlank()) {
+							BaseToken lastTok = (BaseToken)nodeList.get(nodeList.size()-1);
+							if (lastTok==token) {
+								_headTags.add(new WhitespaceTagNode(contentToken, bodyNode));
+							}
+						}
+					}					
+				}
+				
 				if ( !isAllowedInLastOpenTag(token) ) {
                     saveToLastOpenTag(nodeList, token);
                     nodeIterator.set(null);
@@ -823,7 +835,7 @@ public class HtmlCleaner {
         // move all viable head candidates to head section of the tree
         Iterator headIterator = _headTags.iterator();
         while (headIterator.hasNext()) {
-            TagNode headCandidateNode = (TagNode) headIterator.next();
+        	TagNode headCandidateNode = (TagNode) headIterator.next();
 
             // check if this node is already inside a candidate for moving to head
             TagNode parent = headCandidateNode.getParent();

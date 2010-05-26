@@ -82,6 +82,8 @@ public class CleanerProperties implements HtmlModificationListener{
     private boolean ignoreQuestAndExclam;
     private boolean allowHtmlInsideAttributes;
     private boolean namespacesAware;
+    private boolean addNewlineToHeadAndBody;
+    private boolean keepWhitespaceInHead;    
     private String hyphenReplacementInComment;
     // comma separate list of tags pruned.
     private String pruneTags;
@@ -267,7 +269,23 @@ public class CleanerProperties implements HtmlModificationListener{
 
     public void setNamespacesAware(boolean namespacesAware) {
         this.namespacesAware = namespacesAware;
+    }    
+
+    public boolean isAddNewlineToHeadAndBody() {
+        return addNewlineToHeadAndBody;
     }
+
+    public void setAddNewlineToHeadAndBody(boolean addNewlineToHeadAndBody) {
+        this.addNewlineToHeadAndBody = addNewlineToHeadAndBody;
+    }       
+
+    public boolean isKeepWhitespaceInHead() {
+        return keepWhitespaceInHead;
+    }
+
+    public void setKeepWhitespaceInHead(boolean keepHeadWhitespace) {
+        this.keepWhitespaceInHead = keepHeadWhitespace;
+    }     
 
     public String getHyphenReplacementInComment() {
         return hyphenReplacementInComment;
@@ -382,7 +400,9 @@ public class CleanerProperties implements HtmlModificationListener{
      * allowMultiWordAttributes = true; 
      * allowHtmlInsideAttributes = false; 
      * ignoreQuestAndExclam = false; 
-     * namespacesAware = true; 
+     * namespacesAware = true;
+     * keepHeadWhitespace = true;
+     * addNewlineToHeadAndBody = true; 
      * hyphenReplacementInComment = "="; 
      * pruneTags = null; 
      * allowTags = null;
@@ -408,6 +428,8 @@ public class CleanerProperties implements HtmlModificationListener{
         allowHtmlInsideAttributes = false;
         ignoreQuestAndExclam = false;
         namespacesAware = true;
+        addNewlineToHeadAndBody = true;
+        keepWhitespaceInHead = true;
         hyphenReplacementInComment = "=";
         setPruneTags(null);
         setAllowTags(null);

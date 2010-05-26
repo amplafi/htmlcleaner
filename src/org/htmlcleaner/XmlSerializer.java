@@ -107,7 +107,7 @@ public abstract class XmlSerializer {
     public String getXmlAsString(CleanerProperties cleanerProperties, String htmlContent, String charset) {
         this.props = cleanerProperties;
         HtmlCleaner htmlCleaner = new HtmlCleaner(cleanerProperties);
-        TagNode tagNode= htmlCleaner.clean(htmlContent);
+        TagNode tagNode = htmlCleaner.clean(htmlContent);
         return getXmlAsString(tagNode, charset==null||charset.length()==0?props.getCharset():charset);
     }
 
@@ -164,6 +164,10 @@ public abstract class XmlSerializer {
 		String tagName = tagNode.getName();
 		return "script".equalsIgnoreCase(tagName) || "style".equalsIgnoreCase(tagName);
 	}
+	
+	protected boolean isHeadOrBody(String tagName) {
+		return "head".equalsIgnoreCase(tagName) || "body".equalsIgnoreCase(tagName);
+	}	
 
     protected boolean isMinimizedTagSyntax(TagNode tagNode) {
         final TagInfo tagInfo = props.getTagInfoProvider().getTagInfo(tagNode.getName());
@@ -175,7 +179,12 @@ public abstract class XmlSerializer {
         if ( !isForbiddenTag(tagNode)) {
             String tagName = tagNode.getName();
             Map tagAtttributes = tagNode.getAttributes();
-    
+            
+            // always have head and body in newline
+            if (props.isAddNewlineToHeadAndBody() && isHeadOrBody(tagName)) {
+            	writer.write("\n");
+            }
+            
             writer.write("<" + tagName);
             Iterator it = tagAtttributes.entrySet().iterator();
             while (it.hasNext()) {
