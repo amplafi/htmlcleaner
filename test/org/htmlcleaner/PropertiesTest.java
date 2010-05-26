@@ -74,27 +74,10 @@ public class PropertiesTest extends TestCase {
         properties.setTreatDeprecatedTagsAsContent(false);
         assertTrue( getXmlString(cleaner, properties).indexOf("<u>content of deprecated tag</u>") >= 0 );
 
-        properties.setOmitComments(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<!--my comment-->") >= 0 );
-        properties.setOmitComments(true);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<!--my comment-->") < 0 );
-
-        properties.setOmitXmlDeclaration(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<?xml version=\"1.0\"") >= 0 );
-        properties.setOmitXmlDeclaration(true);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<?xml version=\"1.0\"") < 0 );
-
         properties.setOmitDoctypeDeclaration(false);
         assertTrue( getXmlString(cleaner, properties).indexOf("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">") >= 0 );
         properties.setOmitDoctypeDeclaration(true);
         assertTrue( getXmlString(cleaner, properties).indexOf("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">") < 0 );
-
-        properties.setOmitHtmlEnvelope(true);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<html><head>") < 0 );
-        assertTrue( getXmlString(cleaner, properties).indexOf("</body></html>") < 0 );
-        properties.setOmitHtmlEnvelope(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<html><head>") >= 0 );
-        assertTrue( getXmlString(cleaner, properties).indexOf("</body></html>") >= 0 );
 
         properties.setUseEmptyElementTags(true);
         xmlString = getXmlString(cleaner, properties);
@@ -132,11 +115,54 @@ public class PropertiesTest extends TestCase {
         properties.setNamespacesAware(false);
         assertTrue( getXmlString(cleaner, properties).indexOf("<html") >= 0 );
         assertTrue( getXmlString(cleaner, properties).indexOf("<tag id=\"xxx\">aaa</tag>") >= 0 );
-
+    }
+    /**
+     * @throws IOException
+     */
+    public void testOmitHtmlEnvelope() throws IOException {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        properties.setNamespacesAware(false);
+        String xmlString;
+        properties.setOmitHtmlEnvelope(true);
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<html><head>") < 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("</body></html>") < 0 );
+        properties.setOmitHtmlEnvelope(false);
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue(xmlString,  xmlString.indexOf("<html><head>") >= 0);
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString, xmlString.indexOf("</body></html>") >= 0 );
+    }
+    /**
+     * @throws IOException
+     */
+    public void testComments() throws IOException {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        properties.setNamespacesAware(false);
+        properties.setOmitComments(false);
+        assertTrue( getXmlString(cleaner, properties).indexOf("<!--my comment-->") >= 0 );
+        properties.setOmitComments(true);
+        assertTrue( getXmlString(cleaner, properties).indexOf("<!--my comment-->") < 0 );
+        
         properties.setOmitComments(false);
         assertTrue( getXmlString(cleaner, properties).indexOf("<!-- comment with == - hyphen -->") >= 0 );
         properties.setHyphenReplacementInComment("*");
         assertTrue( getXmlString(cleaner, properties).indexOf("<!-- comment with ** - hyphen -->") >= 0 );
+    }
+    /**
+     * @throws IOException
+     */
+    public void testOmitXmlDeclaration() throws IOException {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        properties.setNamespacesAware(false);
+        properties.setOmitXmlDeclaration(false);
+        assertTrue( getXmlString(cleaner, properties).indexOf("<?xml version=\"1.0\"") >= 0 );
+        properties.setOmitXmlDeclaration(true);
+        assertTrue( getXmlString(cleaner, properties).indexOf("<?xml version=\"1.0\"") < 0 );
     }
     public void testPruneProperties() throws Exception {
         HtmlCleaner cleaner = new HtmlCleaner();
