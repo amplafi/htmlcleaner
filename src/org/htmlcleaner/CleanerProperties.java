@@ -82,6 +82,13 @@ public class CleanerProperties implements HtmlModificationListener{
     private boolean ignoreQuestAndExclam;
     private boolean allowHtmlInsideAttributes;
     private boolean namespacesAware;
+    /**
+     * "cause the cleaner cannot keep track of whitespace at that level",
+     * there are 2 lists built: one for the head , one for the body. So whitespace that falls outside of the head and body is not preserved
+     * this creates at least a newline break.
+     * 
+     * More work than really wanted at this point to "preserve" the whitespace.
+     */
     private boolean addNewlineToHeadAndBody;
     private boolean keepWhitespaceInHead;    
     private String hyphenReplacementInComment;
