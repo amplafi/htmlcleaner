@@ -26,6 +26,7 @@ public class TransformationTest extends TestCase {
         CleanerProperties props = cleaner.getProperties();
         props.setCleanerTransformations(transformations);
         props.setOmitXmlDeclaration(true);
+        props.setAddNewlineToHeadAndBody(false);
         TagNode node = cleaner.clean("<div><strong>Mama</strong></div>");
         assertEquals(
                 "<html><head /><body><div><span style=\"font-weight:bold\">Mama</span></div></body></html>",
@@ -93,6 +94,7 @@ public class TransformationTest extends TestCase {
         CleanerProperties props = cleaner.getProperties();
         props.setCleanerTransformations(transformations);
         props.setOmitXmlDeclaration(true);
+        props.setAddNewlineToHeadAndBody(false);
         TagNode node = cleaner.clean("<div onfoo=\"bar\" ONNot=\"\"><p bad=\" javascript:  \" class=\"javascript\" unknown=\"good\">Mama</p></div>");
         assertEquals(
                 "<html><head /><body><div><p class=\"javascript\" unknown=\"good\">Mama</p></div></body></html>",
