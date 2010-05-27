@@ -254,7 +254,6 @@ public abstract class XmlSerializer {
                 // because we are not considering if the file is xhtml or html,
                 // we need to put a javascript comment in front of the CDATA in case this is NOT xhtml
         		
-        		// TODO: see if it ends this way
         		if (!tagNode.getText().toString().trim().endsWith(SAFE_END_CDATA))
         			writer.write(SAFE_END_CDATA);
         	}
