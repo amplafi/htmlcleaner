@@ -68,7 +68,18 @@ public class SimpleXmlSerializer extends XmlSerializer {
                 if (item != null) {
                     if ( item instanceof ContentToken ) {
                         String content = ((ContentToken) item).getContent();
-                        writer.write( dontEscape(tagNode) ? content.replaceAll("]]>", "]]&gt;") : escapeXml(content) );
+                        if (dontEscape(tagNode)) {
+                        	if (content.trim().endsWith(SAFE_END_CDATA)) {
+                        		int pos = content.lastIndexOf(SAFE_END_CDATA);
+                        		String ending = content.substring(pos);
+                        		writer.write( content.substring(0, pos).replaceAll("]]>", "]]&gt;") );
+                        		writer.write(ending);
+                        	} else {
+                        		writer.write( content.replaceAll("]]>", "]]&gt;") );
+                        	}
+                        } else {
+                        	writer.write( escapeXml(content) );
+                        }                        
                     } else {
                         ((BaseToken)item).serialize(this, writer);
                     }

@@ -202,7 +202,10 @@ public abstract class XmlSerializer {
             } else if (dontEscape(tagNode)) {
                 // because we are not considering if the file is xhtml or html,
                 // we need to put a javascript comment in front of the CDATA in case this is NOT xhtml
-                writer.write(">"+SAFE_BEGIN_CDATA);
+                writer.write(">");
+                if (!tagNode.getText().toString().startsWith(SAFE_BEGIN_CDATA)) {
+                	writer.write(SAFE_BEGIN_CDATA);
+                }
             } else {
             	writer.write(">");
             }
@@ -250,7 +253,10 @@ public abstract class XmlSerializer {
         	if (dontEscape(tagNode)) {
                 // because we are not considering if the file is xhtml or html,
                 // we need to put a javascript comment in front of the CDATA in case this is NOT xhtml
-        		writer.write(SAFE_END_CDATA);
+        		
+        		// TODO: see if it ends this way
+        		if (!tagNode.getText().toString().trim().endsWith(SAFE_END_CDATA))
+        			writer.write(SAFE_END_CDATA);
         	}
     
         	writer.write( "</" + tagName + ">" );
