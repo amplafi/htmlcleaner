@@ -404,7 +404,7 @@ public class PropertiesTest extends TestCase {
         properties.setUseCdataForScriptAndStyle(true);
         properties.setAddNewlineToHeadAndBody(false);
         TagNode node = cleaner.clean(html);
-        // test to make sure the no-op still works
+        // test to make sure the no-op still works - ANDY: not sure what is being tested by setting that to false
         properties.setUseCdataForScriptAndStyle(false);
         String xmlString = new SimpleXmlSerializer(properties).getXmlAsString(node);
         assertEquals(html, xmlString);
