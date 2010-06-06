@@ -112,7 +112,7 @@ public class HtmlCleaner {
      * Marker attribute added to aid with part of the cleaning process.
      * TODO: a non-intrusive way of doing this that does not involve modifying the source html
      */
-    private static final String MARKER_ATTRIBUTE = "_htmlcleaner_marker";
+    private static final String MARKER_ATTRIBUTE = "htmlcleaner_marker";
     /**
      * Contains information about single open tag
      */
