@@ -25,8 +25,7 @@ public class HtmlCleanerTest extends TestCase {
     }
     
     /** 
-     * Test for #2901.
-     * TODO: Fails due to some more random (but in body & innocent) whitespaces.  
+     * Test for #2901.  
      */
 	public void testWhitespaceInHead() throws IOException {
 		String initial = readFile("test/org/htmlcleaner/files/Real_1.html");
@@ -36,15 +35,14 @@ public class HtmlCleanerTest extends TestCase {
 	
 	/** 
 	 * Mentioned in #2901 - we should eliminate the first <tr>
-	 * TODO: Fails, instead of being removed, first <tr> is self closed and an additional one
-	 * is added to the end of the table.
+	 * TODO: Passes but not with ideal result.
 	 */
 	public void testUselessTr() throws IOException {
 		cleaner.getProperties().setAddNewlineToHeadAndBody(false);
 		String start = "<html><head /><body><table>";
 		String end = "</body></html>";
 		assertCleaned(start + "<tr><tr><td>stuff</td></tr>" + end, 
-				//start + "<tbody><tr><td>stuff</td></tr></tbody></table>" + end // "ideal" output
+				//start+"<tbody><tr><td>stuff</td></tr></tbody></table>" + end // "ideal" output
 				start + "<tbody><tr /><tr><td>stuff</td></tr><tr></tr></tbody></table>" + end // actual
 		);
 	}
