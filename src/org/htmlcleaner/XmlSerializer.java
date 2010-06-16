@@ -49,18 +49,12 @@ import java.util.Map;
  */
 public abstract class XmlSerializer {
 
-	/**
-     * 
-     */
     public static final String XMLNS_NAMESPACE = "xmlns";
-    /**
-     * 
-     */
-    public static final String SAFE_BEGIN_CDATA = "/*<![CDATA[*/";
-    /**
-     * 
-     */
-    public static final String SAFE_END_CDATA = "/*]]>*/";
+    public static final String BEGIN_CDATA = "<![CDATA[";
+    public static final String END_CDATA = "]]>";
+    public static final String SAFE_BEGIN_CDATA = "/*" + BEGIN_CDATA + "*/";
+    public static final String SAFE_END_CDATA = "/*" + END_CDATA + "*/";
+    
     protected CleanerProperties props;
 	private boolean creatingHtmlDom;
 
@@ -265,10 +259,10 @@ public abstract class XmlSerializer {
         	}
     	}
     }
+    
     protected void serializeEndTag(TagNode tagNode, Writer writer) throws IOException {
     	serializeEndTag(tagNode, writer, true);
     }
-
 
     protected abstract void serialize(TagNode tagNode, Writer writer) throws IOException;
 

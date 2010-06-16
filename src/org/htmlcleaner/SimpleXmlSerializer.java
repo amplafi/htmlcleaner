@@ -55,6 +55,34 @@ public class SimpleXmlSerializer extends XmlSerializer {
 	public SimpleXmlSerializer(CleanerProperties props) {
         super(props);
     }
+	
+	protected void serializeContentToken(ContentToken item, TagNode tagNode, Writer writer) throws IOException {
+		String content = item.getContent();
+		String trimmed = content.trim();
+        boolean dontEscape = dontEscape(tagNode);                        
+    	if (trimmed.endsWith(SAFE_END_CDATA)) {
+    		int pos = content.lastIndexOf(SAFE_END_CDATA);
+    		String ending = content.substring(pos);
+    		if (dontEscape)
+    			writer.write( content.substring(0, pos).replaceAll("]]>", "]]&gt;") );
+    		else {
+    			if (trimmed.startsWith(BEGIN_CDATA)) {
+    				int actualStart = content.indexOf(BEGIN_CDATA) + BEGIN_CDATA.length();
+    				writer.write(content.substring(0, actualStart));
+    				writer.write( escapeXml(content.substring(actualStart, pos)));
+    			} else {
+    				writer.write( escapeXml(content.substring(0, pos)));
+    			}
+    		}
+    		writer.write(ending);
+    	} else {
+    		if (dontEscape)
+    			writer.write( content.replaceAll("]]>", "]]&gt;") );
+    		else {
+    			writer.write( escapeXml(content) );
+    		}
+    	}		
+	}
 
     @Override
     protected void serialize(TagNode tagNode, Writer writer) throws IOException {
@@ -67,19 +95,7 @@ public class SimpleXmlSerializer extends XmlSerializer {
                 Object item = childrenIt.next();
                 if (item != null) {
                     if ( item instanceof ContentToken ) {
-                        String content = ((ContentToken) item).getContent();
-                        if (dontEscape(tagNode)) {
-                        	if (content.trim().endsWith(SAFE_END_CDATA)) {
-                        		int pos = content.lastIndexOf(SAFE_END_CDATA);
-                        		String ending = content.substring(pos);
-                        		writer.write( content.substring(0, pos).replaceAll("]]>", "]]&gt;") );
-                        		writer.write(ending);
-                        	} else {
-                        		writer.write( content.replaceAll("]]>", "]]&gt;") );
-                        	}
-                        } else {
-                        	writer.write( escapeXml(content) );
-                        }                        
+                    	serializeContentToken((ContentToken)item, tagNode, writer);
                     } else {
                         ((BaseToken)item).serialize(this, writer);
                     }
