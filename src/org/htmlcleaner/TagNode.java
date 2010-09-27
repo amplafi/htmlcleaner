@@ -212,7 +212,7 @@ public class TagNode extends TagToken {
         if ( attName != null ) {
             String trim = attName.trim().toLowerCase();
             String value = attValue == null?"":attValue.trim().replaceAll("\\p{Cntrl}", " ");
-            if ( !trim.isEmpty() ) {
+            if ( trim.length() != 0 ) {
                 attributes.put(trim, value );
             }
         }
