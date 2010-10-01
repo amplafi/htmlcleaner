@@ -480,30 +480,26 @@ public class CleanerProperties implements HtmlModificationListener{
     public void addHtmlModificationListener(HtmlModificationListener listener){
         htmlModificationListeners.add(listener);
     }
-
-    @Override
+   
     public void fireConditionModification(ITagNodeCondition condition, TagNode tagNode) {
         for (HtmlModificationListener listener : htmlModificationListeners) {
             listener.fireConditionModification(condition, tagNode);
         }
     }
-
-    @Override
+    
     public void fireHtmlError(boolean certainty, TagNode startTagToken, ErrorType type) {
         for (HtmlModificationListener listener : htmlModificationListeners) {
             listener.fireHtmlError(certainty, startTagToken, type);
         }
         
     }
-
-    @Override
+   
     public void fireUglyHtml(boolean certainty, TagNode startTagToken, ErrorType errorType) {
         for (HtmlModificationListener listener : htmlModificationListeners) {
             listener.fireUglyHtml(certainty, startTagToken, errorType);
         }
     }
 
-    @Override
     public void fireUserDefinedModification(boolean certainty, TagNode tagNode, ErrorType errorType) {
         for (HtmlModificationListener listener : htmlModificationListeners) {
             listener.fireUserDefinedModification(certainty, tagNode, errorType);

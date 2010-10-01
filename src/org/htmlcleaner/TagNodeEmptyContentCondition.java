@@ -45,7 +45,6 @@ public class TagNodeEmptyContentCondition implements ITagNodeCondition {
         this.tagInfoProvider = provider;
     }
 
-    @Override
     public boolean satisfy(TagNode tagNode) {
         return satisfy(tagNode, false);
     }

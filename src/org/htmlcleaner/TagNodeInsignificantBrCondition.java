@@ -15,7 +15,6 @@ public class TagNodeInsignificantBrCondition implements ITagNodeCondition {
 	public TagNodeInsignificantBrCondition() {
 	}
 
-	@Override
 	public boolean satisfy(TagNode tagNode) {
 		if (!isBrNode(tagNode)) {
 			return false;
