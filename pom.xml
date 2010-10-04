@@ -38,6 +38,15 @@
             <timezone>1</timezone>
             <email>vnikic@users.sourceforge.net</email>
         </developer>
+        <developer>
+            <name>Patrick Moore</name>
+            <id>patmoore</id>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>-8</timezone>
+            <email>patmoore@users.sourceforge.net</email>
+        </developer>
     </developers>
 <!-- 
     <scm>
