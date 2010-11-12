@@ -61,6 +61,13 @@ public class WorkingTest {
 //        System.out.println( new PrettyXmlSerializer(props).getXmlAsString(node) );
 
         System.out.println("vreme: " + (System.currentTimeMillis() - start));
+
+        for (Object oNode: new XPather("//script").evaluateAgainstNode(node)) {
+            ((TagNode)oNode).setName("MAMA");
+            ((TagNode)oNode).getAttributes().clear();
+            ((TagNode)oNode).removeAllChildren();
+        }
+
         new PrettyXmlSerializer(props).writeXmlToFile(node, "c:/temp/htmlcleanertest/1.xml");
 //        new PrettyXmlSerializer(props).writeXmlToStream(node, System.out);
         System.out.println("vreme: " + (System.currentTimeMillis() - start));

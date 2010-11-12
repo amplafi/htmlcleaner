@@ -151,6 +151,20 @@ public class TagNode extends TagToken {
     }
 
     /**
+     * Changes name of the tag
+     * @param name
+     * @return True if new name is valid, false otherwise
+     */
+    public boolean setName(String name) {
+        if (Utils.isValidXmlIdentifier(name)) {
+            this.name = name;
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param attName
      * @return Value of the specified attribute, or null if it this tag doesn't contain it. 
      */
@@ -456,6 +470,13 @@ public class TagNode extends TagToken {
      */
     public boolean removeChild(Object child) {
         return this.children.remove(child);
+    }
+
+    /**
+     * Removes all children (subelements and text content).
+     */
+    public void removeAllChildren() {
+        this.children.clear();
     }
     
     void addItemForMoving(Object item) {
