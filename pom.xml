@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>net.sourceforge.htmlcleaner</groupId>
+    <artifactId>htmlcleaner</artifactId>
+    <packaging>jar</packaging>
+    <version>2.1</version>
+    <name>HtmlCleaner</name>
+    <description>
+        HtmlCleaner is an HTML parser written in Java. It transforms dirty HTML to well-formed XML following
+        the same rules that most web-browsers use.
+    </description>
+    <url>http://htmlcleaner.sourceforge.net/</url>
+    <inceptionYear>2006</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>BSD License</name>
+            <url>http://www.opensource.org/licenses/bsd-license.php</url>
+            <comments>
+                OWNER = Vladimir Nikic
+                YEAR = 2006-2008
+            </comments>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Vladimir Nikic</name>
+            <id>vnikic</id>
+            <roles>
+                <role>Project Admin</role>
+                <role>Developer</role>
+            </roles>
+            <timezone>1</timezone>
+            <email>vnikic@users.sourceforge.net</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>http://htmlcleaner.svn.sourceforge.net/</url>
+    </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.7.0</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestFile>config/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
