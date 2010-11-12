@@ -19,9 +19,7 @@
     <!--  sources targets -->
 	<target name="build" description="compilation of source files">
 		<mkdir dir="${dir.dist}"/>
-		<javac srcdir="${dir.src}" destdir="${dir.dist}"
-			   listfiles="on" source="1.4" target="1.4"
-			   excludes="org/htmlcleaner/Test.java">
+		<javac srcdir="${dir.src}" destdir="${dir.dist}" listfiles="on" source="1.4" target="1.4">
 			<classpath refid="classpath.compile"/>
 		</javac>
     </target>
@@ -69,7 +67,7 @@
         <zip destfile="${dir.zip}/htmlcleaner${version}-all.zip">
             <zipfileset file="${jarfile}"/>
             <zipfileset file="licence.txt"/>
-            <zipfileset dir="src" prefix="src" excludes="org/htmlcleaner/Test.java" />
+            <zipfileset dir="src" prefix="src" />
             <zipfileset dir="test" prefix="test" />
             <zipfileset dir="config" prefix="config"/>
             <zipfileset dir="doc" prefix="doc"/>

@@ -1,3 +1,5 @@
+package org.htmlcleaner;
+
 import org.htmlcleaner.*;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -18,11 +20,10 @@ import java.net.URL;
  * Vladimir Nikic
  * Date: Apr 13, 2007
  */
-public class Test {
+public class WorkingTest {
 
     public static void main(String[] args) throws IOException, JDOMException, XPatherException {
         long start = System.currentTimeMillis();
-
 
 //        long time = System.currentTimeMillis();
 //        TagNode x = rootNode.findElementByName("a", true);
@@ -51,7 +52,7 @@ public class Test {
         props.setBooleanAttributeValues("empty");
 
 //        TagNode node = cleaner.clean(html);
-        TagNode node = cleaner.clean(new File("c:/temp/htmlcleanertest/1.xml"));
+        TagNode node = cleaner.clean(new File("c:/temp/htmlcleanertest/1.html"));
 //        cleaner.setInnerHtml( (TagNode)(node.evaluateXPath("//table[1]")[0]), "<td>row1<td>row2<td>row3");
 //        Document document = new JDomSerializer(props).createJDom(node);
 //        XMLOutputter xmlOut = new XMLOutputter();
@@ -60,9 +61,8 @@ public class Test {
 //        System.out.println( new PrettyXmlSerializer(props).getXmlAsString(node) );
 
         System.out.println("vreme: " + (System.currentTimeMillis() - start));
-
-        new PrettyXmlSerializer(props).writeXmlToStream(node, System.out);
-
+        new PrettyXmlSerializer(props).writeXmlToFile(node, "c:/temp/htmlcleanertest/1.xml");
+//        new PrettyXmlSerializer(props).writeXmlToStream(node, System.out);
         System.out.println("vreme: " + (System.currentTimeMillis() - start));
 
         new ConfigFileTagProvider(new File("default.xml"));
