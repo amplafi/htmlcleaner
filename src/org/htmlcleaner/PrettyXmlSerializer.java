@@ -49,10 +49,17 @@ import java.util.*;
  */
 public class PrettyXmlSerializer extends XmlSerializer {
 
-	private static final String INDENTATION_STRING = "\t";
+	private static final String DEFAULT_INDENTATION_STRING = "\t";
+
+    private String indentString = DEFAULT_INDENTATION_STRING;
 
 	public PrettyXmlSerializer(CleanerProperties props) {
+		this(props, DEFAULT_INDENTATION_STRING);
+	}
+
+	public PrettyXmlSerializer(CleanerProperties props, String indentString) {
 		super(props);
+        this.indentString = indentString;
 	}
 
 	protected void serialize(TagNode tagNode, Writer writer) throws IOException {
@@ -66,7 +73,7 @@ public class PrettyXmlSerializer extends XmlSerializer {
     private String indent(int level) {
         String result = "";
         while (level > 0) {
-            result += INDENTATION_STRING;
+            result += indentString;
             level--;
         }
 
