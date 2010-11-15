@@ -248,6 +248,19 @@ public class HtmlTokenizer {
         return Character.isUnicodeIdentifierStart(ch) || Character.isDigit(ch) || Utils.isIdentifierHelperChar(ch);
     }
 
+    private boolean isValidXmlChar(char ch) {
+        return (ch == 0x9) ||
+               (ch == 0xA) ||
+               (ch == 0xD) ||
+               ((ch >= 0x20) && (ch <= 0xD7FF)) ||
+               ((ch >= 0xE000) && (ch <= 0xFFFD)) ||
+               ((ch >= 0x10000) && (ch <= 0x10FFFF));
+    }
+
+    private boolean isValidXmlChar() {
+        return (_len >= 0 && _pos >= _len) || isValidXmlChar(_working[_pos]);
+    }
+
     /**
      * Checks if end of the content is reached.
      */
@@ -580,7 +593,9 @@ public class HtmlTokenizer {
 
             if (!_asExpected) {
                 if ( !isChar('<') && !isChar('>') && !startsWith("/>") ) {
-                    saveCurrent();
+                    if (isValidXmlChar()) {
+                        saveCurrent();
+                    }
                     go();
                 }
 
@@ -652,8 +667,10 @@ public class HtmlTokenizer {
                   (!isAposMode && !isQuoteMode && !isWhitespace() && !isChar('>') && !isChar('<'))
                 )
               ) {
-            result.append( _working[_pos] );
-            saveCurrent();
+            if (isValidXmlChar()) {
+                result.append( _working[_pos] );
+                saveCurrent();
+            }
             go();
         }
 
@@ -671,7 +688,9 @@ public class HtmlTokenizer {
 
     private boolean content() throws IOException {
         while ( !isAllRead() ) {
-            saveCurrent();
+            if (isValidXmlChar()) {
+                saveCurrent();
+            }
             go();
 
             if ( isChar('<') ) {
@@ -694,7 +713,9 @@ public class HtmlTokenizer {
     private void comment() throws IOException {
     	go(4);
         while ( !isAllRead() && !startsWith("-->") ) {
-            saveCurrent();
+            if (isValidXmlChar()) {
+                saveCurrent();
+            }
             go();
         }
 
