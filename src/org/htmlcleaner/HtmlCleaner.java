@@ -285,7 +285,7 @@ public class HtmlCleaner {
     }
 
     public TagNode clean(URL url, String charset) throws IOException {
-        StringBuffer content = Utils.readUrl(url, charset);
+        StringBuilder content = Utils.readUrl(url, charset);
         Reader reader = new StringReader( content.toString() );
         return clean(reader);
     }
@@ -837,7 +837,7 @@ public class HtmlCleaner {
     public void setInnerHtml(TagNode node, String content) {
         if (node != null) {
             String nodeName = node.getName();
-            StringBuffer html = new StringBuffer();
+            StringBuilder html = new StringBuilder();
             html.append("<" + nodeName + " marker=''>");
             html.append(content);
             html.append("</" + nodeName + ">");

@@ -61,7 +61,7 @@ public class HtmlTokenizer {
     private transient int _pos = 0;
     private transient int _len = -1;
 
-    private transient StringBuffer _saved = new StringBuffer(512);
+    private transient StringBuilder _saved = new StringBuilder(512);
 
     private transient boolean _isLateForDoctype = false;
     private transient DoctypeToken _docType = null;
@@ -542,7 +542,7 @@ public class HtmlTokenizer {
             return null;
         }
 
-        StringBuffer identifierValue = new StringBuffer();
+        StringBuilder identifierValue = new StringBuilder();
 
         while ( !isAllRead() && isIdentifierChar() ) {
             saveCurrent();
@@ -645,7 +645,7 @@ public class HtmlTokenizer {
         boolean isQuoteMode = false;
         boolean isAposMode = false;
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         if ( isChar('\'') ) {
             isAposMode = true;

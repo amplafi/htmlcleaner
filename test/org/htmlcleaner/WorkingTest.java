@@ -51,8 +51,10 @@ public class WorkingTest {
         props.setTranslateSpecialEntities(true);
         props.setBooleanAttributeValues("empty");
 
+        System.out.println("vreme: " + (System.currentTimeMillis() - start));
 //        TagNode node = cleaner.clean(html);
-        TagNode node = cleaner.clean(new File("c:/temp/htmlcleanertest/1.html"));
+        TagNode node = cleaner.clean(new File("c:/temp/b92.html"));
+//        TagNode node = cleaner.clean(new URL("http://www.golflink.com/golf-courses/course.aspx?course=1821556"));
 //        cleaner.setInnerHtml( (TagNode)(node.evaluateXPath("//table[1]")[0]), "<td>row1<td>row2<td>row3");
 //        Document document = new JDomSerializer(props).createJDom(node);
 //        XMLOutputter xmlOut = new XMLOutputter();

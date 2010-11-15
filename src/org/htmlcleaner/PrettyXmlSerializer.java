@@ -82,7 +82,7 @@ public class PrettyXmlSerializer extends XmlSerializer {
 
     private String getIndentedText(String content,  int level) {
         String indent = indent(level);
-        StringBuffer result = new StringBuffer( content.length() );
+        StringBuilder result = new StringBuilder( content.length() );
         StringTokenizer tokenizer = new StringTokenizer(content, "\n\r");
 
         while (tokenizer.hasMoreTokens()) {
@@ -96,7 +96,7 @@ public class PrettyXmlSerializer extends XmlSerializer {
     }
 
     private String getSingleLineOfChildren(List children) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         Iterator childrenIt = children.iterator();
         boolean isFirst = true;
 

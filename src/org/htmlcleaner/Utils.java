@@ -98,8 +98,8 @@ public class Utils {
      * @param charset
      * @throws IOException
      */
-    public static StringBuffer readUrl(URL url, String charset) throws IOException {
-        StringBuffer buffer = new StringBuffer(1024);
+    public static StringBuilder readUrl(URL url, String charset) throws IOException {
+        StringBuilder buffer = new StringBuilder(1024);
 
         Object content = url.getContent();
         if (content instanceof InputStream) {
@@ -137,7 +137,7 @@ public class Utils {
 
         if (s != null) {
     		int len = s.length();
-    		StringBuffer result = new StringBuffer(len);
+    		StringBuilder result = new StringBuilder(len);
     		
     		for (int i = 0; i < len; i++) {
     			char ch = s.charAt(i);
@@ -307,7 +307,7 @@ public class Utils {
             return template;
         }
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         int startIndex = template.indexOf(VAR_START);
         int endIndex = -1;
