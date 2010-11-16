@@ -272,7 +272,7 @@ public class DefaultTagProvider extends HashMap implements ITagInfoProvider {
         this.put("dir", tagInfo);
 
         tagInfo = new TagInfo("table", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false);
-        tagInfo.defineAllowedChildrenTags("tr,tbody,thead,tfoot,colgroup,caption,tr");
+        tagInfo.defineAllowedChildrenTags("tr,tbody,thead,tfoot,colgroup,col,caption,tr");
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("tr,thead,tbody,tfoot,caption,colgroup,table,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("table", tagInfo);
@@ -316,7 +316,7 @@ public class DefaultTagProvider extends HashMap implements ITagInfoProvider {
         this.put("tfoot", tagInfo);
 
         tagInfo = new TagInfo("col", TagInfo.CONTENT_NONE, TagInfo.BODY, false, false, false);
-        tagInfo.defineFatalTags("colgroup");
+        tagInfo.defineFatalTags("table");
         this.put("col", tagInfo);
 
         tagInfo = new TagInfo("colgroup", TagInfo.CONTENT_ALL, TagInfo.BODY, false, false, false);
