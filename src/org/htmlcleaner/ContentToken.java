@@ -48,10 +48,10 @@ import java.io.Writer;
  */
 public class ContentToken implements BaseToken {
 
-    private StringBuffer content;
+    private StringBuilder content;
 
     public ContentToken(String content) {
-        this.content = new StringBuffer(content);
+        this.content = new StringBuilder(content);
     }
 
     public String getContent() {

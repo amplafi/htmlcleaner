@@ -51,7 +51,6 @@ public class WorkingTest {
         props.setTranslateSpecialEntities(true);
         props.setBooleanAttributeValues("empty");
 
-        System.out.println("vreme: " + (System.currentTimeMillis() - start));
 //        TagNode node = cleaner.clean(html);
         TagNode node = cleaner.clean(new File("c:/temp/b92.html"));
 //        TagNode node = cleaner.clean(new URL("http://www.golflink.com/golf-courses/course.aspx?course=1821556"));
@@ -63,12 +62,7 @@ public class WorkingTest {
 //        System.out.println( new PrettyXmlSerializer(props).getXmlAsString(node) );
 
         System.out.println("vreme: " + (System.currentTimeMillis() - start));
-
-        for (Object oNode: new XPather("//script").evaluateAgainstNode(node)) {
-            ((TagNode)oNode).setName("MAMA");
-            ((TagNode)oNode).getAttributes().clear();
-            ((TagNode)oNode).removeAllChildren();
-        }
+        start = System.currentTimeMillis();
 
         new PrettyXmlSerializer(props).writeXmlToFile(node, "c:/temp/htmlcleanertest/1.xml");
 //        new PrettyXmlSerializer(props).writeXmlToStream(node, System.out);

@@ -52,6 +52,7 @@ public class PrettyXmlSerializer extends XmlSerializer {
 	private static final String DEFAULT_INDENTATION_STRING = "\t";
 
     private String indentString = DEFAULT_INDENTATION_STRING;
+    private List<String> indents = new ArrayList<String>();
 
 	public PrettyXmlSerializer(CleanerProperties props) {
 		this(props, DEFAULT_INDENTATION_STRING);
@@ -70,25 +71,29 @@ public class PrettyXmlSerializer extends XmlSerializer {
 	 * @param level
 	 * @return Appropriate indentation for the specified depth.
 	 */
-    private String indent(int level) {
-        String result = "";
-        while (level > 0) {
-            result += indentString;
-            level--;
+    private String getIndent(int level) {
+        int size = indents.size();
+        if (size <= level) {
+            String prevIndent = size == 0 ? null : indents.get(size - 1);
+            for (int i = size; i <= level; i++) {
+                String currIndent = prevIndent == null ? "" : prevIndent + indentString;
+                indents.add(currIndent);
+                prevIndent = currIndent;
+            }
         }
 
-        return result;
+        return indents.get(level);
     }
 
-    private String getIndentedText(String content,  int level) {
-        String indent = indent(level);
+    private String getIndentedText(String content, int level) {
+        String indent = getIndent(level);
         StringBuilder result = new StringBuilder( content.length() );
         StringTokenizer tokenizer = new StringTokenizer(content, "\n\r");
 
         while (tokenizer.hasMoreTokens()) {
             String line = tokenizer.nextToken().trim();
             if (!"".equals(line)) {
-                result.append(indent + line + "\n");
+                result.append(indent).append(line).append("\n");
             }
         }
 
@@ -133,7 +138,7 @@ public class PrettyXmlSerializer extends XmlSerializer {
 
     protected void serializePrettyXml(TagNode tagNode, Writer writer, int level) throws IOException {
         List tagChildren = tagNode.getChildren();
-        String indent = indent(level);
+        String indent = getIndent(level);
 
         writer.write(indent);
         serializeOpenTag(tagNode, writer);
