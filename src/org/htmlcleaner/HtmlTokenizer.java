@@ -224,7 +224,7 @@ public class HtmlTokenizer {
         }
 
         char ch = _working[position];
-        return Character.isUnicodeIdentifierStart(ch);
+        return Character.isUnicodeIdentifierStart(ch) || ch == '_';
     }
 
     /**

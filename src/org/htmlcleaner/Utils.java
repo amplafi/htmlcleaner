@@ -286,7 +286,7 @@ public class Utils {
             }
             for (int i = 0; i < len; i++) {
                 char ch = s.charAt(i);
-                if ( (i == 0 && !Character.isUnicodeIdentifierStart(ch)) ||
+                if ( (i == 0 && !Character.isUnicodeIdentifierStart(ch) && ch != '_') ||
                      (!Character.isUnicodeIdentifierStart(ch) && !Character.isDigit(ch) && !Utils.isIdentifierHelperChar(ch)) ) {
                     return false;
                 }

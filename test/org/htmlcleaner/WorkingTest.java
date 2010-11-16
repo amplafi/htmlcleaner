@@ -40,9 +40,9 @@ public class WorkingTest {
 
 
         String html = "<script src=\"a\" type=\"text/javascript\" /><script src=\"b\" type=\"text/javascript\"/>";
-        HtmlCleaner cleaner = new HtmlCleaner();
+        final HtmlCleaner cleaner = new HtmlCleaner();
         CleanerProperties props = cleaner.getProperties();
-        props.setOmitUnknownTags(true);
+        props.setOmitUnknownTags(false);
         props.setUseCdataForScriptAndStyle(true);
         props.setRecognizeUnicodeChars(false);
         props.setUseEmptyElementTags(true);
@@ -52,7 +52,19 @@ public class WorkingTest {
         props.setNamespacesAware(false);
 
 //        TagNode node = cleaner.clean(html);
+//        TagNode node = cleaner.clean("<_mama>ceca&#60;</_mama>");
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    cleaner.clean(new URL("http://www.youtube.com/"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
         TagNode node = cleaner.clean(new File("c:/temp/b92.html"));
+
 //        TagNode node = cleaner.clean(new URL("http://www.youtube.com/"));
 //        cleaner.setInnerHtml( (TagNode)(node.evaluateXPath("//table[1]")[0]), "<td>row1<td>row2<td>row3");
 //        Document document = new JDomSerializer(props).createJDom(node);
