@@ -558,13 +558,13 @@ public class HtmlCleaner {
                     _headOpened = true;
                     addAttributesToTag(headNode, startTagToken.getAttributes());
 					nodeIterator.set(null);
-                // unknows HTML tag and unknown tags are not allowed
+                // unknown HTML tag and unknown tags are not allowed
                 } else if ( (tag == null && properties.omitUnknownTags) || (tag != null && tag.isDeprecated() && properties.omitDeprecatedTags) ) {
                     nodeIterator.set(null);
-                // if current tag is unknown and last open tag doesn't allow any other tags in its body
+                // if current tag is unknown, unknown tags are allowed and last open tag doesn't allow any other tags in its body
                 } else if ( tag == null && lastTagInfo != null && !lastTagInfo.allowsAnything() ) {
-                    closeSnippet(nodeList, lastTagPos, startTagToken);
-                    nodeIterator.previous();
+                    saveToLastOpenTag(nodeList, token);
+                    nodeIterator.set(null);
                 } else if ( tag != null && tag.hasPermittedTags() && _openTags.someAlreadyOpen(tag.getPermittedTags()) ) {
                 	nodeIterator.set(null);
                 // if tag that must be unique, ignore this occurence
