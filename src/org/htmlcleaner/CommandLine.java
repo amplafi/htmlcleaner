@@ -262,11 +262,11 @@ public class CommandLine {
 
         TagNode node;
 
-        String src = source.toLowerCase();
-        if ( src.startsWith("http://") || src.startsWith("https://") ) {
-            node = cleaner.clean(new URL(src), inCharset);
+        String srcLowerCase = source.toLowerCase();
+        if ( srcLowerCase.startsWith("http://") || srcLowerCase.startsWith("https://") ) {
+            node = cleaner.clean(new URL(source), inCharset);
         } else {
-            node = cleaner.clean(new File(src), inCharset);
+            node = cleaner.clean(new File(source), inCharset);
         }
 
         // if user specifies XPath expresssion to choose node for serialization, then
