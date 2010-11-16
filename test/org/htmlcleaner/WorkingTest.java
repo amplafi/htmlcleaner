@@ -49,9 +49,10 @@ public class WorkingTest {
         props.setAdvancedXmlEscape(true);
         props.setTranslateSpecialEntities(true);
         props.setBooleanAttributeValues("empty");
+        props.setNamespacesAware(false);
 
 //        TagNode node = cleaner.clean(html);
-        TagNode node = cleaner.clean(new File("c:/temp/test.html"));
+        TagNode node = cleaner.clean(new File("c:/temp/b92.html"));
 //        TagNode node = cleaner.clean(new URL("http://www.youtube.com/"));
 //        cleaner.setInnerHtml( (TagNode)(node.evaluateXPath("//table[1]")[0]), "<td>row1<td>row2<td>row3");
 //        Document document = new JDomSerializer(props).createJDom(node);
@@ -70,38 +71,13 @@ public class WorkingTest {
         new ConfigFileTagProvider(new File("default.xml"));
 
 
-
-
-
-
-        html = "<div id=goca class=\"bob\">Bob!<h1 style='ssss'>MAMA</h1></div>";
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        //Setup properties
-        cleaner = new HtmlCleaner();
-        props = cleaner.getProperties();
-        props.setOmitHtmlEnvelope(true);
-        props.setOmitXmlDeclaration(true);
-        props.setUseCdataForScriptAndStyle(false);
-
-        //Clean
-        node = cleaner.clean(html);
-
-        //Display DomSerializer Output
+        System.out.println("vreme: " + (System.currentTimeMillis() - start));
+        start = System.currentTimeMillis();
         Document document = new DomSerializer(props, true).createDOM(node);
-        XMLSerializer serializer2 = new XMLSerializer();
-        serializer2.setOutputByteStream(outputStream);
-        serializer2.serialize(document);
-        System.out.print("DomSerializer Output:\n" + new String(outputStream.toByteArray()) + "\n\n");
 
-        //Display XmlSerializer Output
-        outputStream = new ByteArrayOutputStream();
-        new PrettyXmlSerializer(props).writeXmlToStream(node, outputStream);
-        System.out.println("PrettyXmlSerializer Output:\n" + outputStream.toString() + "\n\n");
-
+        System.out.println("vreme: " + (System.currentTimeMillis() - start));
+        start = System.currentTimeMillis();
         org.jdom.Document jDom = new JDomSerializer(props, true).createJDom(node);
-        System.out.println("KRAJ");
-
     }
 
 }
