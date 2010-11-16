@@ -247,6 +247,10 @@
         <close-before-copy-inside-tags>a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font</close-before-copy-inside-tags>
         <close-before-tags>p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml</close-before-tags>
     </tag>
+    <tag name="legend" content="text" section="body" deprecated="false" unique="false" ignore-permitted="false">
+        <req-enclosing-tags>fieldset</req-enclosing-tags>
+        <close-before-tags>legend</close-before-tags>
+    </tag>
     <tag name="isindex" content="none" section="body" deprecated="true" unique="false" ignore-permitted="false">
         <close-before-copy-inside-tags>a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font</close-before-copy-inside-tags>
         <close-before-tags>p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml</close-before-tags>

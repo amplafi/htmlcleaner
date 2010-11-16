@@ -49,13 +49,13 @@ import java.util.HashMap;
  * Created by: Vladimir Nikic<br/>
  * Date: April, 2008.
  */
-public class DefaultTagProvider extends HashMap implements ITagInfoProvider {
+public class DefaultTagProvider extends HashMap<String, TagInfo> implements ITagInfoProvider {
 
     // singleton instance, used if no other TagInfoProvider is specified
     private static DefaultTagProvider _instance;
 
     /**
-     * Returns singleton instance of this class.
+     * @return Singleton instance of this class.
      */
     public static synchronized DefaultTagProvider getInstance() {
         if (_instance == null) {
@@ -371,6 +371,11 @@ public class DefaultTagProvider extends HashMap implements ITagInfoProvider {
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("fieldset", tagInfo);
+
+        tagInfo = new TagInfo("legend", TagInfo.CONTENT_TEXT, TagInfo.BODY, false, false, false);
+        tagInfo.defineRequiredEnclosingTags("fieldset");
+        tagInfo.defineCloseBeforeTags("legend");
+        this.put("legend", tagInfo);
 
         tagInfo = new TagInfo("isindex", TagInfo.CONTENT_NONE, TagInfo.BODY, true, false, false);
         tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
