@@ -167,7 +167,7 @@
         <close-before-tags>p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml</close-before-tags>
     </tag>
     <tag name="table" content="all" section="body" deprecated="false" unique="false" ignore-permitted="false">
-        <allowed-children-tags>tr,tbody,thead,tfoot,colgroup,caption,tr</allowed-children-tags>
+        <allowed-children-tags>tr,tbody,thead,tfoot,colgroup,col,caption,tr</allowed-children-tags>
         <close-before-copy-inside-tags>a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font</close-before-copy-inside-tags>
         <close-before-tags>tr,thead,tbody,tfoot,caption,colgroup,table,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml</close-before-tags>
     </tag>
@@ -204,8 +204,8 @@
         <close-before-tags>td,th,tr,tbody,thead,tfoot,caption,colgroup</close-before-tags>
     </tag>
     <tag name="col" content="none" section="body" deprecated="false" unique="false" ignore-permitted="false">
-        <fatal-tags>colgroup</fatal-tags>
-        </tag>
+        <fatal-tags>table</fatal-tags>
+    </tag>
     <tag name="colgroup" content="all" section="body" deprecated="false" unique="false" ignore-permitted="false">
         <fatal-tags>table</fatal-tags>
         <allowed-children-tags>col</allowed-children-tags>
