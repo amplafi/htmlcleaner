@@ -37,6 +37,15 @@ public class DomSerializer {
         Element rootElement = document.createElement(rootNode.getName());
         document.appendChild(rootElement);
 
+        for (Map.Entry<String, String> entry: rootNode.getAttributes().entrySet()) {
+            String attrName = entry.getKey();
+            String attrValue = entry.getValue();
+            if (escapeXml) {
+                attrValue = Utils.escapeXml(attrValue, props, true);
+            }
+            rootElement.setAttribute(attrName, attrValue);
+        }
+
         createSubnodes(document, rootElement, rootNode.getChildren());
 
         return document;
@@ -64,12 +73,9 @@ public class DomSerializer {
                 } else if (item instanceof TagNode) {
                     TagNode subTagNode = (TagNode) item;
                     Element subelement = document.createElement( subTagNode.getName() );
-                    Map attributes =  subTagNode.getAttributes();
-                    Iterator entryIterator = attributes.entrySet().iterator();
-                    while (entryIterator.hasNext()) {
-                        Map.Entry entry = (Map.Entry) entryIterator.next();
-                        String attrName = (String) entry.getKey();
-                        String attrValue = (String) entry.getValue();
+                    for ( Map.Entry<String, String> entry: subTagNode.getAttributes().entrySet() ) {
+                        String attrName = entry.getKey();
+                        String attrValue = entry.getValue();
                         if (escapeXml) {
                             attrValue = Utils.escapeXml(attrValue, props, true);
                         }

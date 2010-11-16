@@ -126,7 +126,7 @@ public class TagNode extends TagToken {
     }
 
     private TagNode parent = null; 
-    private Map attributes = new LinkedHashMap();
+    private Map<String, String> attributes = new LinkedHashMap<String, String>();
     private List children = new ArrayList();
     private DoctypeToken docType = null;
     private List<BaseToken> itemsToMove = null;
@@ -169,13 +169,13 @@ public class TagNode extends TagToken {
      * @return Value of the specified attribute, or null if it this tag doesn't contain it. 
      */
     public String getAttributeByName(String attName) {
-		return attName != null ? (String) attributes.get(attName.toLowerCase()) : null;
+		return attName != null ? attributes.get(attName.toLowerCase()) : null;
 	}
 
     /**
      * @return Map instance containing all attribute name/value pairs.
      */
-    public Map getAttributes() {
+    public Map<String, String> getAttributes() {
 		return attributes;
 	}
 
@@ -511,7 +511,7 @@ public class TagNode extends TagToken {
         boolean isPreserveSourceAtts = tagTrans.isPreserveSourceAttributes();
         boolean hasAttTransforms = tagTrans.hasAttributeTransformations();
         if ( hasAttTransforms || !isPreserveSourceAtts) {
-            Map newAttributes = isPreserveSourceAtts ? new LinkedHashMap(attributes) : new LinkedHashMap();
+            Map<String, String> newAttributes = isPreserveSourceAtts ? new LinkedHashMap<String, String>(attributes) : new LinkedHashMap<String, String>();
             if (hasAttTransforms) {
                 Map map = tagTrans.getAttributeTransformations();
                 Iterator iterator = map.entrySet().iterator();

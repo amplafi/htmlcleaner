@@ -1,12 +1,10 @@
 package org.htmlcleaner;
 
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import org.htmlcleaner.*;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.output.XMLOutputter;
-import org.jdom.xpath.XPath;
+import org.w3c.dom.Document;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamResult;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +20,7 @@ import java.net.URL;
  */
 public class WorkingTest {
 
-    public static void main(String[] args) throws IOException, JDOMException, XPatherException {
+    public static void main(String[] args) throws IOException, XPatherException, ParserConfigurationException {
         long start = System.currentTimeMillis();
 
 //        long time = System.currentTimeMillis();
@@ -70,6 +68,40 @@ public class WorkingTest {
         System.out.println("vreme: " + (System.currentTimeMillis() - start));
 
         new ConfigFileTagProvider(new File("default.xml"));
+
+
+
+
+
+
+        html = "<div id=goca class=\"bob\">Bob!<h1 style='ssss'>MAMA</h1></div>";
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        //Setup properties
+        cleaner = new HtmlCleaner();
+        props = cleaner.getProperties();
+        props.setOmitHtmlEnvelope(true);
+        props.setOmitXmlDeclaration(true);
+        props.setUseCdataForScriptAndStyle(false);
+
+        //Clean
+        node = cleaner.clean(html);
+
+        //Display DomSerializer Output
+        Document document = new DomSerializer(props, true).createDOM(node);
+        XMLSerializer serializer2 = new XMLSerializer();
+        serializer2.setOutputByteStream(outputStream);
+        serializer2.serialize(document);
+        System.out.print("DomSerializer Output:\n" + new String(outputStream.toByteArray()) + "\n\n");
+
+        //Display XmlSerializer Output
+        outputStream = new ByteArrayOutputStream();
+        new PrettyXmlSerializer(props).writeXmlToStream(node, outputStream);
+        System.out.println("PrettyXmlSerializer Output:\n" + outputStream.toString() + "\n\n");
+
+        org.jdom.Document jDom = new JDomSerializer(props, true).createJDom(node);
+        System.out.println("KRAJ");
+
     }
 
 }

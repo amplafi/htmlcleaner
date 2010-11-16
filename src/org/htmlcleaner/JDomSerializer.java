@@ -32,6 +32,16 @@ public class JDomSerializer {
         this.factory = new DefaultJDOMFactory();
         Element rootElement = this.factory.element(rootNode.getName());
         Document document = this.factory.document(rootElement);
+        
+        for (Map.Entry<String, String> entry: rootNode.getAttributes().entrySet()) {
+            String attrName = entry.getKey();
+            String attrValue = entry.getValue();
+            if (escapeXml) {
+                attrValue = Utils.escapeXml(attrValue, props, true);
+            }
+            rootElement.setAttribute(attrName, attrValue);
+        }
+
         createSubnodes(rootElement, rootNode.getChildren());
 
         return document;
@@ -60,12 +70,9 @@ public class JDomSerializer {
                 } else if (item instanceof TagNode) {
                     TagNode subTagNode = (TagNode) item;
                     Element subelement = factory.element( subTagNode.getName() );
-                    Map attributes = subTagNode.getAttributes();
-                    Iterator entryIterator = attributes.entrySet().iterator();
-                    while (entryIterator.hasNext()) {
-                        Map.Entry entry = (Map.Entry) entryIterator.next();
-                        String attrName = (String) entry.getKey();
-                        String attrValue = (String) entry.getValue();
+                    for (Map.Entry<String, String> entry: subTagNode.getAttributes().entrySet()) {
+                        String attrName = entry.getKey();
+                        String attrValue = entry.getValue();
                         subelement.setAttribute(attrName, attrValue);
                     }
 
