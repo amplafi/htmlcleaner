@@ -44,17 +44,17 @@ public class WorkingTest {
         String html = "<script src=\"a\" type=\"text/javascript\" /><script src=\"b\" type=\"text/javascript\"/>";
         HtmlCleaner cleaner = new HtmlCleaner();
         CleanerProperties props = cleaner.getProperties();
+        props.setOmitUnknownTags(true);
         props.setUseCdataForScriptAndStyle(true);
-        props.setRecognizeUnicodeChars(true);
+        props.setRecognizeUnicodeChars(false);
         props.setUseEmptyElementTags(true);
         props.setAdvancedXmlEscape(true);
         props.setTranslateSpecialEntities(true);
         props.setBooleanAttributeValues("empty");
 
 //        TagNode node = cleaner.clean(html);
-//        TagNode node = cleaner.clean(new File("c:/temp/b92.html"));
-//        TagNode node = cleaner.clean(new URL("http://www.b92.net/"));
-        TagNode node = cleaner.clean(new URL("http://www.youtube.com/"));
+        TagNode node = cleaner.clean(new File("c:/temp/test.html"));
+//        TagNode node = cleaner.clean(new URL("http://www.youtube.com/"));
 //        cleaner.setInnerHtml( (TagNode)(node.evaluateXPath("//table[1]")[0]), "<td>row1<td>row2<td>row3");
 //        Document document = new JDomSerializer(props).createJDom(node);
 //        XMLOutputter xmlOut = new XMLOutputter();

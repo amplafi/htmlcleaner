@@ -129,7 +129,7 @@ public class TagNode extends TagToken {
     private Map attributes = new LinkedHashMap();
     private List children = new ArrayList();
     private DoctypeToken docType = null;
-    private List itemsToMove = null;
+    private List<BaseToken> itemsToMove = null;
     
     private transient HtmlCleaner cleaner = null;
     private transient boolean isFormed = false;
@@ -479,19 +479,19 @@ public class TagNode extends TagToken {
         this.children.clear();
     }
     
-    void addItemForMoving(Object item) {
+    void addItemForMoving(BaseToken item) {
     	if (itemsToMove == null) {
-    		itemsToMove = new ArrayList();
+    		itemsToMove = new ArrayList<BaseToken>();
     	}
     	
     	itemsToMove.add(item);
     }
     
-    List getItemsToMove() {
+    List<BaseToken> getItemsToMove() {
 		return itemsToMove;
 	}
 
-    void setItemsToMove(List itemsToMove) {
+    void setItemsToMove(List<BaseToken> itemsToMove) {
         this.itemsToMove = itemsToMove;
     }
 

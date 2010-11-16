@@ -66,7 +66,7 @@ public class HtmlTokenizer {
     private transient boolean _isLateForDoctype = false;
     private transient DoctypeToken _docType = null;
     private transient TagToken _currentTagToken = null;
-    private transient List _tokenList = new ArrayList();
+    private transient List<BaseToken> _tokenList = new ArrayList<BaseToken>();
     private transient Set _namespacePrefixes = new HashSet();
     
     private boolean _asExpected = true;
@@ -127,7 +127,7 @@ public class HtmlTokenizer {
         }
     }
 
-    List getTokenList() {
+    List<BaseToken> getTokenList() {
     	return this._tokenList;
     }
 
@@ -356,7 +356,7 @@ public class HtmlTokenizer {
                 } else {
                     boolean isTokenAdded = content();
                     if (isScriptEmpty && isTokenAdded) {
-                        final BaseToken lastToken = (BaseToken) _tokenList.get(_tokenList.size() - 1);
+                        final BaseToken lastToken = _tokenList.get(_tokenList.size() - 1);
                         if (lastToken != null) {
                             final String lastTokenAsString = lastToken.toString();
                             if (lastTokenAsString != null && lastTokenAsString.trim().length() > 0) {
