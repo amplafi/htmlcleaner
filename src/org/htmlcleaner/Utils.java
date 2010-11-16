@@ -39,9 +39,13 @@ package org.htmlcleaner;
 
 import java.io.*;
 import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>Common utilities.</p>
@@ -91,31 +95,39 @@ public class Utils {
 
         return (index <= 0) ? "" : s.substring(0, index);
     }
-    
-    /**
-     * Reads content from the specified URL with specified charset into string
-     * @param url
-     * @param charset
-     * @throws IOException
-     */
-    public static StringBuilder readUrl(URL url, String charset) throws IOException {
-        StringBuilder buffer = new StringBuilder(1024);
 
-        Object content = url.getContent();
-        if (content instanceof InputStream) {
-            InputStreamReader reader = new InputStreamReader((InputStream)content, charset);
-            char[] charArray = new char[1024];
-
-            int charsRead = 0;
-            do {
-                charsRead = reader.read(charArray);
-                if (charsRead >= 0) {
-                    buffer.append(charArray, 0, charsRead);
+    public static String getCharsetFromContentTypeString(String contentType) {
+        if (contentType != null) {
+            String pattern = "charset=([a-z\\d\\-]*)";
+            Matcher matcher = Pattern.compile(pattern,  Pattern.CASE_INSENSITIVE).matcher(contentType);
+            if (matcher.find()) {
+                String charset = matcher.group(1);
+                if (Charset.isSupported(charset)) {
+                    return charset;
                 }
-            } while (charsRead > 0);
+            }
+        }
+        
+        return null;
+    }
+
+    public static String getCharsetFromContent(URL url) throws IOException {
+        InputStream stream = url.openStream();
+        byte chunk[] = new byte[2048];
+        int bytesRead = stream.read(chunk);
+        if (bytesRead > 0) {
+            String startContent = new String(chunk);
+            String pattern = "\\<meta\\s*http-equiv=[\\\"\\']content-type[\\\"\\']\\s*content\\s*=\\s*[\"']text/html\\s*;\\s*charset=([a-z\\d\\-]*)[\\\"\\'\\>]";
+            Matcher matcher = Pattern.compile(pattern,  Pattern.CASE_INSENSITIVE).matcher(startContent);
+            if (matcher.find()) {
+                String charset = matcher.group(1);
+                if (Charset.isSupported(charset)) {
+                    return charset;
+                }
+            }
         }
 
-        return buffer;
+        return null;
     }
 
     public static boolean isHexadecimalDigit(char ch) {

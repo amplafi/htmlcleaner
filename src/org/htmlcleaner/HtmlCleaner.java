@@ -39,6 +39,7 @@ package org.htmlcleaner;
 
 import java.io.*;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 
 /**
@@ -285,13 +286,21 @@ public class HtmlCleaner {
     }
 
     public TagNode clean(URL url, String charset) throws IOException {
-        StringBuilder content = Utils.readUrl(url, charset);
-        Reader reader = new StringReader( content.toString() );
-        return clean(reader);
+        URLConnection urlConnection = url.openConnection();
+        if (charset == null) {
+            charset = Utils.getCharsetFromContentTypeString( urlConnection.getHeaderField("Content-Type") );
+        }
+        if (charset == null) {
+            charset = Utils.getCharsetFromContent(url);
+        }
+        if (charset == null) {
+            charset = DEFAULT_CHARSET;
+        }
+        return clean(url.openStream(), charset);
     }
 
     public TagNode clean(URL url) throws IOException {
-        return clean(url, DEFAULT_CHARSET);
+        return clean(url, null);
     }
 
     public TagNode clean(InputStream in, String charset) throws IOException {

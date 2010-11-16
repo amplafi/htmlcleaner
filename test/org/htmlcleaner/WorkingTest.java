@@ -52,8 +52,9 @@ public class WorkingTest {
         props.setBooleanAttributeValues("empty");
 
 //        TagNode node = cleaner.clean(html);
-        TagNode node = cleaner.clean(new File("c:/temp/b92.html"));
-//        TagNode node = cleaner.clean(new URL("http://www.golflink.com/golf-courses/course.aspx?course=1821556"));
+//        TagNode node = cleaner.clean(new File("c:/temp/b92.html"));
+//        TagNode node = cleaner.clean(new URL("http://www.b92.net/"));
+        TagNode node = cleaner.clean(new URL("http://www.youtube.com/"));
 //        cleaner.setInnerHtml( (TagNode)(node.evaluateXPath("//table[1]")[0]), "<td>row1<td>row2<td>row3");
 //        Document document = new JDomSerializer(props).createJDom(node);
 //        XMLOutputter xmlOut = new XMLOutputter();
@@ -64,7 +65,7 @@ public class WorkingTest {
         System.out.println("vreme: " + (System.currentTimeMillis() - start));
         start = System.currentTimeMillis();
 
-        new PrettyXmlSerializer(props).writeXmlToFile(node, "c:/temp/htmlcleanertest/1.xml");
+        new PrettyXmlSerializer(props).writeXmlToFile(node, "c:/temp/htmlcleanertest/1.xml", "UTF-8");
 //        new PrettyXmlSerializer(props).writeXmlToStream(node, System.out);
         System.out.println("vreme: " + (System.currentTimeMillis() - start));
 
