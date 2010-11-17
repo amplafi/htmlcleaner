@@ -52,27 +52,32 @@ public class WorkingTest {
         final PrettyXmlSerializer prettySerializer = new PrettyXmlSerializer(props);
 
         long start = System.currentTimeMillis();
-        for (int i = 0; i < resources.length; i++) {
-            TagNode node = cleaner.clean(new File(resources[i]));
-            prettySerializer.writeXmlToFile(node, "c:/temp/htmlcleanertest/out/" + i + ".xml", "UTF-8");
-        }
-        System.out.println("Vreme u jednom tredu: " + (System.currentTimeMillis() - start));
-        final long start1 = System.currentTimeMillis();
 
-        for (int i = 0; i < resources.length; i++) {
-            final int index = i;
-            new Thread(new Runnable() {
-                public void run() {
-                    try {
-                        TagNode node = cleaner.clean(new File(resources[index]));
-                        prettySerializer.writeXmlToFile(node, "c:/temp/htmlcleanertest/out/" + index + "a.xml", "UTF-8");
-                        System.out.println("Vreme u tredu " + index + ": " + (System.currentTimeMillis() - start1));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        }
+//        for (int i = 0; i < resources.length; i++) {
+//            TagNode node = cleaner.clean(new File(resources[i]));
+//            prettySerializer.writeXmlToFile(node, "c:/temp/htmlcleanertest/out/" + i + ".xml", "UTF-8");
+//        }
+//        System.out.println("Vreme u jednom tredu: " + (System.currentTimeMillis() - start));
+//
+//        final long start1 = System.currentTimeMillis();
+//
+//        for (int i = 0; i < resources.length; i++) {
+//            final int index = i;
+//            new Thread(new Runnable() {
+//                public void run() {
+//                    try {
+//                        TagNode node = cleaner.clean(new File(resources[index]));
+//                        prettySerializer.writeXmlToFile(node, "c:/temp/htmlcleanertest/out/" + index + "a.xml", "UTF-8");
+//                        System.out.println("Vreme u tredu " + index + ": " + (System.currentTimeMillis() - start1));
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }).start();
+//        }
+
+        TagNode node = cleaner.clean(new File("c:/temp/test.html"));
+        prettySerializer.writeXmlToFile(node, "c:/temp/htmlcleanertest/1.xml", "utf-8");
     }
 
 }
