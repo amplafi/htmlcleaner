@@ -51,7 +51,7 @@ import java.util.*;
  * Date: November, 2006
 
  */
-public class HtmlTokenizer {
+abstract public class HtmlTokenizer {
 	
 	private final static int WORKING_BUFFER_SIZE = 1024;
 
@@ -73,26 +73,30 @@ public class HtmlTokenizer {
 
     private boolean _isScriptContext = false;
 
-    private HtmlCleaner cleaner;
     private CleanerProperties props;
     private CleanerTransformations transformations;
+    private ITagInfoProvider tagInfoProvider;
 
     /**
      * Constructor - cretes instance of the parser with specified content.
      * @param cleaner
      * @throws IOException
      */
-    public HtmlTokenizer(HtmlCleaner cleaner, Reader reader) throws IOException {
+    public HtmlTokenizer(Reader reader, CleanerProperties props, CleanerTransformations transformations, ITagInfoProvider tagInfoProvider) throws IOException {
         this._reader = new BufferedReader(reader);
-        this.cleaner = cleaner;
-        this.props = cleaner.getProperties();
-        this.transformations = cleaner.getTransformations();
+        this.props = props;
+        this.transformations = transformations;
+        this.tagInfoProvider = tagInfoProvider;
     }
 
     private void addToken(BaseToken token) {
         _tokenList.add(token);
-        cleaner.makeTree( _tokenList, _tokenList.listIterator(_tokenList.size() - 1) );
+        makeTree(_tokenList);
     }
+
+    abstract void makeTree(List<BaseToken> tokenList);
+
+    abstract TagNode createTagNode(String name);
 
     private void readIfNeeded(int neededChars) throws IOException {
         if (_len == -1 && _pos + neededChars >= WORKING_BUFFER_SIZE) {
@@ -432,7 +436,6 @@ public class HtmlTokenizer {
         }
 
         if (tagName != null) {
-            ITagInfoProvider tagInfoProvider = cleaner.getTagInfoProvider();
             TagInfo tagInfo = tagInfoProvider.getTagInfo(tagName);
             if ( (tagInfo == null && !props.isOmitUnknownTags() && props.isTreatUnknownTagsAsContent() && !isReservedTag(tagName)) ||
                  (tagInfo != null && tagInfo.isDeprecated() && !props.isOmitDeprecatedTags() && props.isTreatDeprecatedTagsAsContent()) ) {
@@ -441,7 +444,7 @@ public class HtmlTokenizer {
             }
         }
 
-        TagNode tagNode = new TagNode(tagName, cleaner);
+        TagNode tagNode = createTagNode(tagName);
         _currentTagToken = tagNode;
 
         if (_asExpected) {
@@ -497,7 +500,6 @@ public class HtmlTokenizer {
         }
 
         if (tagName != null) {
-            ITagInfoProvider tagInfoProvider = cleaner.getTagInfoProvider();
             TagInfo tagInfo = tagInfoProvider.getTagInfo(tagName);
             if ( (tagInfo == null && !props.isOmitUnknownTags() && props.isTreatUnknownTagsAsContent() && !isReservedTag(tagName)) ||
                  (tagInfo != null && tagInfo.isDeprecated() && !props.isOmitDeprecatedTags() && props.isTreatDeprecatedTagsAsContent()) ) {

@@ -21,75 +21,58 @@ import java.net.URL;
 public class WorkingTest {
 
     public static void main(String[] args) throws IOException, XPatherException, ParserConfigurationException {
-        long start = System.currentTimeMillis();
-
-//        long time = System.currentTimeMillis();
-//        TagNode x = rootNode.findElementByName("a", true);
-////        cleaner.setInnerHtml(x, "<tr>mama</tr><td>seka<td>bata");
-////        System.out.println("***" + cleaner.getInnerHtml(x) + "***");
-//        System.out.println("search time: " + (System.currentTimeMillis() - time));
-
-//        for (int i = 0; i < x.length; i++) {
-//            TagNode tagNode = x[i];
-//            tagNode.removeFromTree();
-//        }
-//        System.out.println(new SimpleXmlSerializer(cleaner.getProperties()).getXmlAsString(rootNode));
-        // writeXmlToFile(rootNode, "c:/temp/out.xml", "UTF-8")
-//        Object z[] = rootNode.evaluateXPath("data( //a['v' < @id] )");
-//        System.out.println("-->" + z.length);
-
-
         String html = "<script src=\"a\" type=\"text/javascript\" /><script src=\"b\" type=\"text/javascript\"/>";
         final HtmlCleaner cleaner = new HtmlCleaner();
-        CleanerProperties props = cleaner.getProperties();
-        props.setOmitUnknownTags(false);
-        props.setUseCdataForScriptAndStyle(true);
-        props.setRecognizeUnicodeChars(false);
-        props.setUseEmptyElementTags(true);
-        props.setAdvancedXmlEscape(true);
-        props.setTranslateSpecialEntities(true);
-        props.setBooleanAttributeValues("empty");
-        props.setNamespacesAware(false);
+        final CleanerProperties props = cleaner.getProperties();
 
-//        TagNode node = cleaner.clean(html);
-//        TagNode node = cleaner.clean("<_mama>ceca&#60;</_mama>");
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    cleaner.clean(new URL("http://www.youtube.com/"));
-                } catch (IOException e) {
-                    e.printStackTrace();
+//        props.setOmitUnknownTags(false);
+//        props.setUseCdataForScriptAndStyle(true);
+//        props.setRecognizeUnicodeChars(false);
+//        props.setUseEmptyElementTags(true);
+//        props.setAdvancedXmlEscape(true);
+//        props.setTranslateSpecialEntities(true);
+//        props.setBooleanAttributeValues("empty");
+//        props.setNamespacesAware(false);
+
+//        final String resources[] = {
+//                "http://www.b92.net",
+//                "http://www.nba.com",
+//                "http://www.naslovi.net/",
+//                "http://www.theserverside.com/",
+//                "http://www.yahoo.com",
+//        };
+        final String resources[] = {
+                "c:/temp/htmlcleanertest/1.htm",
+                "c:/temp/htmlcleanertest/2.htm",
+                "c:/temp/htmlcleanertest/3.htm",
+                "c:/temp/htmlcleanertest/4.htm",
+                "c:/temp/htmlcleanertest/5.htm",
+        };
+
+        final PrettyXmlSerializer prettySerializer = new PrettyXmlSerializer(props);
+
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < resources.length; i++) {
+            TagNode node = cleaner.clean(new File(resources[i]));
+            prettySerializer.writeXmlToFile(node, "c:/temp/htmlcleanertest/out/" + i + ".xml", "UTF-8");
+        }
+        System.out.println("Vreme u jednom tredu: " + (System.currentTimeMillis() - start));
+        final long start1 = System.currentTimeMillis();
+
+        for (int i = 0; i < resources.length; i++) {
+            final int index = i;
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        TagNode node = cleaner.clean(new File(resources[index]));
+                        prettySerializer.writeXmlToFile(node, "c:/temp/htmlcleanertest/out/" + index + "a.xml", "UTF-8");
+                        System.out.println("Vreme u tredu " + index + ": " + (System.currentTimeMillis() - start1));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        }).start();
-
-        TagNode node = cleaner.clean(new File("c:/temp/b92.html"));
-
-//        TagNode node = cleaner.clean(new URL("http://www.youtube.com/"));
-//        cleaner.setInnerHtml( (TagNode)(node.evaluateXPath("//table[1]")[0]), "<td>row1<td>row2<td>row3");
-//        Document document = new JDomSerializer(props).createJDom(node);
-//        XMLOutputter xmlOut = new XMLOutputter();
-//        xmlOut.output(document, System.out);
-
-//        System.out.println( new PrettyXmlSerializer(props).getXmlAsString(node) );
-
-        System.out.println("vreme: " + (System.currentTimeMillis() - start));
-        start = System.currentTimeMillis();
-
-        new PrettyXmlSerializer(props).writeXmlToFile(node, "c:/temp/htmlcleanertest/1.xml", "UTF-8");
-//        new PrettyXmlSerializer(props).writeXmlToStream(node, System.out);
-        System.out.println("vreme: " + (System.currentTimeMillis() - start));
-
-        new ConfigFileTagProvider(new File("default.xml"));
-
-
-        System.out.println("vreme: " + (System.currentTimeMillis() - start));
-        start = System.currentTimeMillis();
-        Document document = new DomSerializer(props, true).createDOM(node);
-
-        System.out.println("vreme: " + (System.currentTimeMillis() - start));
-        start = System.currentTimeMillis();
-        org.jdom.Document jDom = new JDomSerializer(props, true).createJDom(node);
+            }).start();
+        }
     }
 
 }

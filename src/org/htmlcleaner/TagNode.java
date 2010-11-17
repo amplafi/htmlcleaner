@@ -131,23 +131,11 @@ public class TagNode extends TagToken {
     private DoctypeToken docType = null;
     private List<BaseToken> itemsToMove = null;
     
-    private transient HtmlCleaner cleaner = null;
     private transient boolean isFormed = false;
 
 
     public TagNode(String name) {
-        this(name, null);
-    }
-    
-    public TagNode(String name, HtmlCleaner cleaner) {
         super(name == null ? null : name.toLowerCase());
-        this.cleaner = cleaner;
-        if (cleaner != null) {
-            Set pruneTagSet = cleaner.getPruneTagSet();
-            if ( pruneTagSet != null && name != null && pruneTagSet.contains(name.toLowerCase()) ) {
-                cleaner.addPruneNode(this);
-            }
-        }
     }
 
     /**
@@ -535,8 +523,8 @@ public class TagNode extends TagToken {
     	xmlSerializer.serialize(this, writer);
     }
     
-    public TagNode makeCopy() {
-    	TagNode copy = new TagNode(name, cleaner);
+    TagNode makeCopy() {
+    	TagNode copy = new TagNode(name);
         copy.attributes.putAll(attributes);
     	return copy;
     }

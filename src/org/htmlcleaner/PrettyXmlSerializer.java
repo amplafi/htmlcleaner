@@ -71,7 +71,7 @@ public class PrettyXmlSerializer extends XmlSerializer {
 	 * @param level
 	 * @return Appropriate indentation for the specified depth.
 	 */
-    private String getIndent(int level) {
+    private synchronized String getIndent(int level) {
         int size = indents.size();
         if (size <= level) {
             String prevIndent = size == 0 ? null : indents.get(size - 1);
