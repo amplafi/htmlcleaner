@@ -19,7 +19,7 @@
     <!--  sources targets -->
 	<target name="build" description="compilation of source files">
 		<mkdir dir="${dir.dist}"/>
-		<javac srcdir="${dir.src}" destdir="${dir.dist}" listfiles="on" source="1.4" target="1.4">
+		<javac srcdir="${dir.src}" destdir="${dir.dist}" listfiles="on" source="1.5" target="1.5">
 			<classpath refid="classpath.compile"/>
 		</javac>
     </target>
