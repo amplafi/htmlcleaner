@@ -311,10 +311,6 @@ public class SpecialEntity {
         addEntity("clubs", 9827);
         addEntity("hearts", 9829);
         addEntity("diams", 9830);
-        addEntity("amp", 38);
-        addEntity("lt", 60);
-        addEntity("gt", 62);
-        addEntity("quot", 34);
     }
 
 

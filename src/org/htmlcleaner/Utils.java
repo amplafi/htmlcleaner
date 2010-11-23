@@ -40,6 +40,7 @@ package org.htmlcleaner;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -55,6 +56,16 @@ public class Utils {
 
     public static String VAR_START = "${";
     public static String VAR_END = "}";
+
+    public static final Map<Character, String> RESERVED_XML_CHARS = new HashMap<Character, String>();
+
+    static {
+        RESERVED_XML_CHARS.put('&', "&amp;");
+        RESERVED_XML_CHARS.put('<', "&lt;");
+        RESERVED_XML_CHARS.put('>', "&gt;");
+        RESERVED_XML_CHARS.put('\"', "&quot;");
+        RESERVED_XML_CHARS.put('\'', "&apos;");
+    }
     
     /**
      * Trims specified string from left.
@@ -133,6 +144,28 @@ public class Utils {
                ch == 'A' || ch == 'a' || ch == 'B' || ch == 'b' || ch == 'C' || ch == 'c' ||
                ch == 'D' || ch == 'd' || ch == 'E' || ch == 'e' || ch == 'F' || ch == 'f';
     }
+
+    public static boolean isValidXmlChar(char ch) {
+        return (ch == 0x9) ||
+               (ch == 0xA) ||
+               (ch == 0xD) ||
+               ((ch >= 0x20) && (ch <= 0xD7FF)) ||
+               ((ch >= 0xE000) && (ch <= 0xFFFD)) ||
+               ((ch >= 0x10000) && (ch <= 0x10FFFF));
+    }
+
+    public static boolean isReservedXmlChar(char ch) {
+        return RESERVED_XML_CHARS.containsKey(ch);
+    }
+
+    public static boolean isValidInt(String s, int radix) {
+        try {
+            Integer.parseInt(s, radix);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
     
     /**
      * Escapes XML string.
@@ -167,13 +200,15 @@ public class Utils {
     							char unicodeChar = unicode.toLowerCase().startsWith("x") ?
                                                         (char)Integer.parseInt(unicode.substring(1), 16) :                                
                                                         (char)Integer.parseInt(unicode);
-    							if ( "&<>\'\"".indexOf(unicodeChar) < 0 ) {
+    							if ( !isValidXmlChar(unicodeChar) ) {
+                                    i = charIndex;
+                                } else if ( !isReservedXmlChar(unicodeChar) ) {
 	    							int replaceChunkSize = (charIndex < len && s.charAt(charIndex) == ';') ? unicode.length()+1 : unicode.length();
 	    							result.append( recognizeUnicodeChars ? String.valueOf(unicodeChar) : "&#" + unicode + ";" );
 	    							i += replaceChunkSize + 1;
     							} else {
         							i = charIndex;
-        							result.append("&amp;#" + unicode + ";");
+        							result.append("&#" + unicode + ";");
     							}
     						} catch (NumberFormatException e) {
     							i = charIndex;
@@ -200,38 +235,26 @@ public class Utils {
     					
     					if (advanced) {
                             String sub = s.substring(i);
-                            if ( sub.startsWith("&amp;") ) {
-                                result.append(isDomCreation ? "&" : "&amp;");
-                                i += 4;
-                            } else if ( sub.startsWith("&apos;") ) {
-                                result.append(isDomCreation ? "'" : "&apos;");
-                                i += 5;
-                            } else if ( sub.startsWith("&gt;") ) {
-                                result.append(isDomCreation ? ">" : "&gt;");
-                                i += 3;
-                            } else if ( sub.startsWith("&lt;") ) {
-                                result.append(isDomCreation ? "<" : "&lt;");
-                                i += 3;
-                            } else if ( sub.startsWith("&quot;") ) {
-                                result.append(isDomCreation ? "\"" : "&quot;");
-                                i += 5;
-                            } else {
+                            boolean isReservedSeq = false;
+                            for (Map.Entry<Character, String> entry: RESERVED_XML_CHARS.entrySet()) {
+                                String seq = entry.getValue();
+                                if ( sub.startsWith(seq) ) {
+                                    result.append(isDomCreation ? entry.getKey() : seq);
+                                    i += seq.length() - 1;
+                                    isReservedSeq = true;
+                                    break;
+                                }
+                            }
+                            if (!isReservedSeq) {
                                 result.append(isDomCreation ? "&" : "&amp;");
                             }
-    						
     						continue;
     					}
     					
     					result.append("&amp;");
     				}
-    			} else if (ch == '\'') {
-    				result.append("&apos;");
-    			} else if (ch == '>') {
-    				result.append("&gt;");
-    			} else if (ch == '<') {
-    				result.append("&lt;");
-    			} else if (ch == '\"') {
-    				result.append("&quot;");
+    			} else if (isReservedXmlChar(ch)) {
+    				result.append(RESERVED_XML_CHARS.get(ch));
     			} else {
     				result.append(ch);
     			}

@@ -79,7 +79,12 @@ abstract public class HtmlTokenizer {
 
     /**
      * Constructor - cretes instance of the parser with specified content.
-     * @param cleaner
+     * 
+     * @param reader
+     * @param props
+     * @param transformations
+     * @param tagInfoProvider
+     * 
      * @throws IOException
      */
     public HtmlTokenizer(Reader reader, CleanerProperties props, CleanerTransformations transformations, ITagInfoProvider tagInfoProvider) throws IOException {
@@ -252,17 +257,8 @@ abstract public class HtmlTokenizer {
         return Character.isUnicodeIdentifierStart(ch) || Character.isDigit(ch) || Utils.isIdentifierHelperChar(ch);
     }
 
-    private boolean isValidXmlChar(char ch) {
-        return (ch == 0x9) ||
-               (ch == 0xA) ||
-               (ch == 0xD) ||
-               ((ch >= 0x20) && (ch <= 0xD7FF)) ||
-               ((ch >= 0xE000) && (ch <= 0xFFFD)) ||
-               ((ch >= 0x10000) && (ch <= 0x10FFFF));
-    }
-
     private boolean isValidXmlChar() {
-        return (_len >= 0 && _pos >= _len) || isValidXmlChar(_working[_pos]);
+        return (_len >= 0 && _pos >= _len) || Utils.isValidXmlChar(_working[_pos]);
     }
 
     /**
