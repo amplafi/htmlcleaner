@@ -39,10 +39,8 @@ package org.htmlcleaner;
 
 import java.io.*;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -190,16 +188,11 @@ public class Utils {
     						String seq = s.substring(i, i+Math.min(10, len-i));
     						int semiIndex = seq.indexOf(';');
     						if (semiIndex > 0) {
-    							String entity = seq.substring(1, semiIndex);
-    							Integer code = (Integer) SpecialEntities.entities.get(entity);
-    							if (code != null) {
-    								int entityLen = entity.length();
-                                    if (recognizeUnicodeChars) {
-                                        result.append( (char)code.intValue() );
-                                    } else {
-                                        result.append( "&#" + code + ";" );
-                                    }
-    								i += entityLen + 1;
+    							String entityKey = seq.substring(1, semiIndex);
+    							SpecialEntity entity = SpecialEntity.getEntity(entityKey);
+    							if (entity != null) {
+                                    result.append( recognizeUnicodeChars ? entity.getCharacter() : entity.getDecimalNCR() );
+    								i += entityKey.length() + 1;
     								continue;
     							}
     						}
