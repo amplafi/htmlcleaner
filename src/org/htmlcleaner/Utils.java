@@ -186,34 +186,35 @@ public class Utils {
     			char ch = s.charAt(i);
     			
     			if (ch == '&') {
-    				if ( (advanced || recognizeUnicodeChars) && (i < len-1) && (s.charAt(i+1) == '#') ) {
-    					int charIndex = i + 2;
-    					String unicode = "";
-    					while ( charIndex < len &&
-                                (isHexadecimalDigit(s.charAt(charIndex)) || s.charAt(charIndex) == 'x' || s.charAt(charIndex) == 'X') 
-                              ) {
-    						unicode += s.charAt(charIndex);
-    						charIndex++;
-    					}
-    					if (charIndex == len || !"".equals(unicode)) {
-    						try {
-    							char unicodeChar = unicode.toLowerCase().startsWith("x") ?
-                                                        (char)Integer.parseInt(unicode.substring(1), 16) :                                
-                                                        (char)Integer.parseInt(unicode);
-    							if ( !isValidXmlChar(unicodeChar) ) {
-                                    i = charIndex;
-                                } else if ( !isReservedXmlChar(unicodeChar) ) {
-	    							int replaceChunkSize = (charIndex < len && s.charAt(charIndex) == ';') ? unicode.length()+1 : unicode.length();
-	    							result.append( recognizeUnicodeChars ? String.valueOf(unicodeChar) : "&#" + unicode + ";" );
-	    							i += replaceChunkSize + 1;
-    							} else {
-        							i = charIndex;
-        							result.append("&#" + unicode + ";");
-    							}
-    						} catch (NumberFormatException e) {
-    							i = charIndex;
-    							result.append("&amp;#" + unicode + ";");
-    						}
+    				if ( (advanced || recognizeUnicodeChars) && (i < len-2) && (s.charAt(i+1) == '#') ) {
+                        boolean isHex = Character.toLowerCase(s.charAt(i+2)) == 'x';
+                        int charIndex = i + (isHex ? 3 : 2);
+                        int radix = isHex ? 16 : 10;
+                        String unicode = "";
+                        while (charIndex < len) {
+                            char currCh = s.charAt(charIndex);
+                            if (currCh == ';') {
+                                break;
+                            } else if (isValidInt(unicode + currCh, radix)) {
+                                unicode += currCh;
+                                charIndex++;
+                            } else {
+                                charIndex--;
+                                break;
+                            }
+                        }
+
+    					if (isValidInt(unicode, radix)) {
+                            char unicodeChar = (char)Integer.parseInt(unicode, radix);
+                            if ( !isValidXmlChar(unicodeChar) ) {
+                                i = charIndex;
+                            } else if ( !isReservedXmlChar(unicodeChar) ) {
+                                result.append( recognizeUnicodeChars ? String.valueOf(unicodeChar) : "&#" + unicode + ";" );
+                                i = charIndex;
+                            } else {
+                                i = charIndex;
+                                result.append("&#" + unicode + ";");
+                            }
     					} else {
     						result.append("&amp;");
     					}
