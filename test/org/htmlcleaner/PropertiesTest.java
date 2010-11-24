@@ -34,14 +34,16 @@ public class PropertiesTest extends TestCase {
         assertTrue( getXmlString().indexOf("<style>.test{font-size:10;}</style>") >= 0 );
 
         properties.setTranslateSpecialEntities(true);
-        assertTrue( getXmlString().indexOf("<div>ô‰×Ÿ€</div>") >= 0 );
+        String specialHtmlEntities = "<div>"+ new String(new char[] {244,8240, 215,376, 8364})+"</div>";
+        assertTrue( getXmlString().indexOf(specialHtmlEntities) >= 0 );
         properties.setTranslateSpecialEntities(false);
-        assertTrue( getXmlString().indexOf("<div>ô‰×Ÿ€</div>") < 0 );
+        assertTrue( getXmlString().indexOf(specialHtmlEntities) < 0 );
 
+        String unicodeCharString = "<div>"+ new String(new char[] {352, 8224,8249})+"</div>";
         properties.setRecognizeUnicodeChars(true);
-        assertTrue( getXmlString().indexOf("<div>Š†‹</div>") >= 0 );
+        assertTrue( getXmlString().indexOf(unicodeCharString) >= 0 );
         properties.setRecognizeUnicodeChars(false);
-        assertTrue( getXmlString().indexOf("<div>Š†‹</div>") < 0 );
+        assertTrue( getXmlString().indexOf(unicodeCharString) < 0 );
         assertTrue( getXmlString().indexOf("<div>&amp;#352;&amp;#8224;&amp;#8249;</div>") >= 0 );
 
         properties.setOmitUnknownTags(true);
