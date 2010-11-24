@@ -50,6 +50,7 @@ public class WorkingTest {
 //        };
 
         props.setTransResCharsToNCR(false);
+        props.setIgnoreQuestAndExclam(true);
         final PrettyXmlSerializer prettySerializer = new PrettyXmlSerializer(props);
 
         long start = System.currentTimeMillis();

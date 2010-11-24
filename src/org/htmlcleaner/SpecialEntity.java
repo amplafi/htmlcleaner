@@ -47,8 +47,18 @@ public class SpecialEntity {
 	
 	private static Map<String, SpecialEntity> entities = new HashMap<String, SpecialEntity>();
 
-    private static void addEntity(String key, int intCode) {
-        entities.put(key, new SpecialEntity(key, intCode));
+    /**
+     * Add new entity to the set.
+     * @param entityName Entity name, for example "pound"
+     * @param intCode Unicode of the entity, for example 163
+     *
+     * @throws org.htmlcleaner.HtmlCleanerException
+     */
+    public static void addEntity(String entityName, int intCode) throws HtmlCleanerException {
+        if (entities.containsKey(entityName)) {
+            throw new HtmlCleanerException("Entity \"" + entityName + "\" is already defined!");
+        }
+        entities.put(entityName, new SpecialEntity(entityName, intCode));
     }
 
     public static SpecialEntity getEntity(String key) {
@@ -234,7 +244,6 @@ public class SpecialEntity {
         addEntity("Dagger", 8225);
         addEntity("bull", 8226);
 
-        // three ellipses
         addEntity("hellip", 8230);
         addEntity("permil", 8240);
         addEntity("prime", 8242);

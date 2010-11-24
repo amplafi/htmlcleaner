@@ -67,7 +67,7 @@ public class CleanerProperties {
     boolean useEmptyElementTags = true;
     boolean allowMultiWordAttributes = true;
     boolean allowHtmlInsideAttributes = false;
-    boolean ignoreQuestAndExclam = false;
+    boolean ignoreQuestAndExclam = true;
     boolean namespacesAware = true;
     String hyphenReplacementInComment = "=";
     String pruneTags = null;

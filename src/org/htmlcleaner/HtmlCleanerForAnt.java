@@ -77,7 +77,7 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
     private boolean useemptyelementtags = true;
     private boolean allowmultiwordattributes = true;
     private boolean allowhtmlinsideattributes = false;
-    private boolean ignoreqe = false;
+    private boolean ignoreqe = true;
     private boolean namespacesaware = true;
     private String hyphenreplacement = "=";
     private String prunetags = "";
