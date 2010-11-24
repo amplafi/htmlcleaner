@@ -122,6 +122,7 @@ public class CommandLine {
         String destination = getArgValue(args, "dest");
         String outputType = getArgValue(args, "outputtype");
         String advancedXmlEscape = getArgValue(args, "advancedxmlescape");
+        String transResCharsToNCR = getArgValue(args, "transrescharstoncr");
         String useCData = getArgValue(args, "usecdata");
         String translateSpecialEntities = getArgValue(args, "specialentities");
         String unicodeChars = getArgValue(args, "unicodechars");
@@ -172,6 +173,10 @@ public class CommandLine {
 
         if ( !"".equals(advancedXmlEscape) ) {
             props.setAdvancedXmlEscape( toBoolean(advancedXmlEscape) );
+        }
+
+        if ( !"".equals(transResCharsToNCR) ) {
+            props.setTransResCharsToNCR( toBoolean(transResCharsToNCR) );
         }
 
         if ( !"".equals(useCData) ) {

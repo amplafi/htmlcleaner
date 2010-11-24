@@ -26,6 +26,15 @@ public class PropertiesTest extends TestCase {
         properties.setAdvancedXmlEscape(false);
         assertTrue( getXmlString().indexOf("<div>&amp;amp;&amp;quot;&amp;apos;&amp;lt;&amp;gt;</div>") >= 0 );
 
+        properties.setAdvancedXmlEscape(true);
+        properties.setTransResCharsToNCR(true);
+        assertTrue( getXmlString().indexOf("<div>1.&#39;&#34;&#39;&#60;&#62;</div>") >= 0 );
+        assertTrue( getXmlString().indexOf("<div>2.&#39;&#34;&#39;&#60;&#62;</div>") >= 0 );
+        properties.setTransResCharsToNCR(false);
+        assertTrue( getXmlString().indexOf("<div>1.&apos;&quot;&apos;&lt;&gt;</div>") >= 0 );
+        assertTrue( getXmlString().indexOf("<div>2.&apos;&quot;&apos;&lt;&gt;</div>") >= 0 );
+        properties.setAdvancedXmlEscape(false);
+
         properties.setUseCdataForScriptAndStyle(true);
         assertTrue( getXmlString().indexOf("<script><![CDATA[var x=y&&z;]]></script>") >= 0 );
         assertTrue( getXmlString().indexOf("<style><![CDATA[.test{font-size:10;}]]></style>") >= 0 );

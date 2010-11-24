@@ -52,6 +52,7 @@ public class CleanerProperties {
     ITagInfoProvider tagInfoProvider = null;
 
     boolean advancedXmlEscape = true;
+    boolean transResCharsToNCR = false;
     boolean useCdataForScriptAndStyle = true;
     boolean translateSpecialEntities = true;
     boolean recognizeUnicodeChars = true;
@@ -82,6 +83,14 @@ public class CleanerProperties {
 
     public void setAdvancedXmlEscape(boolean advancedXmlEscape) {
         this.advancedXmlEscape = advancedXmlEscape;
+    }
+
+    public boolean isTransResCharsToNCR() {
+        return transResCharsToNCR;
+    }
+
+    public void setTransResCharsToNCR(boolean transResCharsToNCR) {
+        this.transResCharsToNCR = transResCharsToNCR;
     }
 
     public boolean isUseCdataForScriptAndStyle() {

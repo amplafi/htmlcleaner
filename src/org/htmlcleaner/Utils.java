@@ -240,14 +240,14 @@ public class Utils {
                             for (Map.Entry<Character, String> entry: RESERVED_XML_CHARS.entrySet()) {
                                 String seq = entry.getValue();
                                 if ( sub.startsWith(seq) ) {
-                                    result.append(isDomCreation ? entry.getKey() : seq);
+                                    result.append( isDomCreation ? entry.getKey() : (props.transResCharsToNCR ? "&#" + (int)entry.getKey() + ";" : seq) );
                                     i += seq.length() - 1;
                                     isReservedSeq = true;
                                     break;
                                 }
                             }
                             if (!isReservedSeq) {
-                                result.append(isDomCreation ? "&" : "&amp;");
+                                result.append( isDomCreation ? "&" : (props.transResCharsToNCR ? "&#" + (int)'\'' + ";" :  RESERVED_XML_CHARS.get('\'')) );
                             }
     						continue;
     					}
@@ -255,7 +255,7 @@ public class Utils {
     					result.append("&amp;");
     				}
     			} else if (isReservedXmlChar(ch)) {
-    				result.append(RESERVED_XML_CHARS.get(ch));
+    				result.append( props.transResCharsToNCR ? "&#" + (int)ch + ";" : RESERVED_XML_CHARS.get(ch) );
     			} else {
     				result.append(ch);
     			}
