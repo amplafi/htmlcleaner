@@ -406,12 +406,11 @@ public class HtmlCleaner {
         if (properties.omitHtmlEnvelope) {
             List bodyChildren = cleanTimeValues.bodyNode.getChildren();
             if (bodyChildren != null) {
-                Iterator iterator = bodyChildren.iterator();
-                while (iterator.hasNext()) {
-                    Object currChild = iterator.next();
+                for (Object child: bodyChildren) {
                     // if found child that is tag itself, then return it
-                    if (currChild instanceof TagNode) {
-                        cleanTimeValues.rootNode = (TagNode)currChild;
+                    if (child instanceof TagNode) {
+                        cleanTimeValues.rootNode = (TagNode)child;
+                        break;
                     }
                 }
             }
