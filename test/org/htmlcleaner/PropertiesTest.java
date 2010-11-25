@@ -28,11 +28,11 @@ public class PropertiesTest extends TestCase {
 
         properties.setAdvancedXmlEscape(true);
         properties.setTransResCharsToNCR(true);
-        assertTrue( getXmlString().indexOf("<div>1.&#39;&#34;&#39;&#60;&#62;</div>") >= 0 );
-        assertTrue( getXmlString().indexOf("<div>2.&#39;&#34;&#39;&#60;&#62;</div>") >= 0 );
+        assertTrue( getXmlString().indexOf("<div>1.&#38;&#34;&#39;&#60;&#62;</div>") >= 0 );
+        assertTrue( getXmlString().indexOf("<div>2.&#38;&#34;&#39;&#60;&#62;</div>") >= 0 );
         properties.setTransResCharsToNCR(false);
-        assertTrue( getXmlString().indexOf("<div>1.&apos;&quot;&apos;&lt;&gt;</div>") >= 0 );
-        assertTrue( getXmlString().indexOf("<div>2.&apos;&quot;&apos;&lt;&gt;</div>") >= 0 );
+        assertTrue( getXmlString().indexOf("<div>1.&amp;&quot;&apos;&lt;&gt;</div>") >= 0 );
+        assertTrue( getXmlString().indexOf("<div>2.&amp;&quot;&apos;&lt;&gt;</div>") >= 0 );
         properties.setAdvancedXmlEscape(false);
 
         properties.setUseCdataForScriptAndStyle(true);
