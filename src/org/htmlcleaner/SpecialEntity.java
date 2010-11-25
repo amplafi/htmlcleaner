@@ -357,4 +357,11 @@ public class SpecialEntity {
         return "&#x" + Integer.toHexString(intCode) + ";";
     }
 
+    /**
+     * @return Escaped value of the entity
+     */
+    public String getEscapedValue() {
+        return "&" + key + ";";
+    }
+
 }

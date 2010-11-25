@@ -227,7 +227,7 @@ public class Utils {
     							String entityKey = seq.substring(1, semiIndex);
     							SpecialEntity entity = SpecialEntity.getEntity(entityKey);
     							if (entity != null) {
-                                    result.append( recognizeUnicodeChars ? entity.getCharacter() : entity.getDecimalNCR() );
+                                    result.append(entity.getCharacter());
     								i += entityKey.length() + 1;
     								continue;
     							}

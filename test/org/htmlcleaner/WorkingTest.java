@@ -49,9 +49,10 @@ public class WorkingTest {
 //                "c:/temp/htmlcleanertest/5.htm",
 //        };
 
-        props.setTransResCharsToNCR(false);
+        props.setTransResCharsToNCR(true);
         props.setIgnoreQuestAndExclam(true);
         props.setUseCdataForScriptAndStyle(true);
+        props.setRecognizeUnicodeChars(false);
         props.setTranslateSpecialEntities(false);
         final PrettyXmlSerializer prettySerializer = new PrettyXmlSerializer(props);
 

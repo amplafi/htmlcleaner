@@ -104,25 +104,23 @@ public abstract class HtmlSerializer extends Serializer {
     						result.append("&");
     					}
     				} else {
-    					if (translateSpecialEntities) {
-    						// get following sequence of most 10 characters
-    						String seq = s.substring(i, i+Math.min(10, len-i));
-    						int semiIndex = seq.indexOf(';');
-    						if (semiIndex > 0) {
-    							String entityKey = seq.substring(1, semiIndex);
-    							SpecialEntity entity = SpecialEntity.getEntity(entityKey);
-    							if (entity != null) {
-                                    result.append( recognizeUnicodeChars ? entity.getCharacter() : entity.getDecimalNCR() );
-    								i += entityKey.length() + 1;
-    								continue;
-    							}
-    						}
-    					}
+                        // get following sequence of most 10 characters
+                        String seq = s.substring(i, i+Math.min(10, len-i));
+                        int semiIndex = seq.indexOf(';');
+                        if (semiIndex > 0) {
+                            String entityKey = seq.substring(1, semiIndex);
+                            SpecialEntity entity = SpecialEntity.getEntity(entityKey);
+                            if (entity != null) {
+                                result.append( translateSpecialEntities ? entity.getCharacter() : entity.getEscapedValue() );
+                                i += entityKey.length() + 1;
+                                continue;
+                            }
+                        }
 
                         String sub = s.substring(i);
                         boolean isReservedSeq = false;
                         for (Map.Entry<Character, String> entry: Utils.RESERVED_XML_CHARS.entrySet()) {
-                            String seq = entry.getValue();
+                            seq = entry.getValue();
                             if ( sub.startsWith(seq) ) {
                                 result.append( props.transResCharsToNCR ? "&#" + (int)entry.getKey() + ";" : seq );
                                 i += seq.length() - 1;
