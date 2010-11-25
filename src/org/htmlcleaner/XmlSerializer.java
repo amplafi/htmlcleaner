@@ -48,7 +48,7 @@ import java.util.Map;
  * Created by: Vladimir Nikic<br/>
  * Date: November, 2006.
  */
-public abstract class XmlSerializer extends Serializer{
+public abstract class XmlSerializer extends Serializer {
 
 	protected XmlSerializer(CleanerProperties props) {
 		super(props);
@@ -109,5 +109,57 @@ public abstract class XmlSerializer extends Serializer{
     public void writeXml(TagNode tagNode, Writer writer, String charset) throws IOException {
         super.write(tagNode, writer, charset);
     }
-	
+
+    protected String escapeXml(String xmlContent) {
+        return Utils.escapeXml(xmlContent, props, false);
+    }
+
+    protected boolean dontEscape(TagNode tagNode) {
+        return props.isUseCdataForScriptAndStyle() && isScriptOrStyle(tagNode);
+    }
+
+    protected boolean isMinimizedTagSyntax(TagNode tagNode) {
+        final TagInfo tagInfo = props.getTagInfoProvider().getTagInfo(tagNode.getName());
+        return tagNode.getChildren().size() == 0 &&
+               ( props.isUseEmptyElementTags() || (tagInfo != null && tagInfo.isEmptyTag()) );
+    }
+
+    protected void serializeOpenTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
+        String tagName = tagNode.getName();
+
+        writer.write("<" + tagName);
+        for (Map.Entry<String, String> entry: tagNode.getAttributes().entrySet()) {
+            String attName = entry.getKey();
+            if ( !props.isNamespacesAware() && ("xmlns".equals(attName) || attName.startsWith("xmlns:")) ) {
+                continue;
+            }
+            writer.write(" " + attName + "=\"" + escapeXml(entry.getValue()) + "\"");
+        }
+
+        if ( isMinimizedTagSyntax(tagNode) ) {
+            writer.write(" />");
+            if (newLine) {
+                writer.write("\n");
+            }
+        } else if (dontEscape(tagNode)) {
+            writer.write("><![CDATA[");
+        } else {
+            writer.write(">");
+        }
+    }
+
+    protected void serializeEndTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
+        String tagName = tagNode.getName();
+
+        if (dontEscape(tagNode)) {
+            writer.write("]]>");
+        }
+
+        writer.write( "</" + tagName + ">" );
+
+        if (newLine) {
+            writer.write("\n");
+        }
+    }
+
 }

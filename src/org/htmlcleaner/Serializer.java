@@ -100,71 +100,13 @@ public abstract class Serializer {
         writer.flush();
         writer.close();
     }
-	
-	protected String escapeXml(String xmlContent) {
-		return Utils.escapeXml(xmlContent, props, false);
-	}
-	
-	protected boolean dontEscape(TagNode tagNode) {
-		String tagName = tagNode.getName();
-		return props.isUseCdataForScriptAndStyle() && ("script".equalsIgnoreCase(tagName) || "style".equalsIgnoreCase(tagName));
-	}
-	
-	protected boolean isScriptOrStyle(TagNode tagNode) {
-		String tagName = tagNode.getName();
-		return "script".equalsIgnoreCase(tagName) || "style".equalsIgnoreCase(tagName);
-	}
 
-    protected boolean isMinimizedTagSyntax(TagNode tagNode) {
-        final TagInfo tagInfo = props.getTagInfoProvider().getTagInfo(tagNode.getName());
-        return tagNode.getChildren().size() == 0 &&
-               ( props.isUseEmptyElementTags() || (tagInfo != null && tagInfo.isEmptyTag()) );
-    }
-	
-    protected void serializeOpenTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
+
+    protected boolean isScriptOrStyle(TagNode tagNode) {
         String tagName = tagNode.getName();
-        Map tagAtttributes = tagNode.getAttributes();
-        
-        writer.write("<" + tagName);
-        Iterator it = tagAtttributes.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
-            String attName = (String) entry.getKey();
-            String attValue = (String) entry.getValue();
-            
-            if ( !props.isNamespacesAware() && ("xmlns".equals(attName) || attName.startsWith("xmlns:")) ) {
-            	continue;
-            }
-            
-            writer.write(" " + attName + "=\"" + escapeXml(attValue) + "\"");
-        }
-        
-        if ( isMinimizedTagSyntax(tagNode) ) {
-        	writer.write(" />");
-        	if (newLine) {
-        		writer.write("\n");
-        	}
-        } else if (dontEscape(tagNode)) {
-        	writer.write("><![CDATA[");
-        } else {
-        	writer.write(">");
-        }
+        return "script".equalsIgnoreCase(tagName) || "style".equalsIgnoreCase(tagName);
     }
     
-    protected void serializeEndTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
-    	String tagName = tagNode.getName();
-    	
-    	if (dontEscape(tagNode)) {
-    		writer.write("]]>");
-    	}
-    	
-    	writer.write( "</" + tagName + ">" );
-
-        if (newLine) {
-    		writer.write("\n");
-    	}
-    }
-
     protected abstract void serialize(TagNode tagNode, Writer writer) throws IOException;
 	
 }

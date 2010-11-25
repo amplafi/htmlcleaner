@@ -49,16 +49,16 @@ public class WorkingTest {
 //                "c:/temp/htmlcleanertest/5.htm",
 //        };
 
-        props.setTransResCharsToNCR(true);
+        props.setTransResCharsToNCR(false);
         props.setIgnoreQuestAndExclam(true);
-        props.setUseCdataForScriptAndStyle(false);
-        props.setOmitHtmlEnvelope(true);
+        props.setUseCdataForScriptAndStyle(true);
+        props.setTranslateSpecialEntities(false);
         final PrettyXmlSerializer prettySerializer = new PrettyXmlSerializer(props);
 
         long start = System.currentTimeMillis();
 
         TagNode node = cleaner.clean(new File("c:/temp/htmlcleanertest/mama.html"), "UTF-8");
-        new SimpleXmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/mamaout.xml", "UTF-8");
+        new SimpleHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/mamaout.xml", "UTF-8");
 
 //        for (int i = 0; i < resources.length; i++) {
 //            TagNode node = cleaner.clean(new URL(resources[i]));

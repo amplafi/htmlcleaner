@@ -247,7 +247,7 @@ public class Utils {
                                 }
                             }
                             if (!isReservedSeq) {
-                                result.append( isDomCreation ? "&" : (props.transResCharsToNCR ? "&#" + (int)'\'' + ";" :  RESERVED_XML_CHARS.get('\'')) );
+                                result.append( isDomCreation ? "&" : (props.transResCharsToNCR ? "&#" + (int)'&' + ";" :  RESERVED_XML_CHARS.get('&')) );
                             }
     						continue;
     					}
