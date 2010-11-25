@@ -71,7 +71,7 @@ public abstract class HtmlSerializer extends Serializer {
     			char ch = s.charAt(i);
 
     			if (ch == '&') {
-    				if ( recognizeUnicodeChars && (i < len-2) && (s.charAt(i+1) == '#') ) {
+    				if (i < len-2 && s.charAt(i+1) == '#') {
                         boolean isHex = Character.toLowerCase(s.charAt(i+2)) == 'x';
                         int charIndex = i + (isHex ? 3 : 2);
                         int radix = isHex ? 16 : 10;
@@ -101,7 +101,7 @@ public abstract class HtmlSerializer extends Serializer {
                                 result.append("&#" + unicode + ";");
                             }
     					} else {
-    						result.append("&");
+    						result.append(props.transResCharsToNCR ? "&#" + (int)'&' + ";" : "&");
     					}
     				} else {
                         // get following sequence of most 10 characters
