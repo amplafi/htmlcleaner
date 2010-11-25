@@ -156,7 +156,7 @@ public class PropertiesTest extends TestCase {
 
     private String getXmlString() throws IOException {
         TagNode node = cleaner.clean( new File("test/org/htmlcleaner/files/test4.html"), "UTF-8" );
-        return new SimpleXmlSerializer(properties).getXmlAsString(node);
+        return new SimpleXmlSerializer(properties).getAsString(node);
     }
 
 }

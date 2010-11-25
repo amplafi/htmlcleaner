@@ -519,8 +519,8 @@ public class TagNode extends TagToken {
         }
     }
 
-    public void serialize(XmlSerializer xmlSerializer, Writer writer) throws IOException {
-    	xmlSerializer.serialize(this, writer);
+    public void serialize(Serializer serializer, Writer writer) throws IOException {
+    	serializer.serialize(this, writer);
     }
     
     TagNode makeCopy() {

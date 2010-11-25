@@ -311,13 +311,13 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
             }
                 
             if ( "compact".equals(outputtype) ) {
-                new CompactXmlSerializer(props).writeXmlToStream(node, out, outcharset);
+                new CompactXmlSerializer(props).writeToStream(node, out, outcharset);
             } else if ( "browser-compact".equals(outputtype) ) {
-                new BrowserCompactXmlSerializer(props).writeXmlToStream(node, out, outcharset);
+                new BrowserCompactXmlSerializer(props).writeToStream(node, out, outcharset);
             } else if ( "pretty".equals(outputtype) ) {
-                new PrettyXmlSerializer(props).writeXmlToStream(node, out, outcharset);
+                new PrettyXmlSerializer(props).writeToStream(node, out, outcharset);
             } else {
-                new SimpleXmlSerializer(props).writeXmlToStream(node, out, outcharset);
+                new SimpleXmlSerializer(props).writeToStream(node, out, outcharset);
             }
         } catch (IOException e) {
              throw new BuildException(e);

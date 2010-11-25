@@ -68,7 +68,7 @@ public class CommentToken implements BaseToken {
         return getCommentedContent();
     }
 
-    public void serialize(XmlSerializer xmlSerializer, Writer writer) throws IOException {
+    public void serialize(Serializer serializer, Writer writer) throws IOException {
     	writer.write( getCommentedContent() );
     }
 

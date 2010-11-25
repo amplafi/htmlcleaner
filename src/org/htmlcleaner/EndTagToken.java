@@ -59,7 +59,7 @@ public class EndTagToken extends TagToken {
         // do nothing - simply ignore attributes in closing tag
     }
     
-    public void serialize(XmlSerializer xmlSerializer, Writer writer) {
+    public void serialize(Serializer serializer, Writer writer) {
     	// do nothing - simply ignore serialization
     }
 

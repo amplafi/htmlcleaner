@@ -141,7 +141,7 @@ public class PrettyXmlSerializer extends XmlSerializer {
         String indent = getIndent(level);
 
         writer.write(indent);
-        serializeOpenTag(tagNode, writer);
+        serializeOpenTag(tagNode, writer, true);
 
         if ( !isMinimizedTagSyntax(tagNode) ) {
             String singleLine = getSingleLineOfChildren(tagChildren);
@@ -175,7 +175,7 @@ public class PrettyXmlSerializer extends XmlSerializer {
             	writer.write(indent);
             }
 
-            serializeEndTag(tagNode, writer);
+            serializeEndTag(tagNode, writer, true);
         }
     }
 

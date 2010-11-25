@@ -62,7 +62,7 @@ public class ContentToken implements BaseToken {
         return content.toString();
     }
 
-    public void serialize(XmlSerializer xmlSerializer, Writer writer) throws IOException {
+    public void serialize(Serializer serializer, Writer writer) throws IOException {
     	writer.write( content.toString() );
     }
 

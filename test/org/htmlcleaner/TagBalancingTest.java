@@ -38,20 +38,20 @@ public class TagBalancingTest extends TestCase {
         HtmlCleaner cleaner2 = new HtmlCleaner(new ConfigFileTagProvider(new File("default.xml")));
         SimpleXmlSerializer serializer = new SimpleXmlSerializer(cleaner1.getProperties());
 
-        String s1 = serializer.getXmlAsString(cleaner1.clean(new File("test/org/htmlcleaner/files/test5.html")));
-        String s2 = serializer.getXmlAsString(cleaner2.clean(new File("test/org/htmlcleaner/files/test5.html")));
+        String s1 = serializer.getAsString(cleaner1.clean(new File("test/org/htmlcleaner/files/test5.html")));
+        String s2 = serializer.getAsString(cleaner2.clean(new File("test/org/htmlcleaner/files/test5.html")));
         assertEquals(s1, s2);
 
-        s1 = serializer.getXmlAsString(cleaner1.clean(new File("test/org/htmlcleaner/files/test1.html")));
-        s2 = serializer.getXmlAsString(cleaner2.clean(new File("test/org/htmlcleaner/files/test1.html")));
+        s1 = serializer.getAsString(cleaner1.clean(new File("test/org/htmlcleaner/files/test1.html")));
+        s2 = serializer.getAsString(cleaner2.clean(new File("test/org/htmlcleaner/files/test1.html")));
         assertEquals(s1, s2);
 
-        s1 = serializer.getXmlAsString(cleaner1.clean(new File("test/org/htmlcleaner/files/test2.html")));
-        s2 = serializer.getXmlAsString(cleaner2.clean(new File("test/org/htmlcleaner/files/test2.html")));
+        s1 = serializer.getAsString(cleaner1.clean(new File("test/org/htmlcleaner/files/test2.html")));
+        s2 = serializer.getAsString(cleaner2.clean(new File("test/org/htmlcleaner/files/test2.html")));
         assertEquals(s1, s2);
 
-        s1 = serializer.getXmlAsString(cleaner1.clean(new File("test/org/htmlcleaner/files/test3.html")));
-        s2 = serializer.getXmlAsString(cleaner2.clean(new File("test/org/htmlcleaner/files/test3.html")));
+        s1 = serializer.getAsString(cleaner1.clean(new File("test/org/htmlcleaner/files/test3.html")));
+        s2 = serializer.getAsString(cleaner2.clean(new File("test/org/htmlcleaner/files/test3.html")));
         assertEquals(s1, s2);
     }
 
@@ -86,7 +86,7 @@ public class TagBalancingTest extends TestCase {
         CleanerProperties props = cleaner.getProperties();
         props.setOmitXmlDeclaration(true);
         TagNode node = cleaner.clean(html);
-        String result = new CompactXmlSerializer(cleaner.getProperties()).getXmlAsString(node);
+        String result = new CompactXmlSerializer(cleaner.getProperties()).getAsString(node);
 
         String s1 = getJDomOutput(result);
         String s2 = getJDomOutput(xml);
@@ -99,7 +99,7 @@ public class TagBalancingTest extends TestCase {
         CleanerProperties props = cleaner.getProperties();
         props.setOmitXmlDeclaration(true);
         TagNode node = cleaner.clean(html);
-        String result = new CompactXmlSerializer(cleaner.getProperties()).getXmlAsString(node);
+        String result = new CompactXmlSerializer(cleaner.getProperties()).getAsString(node);
 
         String s1 = getJDomOutput(result);
         String s2 = getJDomOutput(xml);

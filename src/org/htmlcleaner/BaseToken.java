@@ -50,6 +50,6 @@ import java.io.Writer;
  */
 public interface BaseToken {
 	
-	public void serialize(XmlSerializer xmlSerializer, Writer writer) throws IOException;
+	public void serialize(Serializer serializer, Writer writer) throws IOException;
 	
 }

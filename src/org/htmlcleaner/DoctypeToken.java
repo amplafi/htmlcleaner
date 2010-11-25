@@ -114,7 +114,7 @@ public class DoctypeToken implements BaseToken {
     	return "";
     }
     
-    public void serialize(XmlSerializer xmlSerializer, Writer writer) throws IOException {
+    public void serialize(Serializer serializer, Writer writer) throws IOException {
     	writer.write(getContent() + "\n");
     }
 

@@ -299,13 +299,13 @@ public class CommandLine {
         }
 
         if ( "compact".equals(outputType) ) {
-            new CompactXmlSerializer(props).writeXmlToStream(node, out, outCharset);
+            new CompactXmlSerializer(props).writeToStream(node, out, outCharset);
         } else if ( "browser-compact".equals(outputType) ) {
-            new BrowserCompactXmlSerializer(props).writeXmlToStream(node, out, outCharset);
+            new BrowserCompactXmlSerializer(props).writeToStream(node, out, outCharset);
         } else if ( "pretty".equals(outputType) ) {
-            new PrettyXmlSerializer(props).writeXmlToStream(node, out, outCharset);
+            new PrettyXmlSerializer(props).writeToStream(node, out, outCharset);
         } else {
-            new SimpleXmlSerializer(props).writeXmlToStream(node, out, outCharset);
+            new SimpleXmlSerializer(props).writeToStream(node, out, outCharset);
         }
 
         System.out.println("Finished successfully in " + (System.currentTimeMillis() - start)+ "ms." );

@@ -26,7 +26,7 @@ public class TransformationTest extends TestCase {
         props.setOmitXmlDeclaration(true);
         TagNode node = cleaner.clean("<div><strong>Mama</strong></div>");
         assertEquals(
-                new CompactXmlSerializer(props).getXmlAsString(node),
+                new CompactXmlSerializer(props).getAsString(node),
                 "<html><head /><body><div><span style=\"font-weight:bold\">Mama</span></div></body></html>"
         );
     }
@@ -59,7 +59,7 @@ public class TransformationTest extends TestCase {
         
         TagNode node = cleaner.clean( new File("test/org/htmlcleaner/files/test8.html"), "UTF-8" );
 
-        String xml = new PrettyXmlSerializer(props).getXmlAsString(node);
+        String xml = new PrettyXmlSerializer(props).getAsString(node);
 
         assertTrue( xml.indexOf("blockquote") < 0 );
         assertTrue( xml.indexOf("&quot;Hi there!&quot;") >= 0 );

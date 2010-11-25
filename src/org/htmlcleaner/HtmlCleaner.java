@@ -843,7 +843,7 @@ public class HtmlCleaner {
     public String getInnerHtml(TagNode node) {
         if (node != null) {
             try {
-                String content = new SimpleXmlSerializer(properties).getXmlAsString(node);
+                String content = new SimpleXmlSerializer(properties).getAsString(node);
                 int index1 = content.indexOf("<" + node.getName());
                 index1 = content.indexOf('>', index1 + 1);
                 int index2 = content.lastIndexOf('<');

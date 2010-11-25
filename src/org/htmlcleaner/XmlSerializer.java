@@ -48,137 +48,66 @@ import java.util.Map;
  * Created by: Vladimir Nikic<br/>
  * Date: November, 2006.
  */
-public abstract class XmlSerializer {
-	
-	protected CleanerProperties props;
+public abstract class XmlSerializer extends Serializer{
 
 	protected XmlSerializer(CleanerProperties props) {
-		this.props = props;
+		super(props);
     }
 
+    /**
+     * @deprecated Use writeToStream() instead.
+     */
+    @Deprecated
     public void writeXmlToStream(TagNode tagNode, OutputStream out, String charset) throws IOException {
-         writeXml( tagNode, new OutputStreamWriter(out, charset), charset );
+         super.writeToStream(tagNode, out, charset);
     }
 
+    /**
+     * @deprecated Use writeToStream() instead.
+     */
+    @Deprecated
     public void writeXmlToStream(TagNode tagNode, OutputStream out) throws IOException {
-         writeXmlToStream( tagNode, out, HtmlCleaner.DEFAULT_CHARSET );
+         super.writeToStream(tagNode, out);
     }
 
+    /**
+     * @deprecated Use writeToFile() instead.
+     */
+    @Deprecated
     public void writeXmlToFile(TagNode tagNode, String fileName, String charset) throws IOException {
-        writeXmlToStream(tagNode, new FileOutputStream(fileName), charset );
+        super.writeToFile(tagNode, fileName, charset);
     }
 
+    /**
+     * @deprecated Use writeToFile() instead.
+     */
+    @Deprecated
     public void writeXmlToFile(TagNode tagNode, String fileName) throws IOException {
-        writeXmlToFile(tagNode,fileName, HtmlCleaner.DEFAULT_CHARSET);
+        super.writeToFile(tagNode, fileName);
     }
 
+    /**
+     * @deprecated Use getAsString() instead.
+     */
+    @Deprecated
     public String getXmlAsString(TagNode tagNode, String charset) throws IOException {
-        StringWriter writer = new StringWriter();
-        writeXml(tagNode, writer, charset);
-        return writer.getBuffer().toString();
+        return super.getAsString(tagNode, charset);
     }
 
+    /**
+     * @deprecated Use getAsString() instead.
+     */
+    @Deprecated
     public String getXmlAsString(TagNode tagNode) throws IOException {
-        return getXmlAsString(tagNode, HtmlCleaner.DEFAULT_CHARSET);
+        return super.getAsString(tagNode);
     }
-	
+
+    /**
+     * @deprecated Use write() instead.
+     */
+    @Deprecated
     public void writeXml(TagNode tagNode, Writer writer, String charset) throws IOException {
-        writer = new BufferedWriter(writer);
-        if ( !props.isOmitXmlDeclaration() ) {
-            String declaration = "<?xml version=\"1.0\"";
-            if (charset != null) {
-                declaration += " encoding=\"" + charset + "\"";
-            }
-            declaration += "?>";
-            writer.write(declaration + "\n");
-		}
-		
-		if ( !props.isOmitDoctypeDeclaration() ) {
-			DoctypeToken doctypeToken = tagNode.getDocType();
-			if ( doctypeToken != null ) {
-				doctypeToken.serialize(this, writer);
-			}
-		}
-		
-		serialize(tagNode, writer);
-
-        writer.flush();
-        writer.close();
+        super.write(tagNode, writer, charset);
     }
-	
-	protected String escapeXml(String xmlContent) {
-		return Utils.escapeXml(xmlContent, props, false);
-	}
-	
-	protected boolean dontEscape(TagNode tagNode) {
-		String tagName = tagNode.getName();
-		return props.isUseCdataForScriptAndStyle() && ("script".equalsIgnoreCase(tagName) || "style".equalsIgnoreCase(tagName));
-	}
-	
-	protected boolean isScriptOrStyle(TagNode tagNode) {
-		String tagName = tagNode.getName();
-		return "script".equalsIgnoreCase(tagName) || "style".equalsIgnoreCase(tagName);
-	}
-
-    protected boolean isMinimizedTagSyntax(TagNode tagNode) {
-        final TagInfo tagInfo = props.getTagInfoProvider().getTagInfo(tagNode.getName());
-        return tagNode.getChildren().size() == 0 &&
-               ( props.isUseEmptyElementTags() || (tagInfo != null && tagInfo.isEmptyTag()) );
-    }
-	
-    protected void serializeOpenTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
-        String tagName = tagNode.getName();
-        Map tagAtttributes = tagNode.getAttributes();
-        
-        writer.write("<" + tagName);
-        Iterator it = tagAtttributes.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
-            String attName = (String) entry.getKey();
-            String attValue = (String) entry.getValue();
-            
-            if ( !props.isNamespacesAware() && ("xmlns".equals(attName) || attName.startsWith("xmlns:")) ) {
-            	continue;
-            }
-            
-            writer.write(" " + attName + "=\"" + escapeXml(attValue) + "\"");
-        }
-        
-        if ( isMinimizedTagSyntax(tagNode) ) {
-        	writer.write(" />");
-        	if (newLine) {
-        		writer.write("\n");
-        	}
-        } else if (dontEscape(tagNode)) {
-        	writer.write("><![CDATA[");
-        } else {
-        	writer.write(">");
-        }
-    }
-    
-    protected void serializeOpenTag(TagNode tagNode, Writer writer) throws IOException {
-    	serializeOpenTag(tagNode, writer, true);
-    }
-    
-    protected void serializeEndTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
-    	String tagName = tagNode.getName();
-    	
-    	if (dontEscape(tagNode)) {
-    		writer.write("]]>");
-    	}
-    	
-    	writer.write( "</" + tagName + ">" );
-
-        if (newLine) {
-    		writer.write("\n");
-    	}
-    }
-    
-    protected void serializeEndTag(TagNode tagNode, Writer writer) throws IOException {
-    	serializeEndTag(tagNode, writer, true);
-    }
-
-
-    protected abstract void serialize(TagNode tagNode, Writer writer) throws IOException;
 	
 }
