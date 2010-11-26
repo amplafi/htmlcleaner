@@ -424,7 +424,7 @@ public class HtmlCleaner {
                 String prefix = (String) iterator.next();
                 String xmlnsAtt = "xmlns:" + prefix;
                 if ( !atts.containsKey(xmlnsAtt) ) {
-                    cleanTimeValues.rootNode.addAttribute(xmlnsAtt, prefix);
+                    cleanTimeValues.rootNode.setAttribute(xmlnsAtt, prefix);
                 }
             }
         }
@@ -445,7 +445,7 @@ public class HtmlCleaner {
 				String attName = (String) currEntry.getKey();
 				if ( !tagAttributes.containsKey(attName) ) {
 					String attValue = (String) currEntry.getValue();
-					tag.addAttribute(attName, attValue);
+					tag.setAttribute(attName, attValue);
 				}
 			}
 		}
