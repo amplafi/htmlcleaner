@@ -51,16 +51,16 @@ public class WorkingTest {
 
         props.setTransResCharsToNCR(false);
         props.setIgnoreQuestAndExclam(true);
-        props.setUseCdataForScriptAndStyle(true);
-        props.setRecognizeUnicodeChars(true);
-        props.setTranslateSpecialEntities(true);
+        props.setUseCdataForScriptAndStyle(false);
+        props.setRecognizeUnicodeChars(false);
+        props.setTranslateSpecialEntities(false);
         props.setOmitXmlDeclaration(true);
         final PrettyXmlSerializer prettySerializer = new PrettyXmlSerializer(props);
         final SimpleHtmlSerializer simpleHtmlSerializer = new SimpleHtmlSerializer(props);
 
         long start = System.currentTimeMillis();
 
-        final String urlToTest = "http://www.b92.net/";
+        final String urlToTest = "http://edition.cnn.com/";
 //        TagNode node = cleaner.clean(new File("c:/temp/htmlcleanertest/mama.html"), "UTF-8");
         TagNode node = cleaner.clean(new URL(urlToTest));
 
@@ -87,10 +87,9 @@ public class WorkingTest {
         System.out.println("Traverse time: " + (System.currentTimeMillis() - start));
         start = System.currentTimeMillis();
 
-        new PrettyXmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/prettymamaout.xml", "UTF-8");
-        new SimpleHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/simplemamaout.html", "UTF-8");
-        new CompactHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/compactmamaout.html", "UTF-8");
-        new PrettyHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/prettymamaout.html", "UTF-8");
+        new SimpleHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/simplemamaout.html", "utf-8");
+        new CompactHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/compactmamaout.html", "utf-8");
+        new PrettyHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/prettymamaout.html", "utf-8");
 
         System.out.println("Serialize time: " + (System.currentTimeMillis() - start));
         start = System.currentTimeMillis();

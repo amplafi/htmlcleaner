@@ -45,11 +45,18 @@ import java.util.*;
  */
 public class CompactHtmlSerializer extends HtmlSerializer {
 
+    private int openPreTags = 0;
+
 	public CompactHtmlSerializer(CleanerProperties props) {
 		super(props);
 	}
 
     protected void serialize(TagNode tagNode, Writer writer) throws IOException {
+        boolean isPreTag = "pre".equalsIgnoreCase(tagNode.getName());
+        if (isPreTag) {
+            openPreTags++;
+        }
+
         serializeOpenTag(tagNode, writer, false);
 
         List tagChildren = tagNode.getChildren();
@@ -59,26 +66,30 @@ public class CompactHtmlSerializer extends HtmlSerializer {
                 Object item = childrenIt.next();
                 if (item instanceof ContentToken) {
                     String content = ((ContentToken) item).getContent();
-                    boolean startsWithSpace = content.length() > 0 && Character.isWhitespace( content.charAt(0) );
-                    boolean endsWithSpace = content.length() > 1 && Character.isWhitespace( content.charAt(content.length() - 1) );
-                    content = dontEscape(tagNode) ? content.trim() : escapeText(content.trim());
-
-                    if (startsWithSpace) {
-                        writer.write(' ');
-                    }
-
-                    if (content.length() != 0) {
+                    if (openPreTags > 0) {
                         writer.write(content);
-                        if (endsWithSpace) {
+                    } else {
+                        boolean startsWithSpace = content.length() > 0 && Character.isWhitespace( content.charAt(0) );
+                        boolean endsWithSpace = content.length() > 1 && Character.isWhitespace( content.charAt(content.length() - 1) );
+                        content = dontEscape(tagNode) ? content.trim() : escapeText(content.trim());
+
+                        if (startsWithSpace) {
                             writer.write(' ');
                         }
-                    }
 
-                    if (childrenIt.hasNext()) {
-                        if ( !Utils.isWhitespaceString(childrenIt.next()) ) {
-                            writer.write("\n");
+                        if (content.length() != 0) {
+                            writer.write(content);
+                            if (endsWithSpace) {
+                                writer.write(' ');
+                            }
                         }
-                        childrenIt.previous();
+
+                        if (childrenIt.hasNext()) {
+                            if ( !Utils.isWhitespaceString(childrenIt.next()) ) {
+                                writer.write("\n");
+                            }
+                            childrenIt.previous();
+                        }
                     }
                 } else if (item instanceof CommentToken) {
                     String content = ((CommentToken) item).getCommentedContent().trim();
@@ -89,6 +100,9 @@ public class CompactHtmlSerializer extends HtmlSerializer {
             }
 
             serializeEndTag(tagNode, writer, false);
+            if (isPreTag) {
+                openPreTags--;
+            }
         }
 	}
 

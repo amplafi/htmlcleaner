@@ -60,7 +60,7 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
 	}
 
 	protected void serialize(TagNode tagNode, Writer writer) throws IOException {
-		serializePrettyXml(tagNode, writer, 0);
+		serializePrettyHtml(tagNode, writer, 0, false);
 	}
 
 	/**
@@ -132,31 +132,37 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
         return result.toString();
     }
 
-    protected void serializePrettyXml(TagNode tagNode, Writer writer, int level) throws IOException {
+    protected void serializePrettyHtml(TagNode tagNode, Writer writer, int level, boolean isPreserveWhitespaces) throws IOException {
         List tagChildren = tagNode.getChildren();
         String indent = getIndent(level);
 
-        writer.write("\n");
-        writer.write(indent);
+        if (!isPreserveWhitespaces) {
+            writer.write("\n");
+            writer.write(indent);
+        }
         serializeOpenTag(tagNode, writer, true);
+
+        boolean preserveWhitespaces = isPreserveWhitespaces || "pre".equalsIgnoreCase(tagNode.getName());
 
         boolean lastWasNewLine = false;
 
         if ( !isMinimizedTagSyntax(tagNode) ) {
             String singleLine = getSingleLineOfChildren(tagChildren);
             boolean dontEscape = dontEscape(tagNode);
-            if (singleLine != null) {
+            if (!preserveWhitespaces && singleLine != null) {
                 writer.write( !dontEscape(tagNode) ? escapeText(singleLine) : singleLine );
             } else {
                 for (Object child: tagChildren) {
                     if (child instanceof TagNode) {
-                        serializePrettyXml((TagNode)child, writer, level + 1);
+                        serializePrettyHtml((TagNode)child, writer, level + 1, preserveWhitespaces);
                         lastWasNewLine = false;
                     } else if (child instanceof ContentToken) {
                         ContentToken contentToken = (ContentToken) child;
                         String content = dontEscape ? contentToken.getContent() : escapeText(contentToken.getContent());
                         if (content.length() > 0) {
-                            if (Character.isWhitespace(content.charAt(0))) {
+                            if (dontEscape || preserveWhitespaces) {
+                                writer.write(content);
+                            } else if (Character.isWhitespace(content.charAt(0))) {
                                 if (!lastWasNewLine) {
                                     writer.write("\n");
                                     lastWasNewLine = false;
@@ -175,7 +181,7 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
                             }
                         }
                     } else if (child instanceof CommentToken) {
-                        if (!lastWasNewLine) {
+                        if (!lastWasNewLine && !preserveWhitespaces) {
                             writer.write("\n");
                             lastWasNewLine = false;
                         }
@@ -186,7 +192,7 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
                 }
             }
 
-            if (singleLine == null) {
+            if (singleLine == null && !preserveWhitespaces) {
                 if (!lastWasNewLine) {
                     writer.write("\n");
                 }
