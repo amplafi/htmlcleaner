@@ -47,6 +47,8 @@ public class SpecialEntity {
 	
 	private static Map<String, SpecialEntity> entities = new HashMap<String, SpecialEntity>();
 
+    private static int maxEntityLength = 0;
+
     /**
      * Add new entity to the set.
      * @param entityName Entity name, for example "pound"
@@ -59,10 +61,18 @@ public class SpecialEntity {
             throw new HtmlCleanerException("Entity \"" + entityName + "\" is already defined!");
         }
         entities.put(entityName, new SpecialEntity(entityName, intCode));
+        int entityNameLen = entityName.length();
+        if (entityNameLen > maxEntityLength) {
+            maxEntityLength = entityNameLen;
+        };
     }
 
     public static SpecialEntity getEntity(String key) {
         return entities.get(key);
+    }
+
+    static int getMaxEntityLength() {
+        return maxEntityLength;
     }
 
     static {

@@ -104,8 +104,8 @@ public abstract class HtmlSerializer extends Serializer {
     						result.append(props.transResCharsToNCR ? "&#" + (int)'&' + ";" : "&");
     					}
     				} else {
-                        // get following sequence of most 10 characters
-                        String seq = s.substring(i, i+Math.min(10, len-i));
+                        // get minimal following sequence required to recognize some special entitiy
+                        String seq = s.substring(i, i + Math.min(SpecialEntity.getMaxEntityLength() + 2, len - i));
                         int semiIndex = seq.indexOf(';');
                         if (semiIndex > 0) {
                             String entityKey = seq.substring(1, semiIndex);
@@ -131,7 +131,6 @@ public abstract class HtmlSerializer extends Serializer {
                         if (!isReservedSeq) {
                             result.append( props.transResCharsToNCR ? "&#" + (int)'&' + ";" : "&" );
                         }
-//    					result.append("&amp;");
     				}
     			} else if (Utils.isReservedXmlChar(ch)) {
     				result.append( props.transResCharsToNCR ? "&#" + (int)ch + ";" : ch );

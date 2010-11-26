@@ -220,8 +220,8 @@ public class Utils {
     					}
     				} else {
     					if (translateSpecialEntities) {
-    						// get following sequence of most 10 characters
-    						String seq = s.substring(i, i+Math.min(10, len-i));
+                            // get minimal following sequence required to recognize some special entitiy
+                            String seq = s.substring(i, i + Math.min(SpecialEntity.getMaxEntityLength() + 2, len - i));
     						int semiIndex = seq.indexOf(';');
     						if (semiIndex > 0) {
     							String entityKey = seq.substring(1, semiIndex);
