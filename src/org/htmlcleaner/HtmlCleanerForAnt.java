@@ -316,6 +316,12 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
                 new BrowserCompactXmlSerializer(props).writeToStream(node, out, outcharset);
             } else if ( "pretty".equals(outputtype) ) {
                 new PrettyXmlSerializer(props).writeToStream(node, out, outcharset);
+            } else if ( "htmlsimple".equals(outputtype) ) {
+                new SimpleHtmlSerializer(props).writeToStream(node, out, outcharset);
+            } else if ( "htmlcompact".equals(outputtype) ) {
+                new CompactHtmlSerializer(props).writeToStream(node, out, outcharset);
+            } else if ( "htmlpretty".equals(outputtype) ) {
+                new PrettyHtmlSerializer(props).writeToStream(node, out, outcharset);
             } else {
                 new SimpleXmlSerializer(props).writeToStream(node, out, outcharset);
             }

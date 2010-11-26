@@ -82,7 +82,7 @@ public class CommandLine {
                                "[dest = <file>] [outcharset = <charset>] [taginfofile=<file>] [options...]");
             System.err.println("");
             System.err.println("where options include:");
-            System.err.println("    outputtype=simple* | compact | browser-compact | pretty");
+            System.err.println("    outputtype=simple* | compact | browser-compact | pretty | htmlsimple | htmlcompact | htmlpretty");
             System.err.println("    advancedxmlescape=true* | false");
             System.err.println("    usecdata=true* | false");
             System.err.println("    specialentities=true* | false");
@@ -304,6 +304,12 @@ public class CommandLine {
             new BrowserCompactXmlSerializer(props).writeToStream(node, out, outCharset);
         } else if ( "pretty".equals(outputType) ) {
             new PrettyXmlSerializer(props).writeToStream(node, out, outCharset);
+        } else if ( "htmlsimple".equals(outputType) ) {
+            new SimpleHtmlSerializer(props).writeToStream(node, out, outCharset);
+        } else if ( "htmlcompact".equals(outputType) ) {
+            new CompactHtmlSerializer(props).writeToStream(node, out, outCharset);
+        } else if ( "htmlpretty".equals(outputType) ) {
+            new PrettyHtmlSerializer(props).writeToStream(node, out, outCharset);
         } else {
             new SimpleXmlSerializer(props).writeToStream(node, out, outCharset);
         }
