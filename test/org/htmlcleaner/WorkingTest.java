@@ -49,18 +49,30 @@ public class WorkingTest {
 //                "c:/temp/htmlcleanertest/5.htm",
 //        };
 
-        props.setTransResCharsToNCR(true);
+        props.setTransResCharsToNCR(false);
         props.setIgnoreQuestAndExclam(true);
         props.setUseCdataForScriptAndStyle(true);
         props.setRecognizeUnicodeChars(true);
-        props.setTranslateSpecialEntities(false);
+        props.setTranslateSpecialEntities(true);
         props.setOmitXmlDeclaration(true);
         final PrettyXmlSerializer prettySerializer = new PrettyXmlSerializer(props);
+        final SimpleHtmlSerializer simpleHtmlSerializer = new SimpleHtmlSerializer(props);
 
         long start = System.currentTimeMillis();
 
         TagNode node = cleaner.clean(new File("c:/temp/htmlcleanertest/mama.html"), "UTF-8");
-        new SimpleHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/mamaout.html", "UTF-8");
+        node.traverse(new TagNodeVisitor() {
+            int changesCount = 0;
+            public boolean visit(TagNode tagNode) {
+                if ("a".equals(tagNode.getName())) {
+//                    tagNode.removeFromTree();
+                    tagNode.setAttribute("href", "#" + tagNode.getAttributeByName("href") + "#");
+                    changesCount++;
+                }
+                return changesCount <= 2;
+            }
+        });
+        simpleHtmlSerializer.writeToFile(node, "c:/temp/htmlcleanertest/mamaout.html", "UTF-8");
 
 //        for (int i = 0; i < resources.length; i++) {
 //            TagNode node = cleaner.clean(new URL(resources[i]));

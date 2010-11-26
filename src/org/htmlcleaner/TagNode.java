@@ -176,14 +176,25 @@ public class TagNode extends TagToken {
     }
 
     /**
+     * @deprecated Use setAttribute instead
      * Adds specified attribute to this tag or overrides existing one.
      * @param attName
      * @param attValue
      */
+    @Deprecated
     public void addAttribute(String attName, String attValue) {
         if ( attName != null && !"".equals(attName.trim()) ) {
             attributes.put( attName.toLowerCase(), attValue == null ? "" : attValue );
         }
+    }
+
+    /**
+     * Adding new attribute ir overriding existing one.
+     * @param attName
+     * @param attValue
+     */
+    public void setAttribute(String attName, String attValue) {
+        addAttribute(attName, attValue);
     }
 
     /**
@@ -455,7 +466,12 @@ public class TagNode extends TagToken {
      * @return True if element is removed (if it is not root node).
      */
     public boolean removeFromTree() {
-        return parent != null ? parent.removeChild(this) : false;
+        if (parent != null) {
+            boolean existed = parent.removeChild(this);
+            parent = null;
+            return existed;
+        }
+        return false;
     }
 
     /**
@@ -524,6 +540,38 @@ public class TagNode extends TagToken {
             }
             this.attributes = newAttributes;
         }
+    }
+
+    /**
+     * Traverses the tree and performs visitor's action on each node. It stops when it
+     * finishes all the tree or when visitor returns false.
+     * @param visitor TagNodeVisitor implementation
+     */
+    public void traverse(TagNodeVisitor visitor) {
+        traverseInternally(visitor);
+    }
+
+
+    private boolean traverseInternally(TagNodeVisitor visitor) {
+        if (visitor != null) {
+            boolean hasParent = parent != null;
+            boolean toContinue = visitor.visit(this);
+
+            if (!toContinue) {
+                return false; // if visitor stops traversal
+            } else if (hasParent && parent == null) {
+                return true; // if this node is pruned from the tree during the visit, then don't go deeper
+            }
+            for (Object child: children.toArray()) {  // make an array to avoid ConcurrentModificationException when some node is cut 
+                if (child instanceof TagNode) {
+                    toContinue = ((TagNode)child).traverseInternally(visitor);
+                    if (!toContinue) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     public void serialize(Serializer serializer, Writer writer) throws IOException {
