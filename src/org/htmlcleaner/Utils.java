@@ -403,5 +403,55 @@ public class Utils {
             }
         }
     }
-    
+
+    /**
+     * Checks if specified link is full URL.
+     *
+     * @param link
+     * @return True, if full URl, false otherwise.
+     */
+    public static boolean isFullUrl(String link) {
+        if (link == null) {
+            return false;
+        }
+        link = link.trim().toLowerCase();
+        return link.startsWith("http://") || link.startsWith("https://") || link.startsWith("file://");
+    }
+
+    /**
+     * Calculates full URL for specified page URL and link
+     * which could be full, absolute or relative like there can
+     * be found in A or IMG tags.
+     */
+    public static String fullUrl(String pageUrl, String link) {
+        if (isFullUrl(link)) {
+            return link;
+        } else if (link != null && link.startsWith("?")) {
+            int qindex = pageUrl.indexOf('?');
+            int len = pageUrl.length();
+            if (qindex < 0) {
+                return pageUrl + link;
+            } else if (qindex == len - 1) {
+                return pageUrl.substring(0, len - 1) + link;
+            } else {
+                return pageUrl + "&" + link.substring(1);
+            }
+        }
+
+        boolean isLinkAbsolute = link.startsWith("/");
+
+        if (!isFullUrl(pageUrl)) {
+            pageUrl = "http://" + pageUrl;
+        }
+
+        int slashIndex = isLinkAbsolute ? pageUrl.indexOf("/", 8) : pageUrl.lastIndexOf("/");
+        if (slashIndex <= 8) {
+            pageUrl += "/";
+        } else {
+            pageUrl = pageUrl.substring(0, slashIndex + 1);
+        }
+
+        return isLinkAbsolute ? pageUrl + link.substring(1) : pageUrl + link;
+    }
+
 }

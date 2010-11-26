@@ -37,28 +37,24 @@
 
 package org.htmlcleaner;
 
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.util.*;
 
 /**
- * <p>Pretty XML serializer - creates resulting XML with indenting lines.</p>
- *
- * Created by: Vladimir Nikic<br/>
- * Date: November, 2006.
+ * <p>Pretty HTML serializer - creates resulting HTML with indenting lines.</p>
  */
-public class PrettyXmlSerializer extends XmlSerializer {
+public class PrettyHtmlSerializer extends HtmlSerializer {
 
 	private static final String DEFAULT_INDENTATION_STRING = "\t";
 
     private String indentString = DEFAULT_INDENTATION_STRING;
     private List<String> indents = new ArrayList<String>();
 
-	public PrettyXmlSerializer(CleanerProperties props) {
+	public PrettyHtmlSerializer(CleanerProperties props) {
 		this(props, DEFAULT_INDENTATION_STRING);
 	}
 
-	public PrettyXmlSerializer(CleanerProperties props, String indentString) {
+	public PrettyHtmlSerializer(CleanerProperties props, String indentString) {
 		super(props);
         this.indentString = indentString;
 	}
@@ -140,28 +136,49 @@ public class PrettyXmlSerializer extends XmlSerializer {
         List tagChildren = tagNode.getChildren();
         String indent = getIndent(level);
 
+        writer.write("\n");
         writer.write(indent);
         serializeOpenTag(tagNode, writer, true);
+
+        boolean lastWasNewLine = false;
 
         if ( !isMinimizedTagSyntax(tagNode) ) {
             String singleLine = getSingleLineOfChildren(tagChildren);
             boolean dontEscape = dontEscape(tagNode);
             if (singleLine != null) {
-            	if ( !dontEscape(tagNode) ) {
-            		writer.write( escapeXml(singleLine) );
-            	} else {
-            		writer.write( singleLine.replaceAll("]]>", "]]&gt;") );
-            	}
+                writer.write( !dontEscape(tagNode) ? escapeText(singleLine) : singleLine );
             } else {
-            	writer.write("\n");
                 for (Object child: tagChildren) {
                     if (child instanceof TagNode) {
-                        serializePrettyXml( (TagNode)child, writer, level + 1 );
+                        serializePrettyXml((TagNode)child, writer, level + 1);
+                        lastWasNewLine = false;
                     } else if (child instanceof ContentToken) {
                         ContentToken contentToken = (ContentToken) child;
-                        String content = dontEscape ? contentToken.getContent().replaceAll("]]>", "]]&gt;") : escapeXml(contentToken.getContent());
-                        writer.write( getIndentedText(content, level + 1) );
+                        String content = dontEscape ? contentToken.getContent() : escapeText(contentToken.getContent());
+                        if (content.length() > 0) {
+                            if (Character.isWhitespace(content.charAt(0))) {
+                                if (!lastWasNewLine) {
+                                    writer.write("\n");
+                                    lastWasNewLine = false;
+                                }
+                                if (content.trim().length() > 0) {
+                                    writer.write( getIndentedText(Utils.rtrim(content), level + 1) );
+                                } else {
+                                    lastWasNewLine = true;
+                                }
+                            } else {
+                                if (content.trim().length() > 0) {
+                                    writer.write(Utils.rtrim(content));
+                                }
+                                writer.write("\n");
+                                lastWasNewLine = true;
+                            }
+                        }
                     } else if (child instanceof CommentToken) {
+                        if (!lastWasNewLine) {
+                            writer.write("\n");
+                            lastWasNewLine = false;
+                        }
                         CommentToken commentToken = (CommentToken) child;
                         String content = commentToken.getCommentedContent();
                         writer.write( getIndentedText(content, level + 1) );
@@ -170,10 +187,13 @@ public class PrettyXmlSerializer extends XmlSerializer {
             }
 
             if (singleLine == null) {
+                if (!lastWasNewLine) {
+                    writer.write("\n");
+                }
             	writer.write(indent);
             }
 
-            serializeEndTag(tagNode, writer, true);
+            serializeEndTag(tagNode, writer, false);
         }
     }
 

@@ -60,19 +60,41 @@ public class WorkingTest {
 
         long start = System.currentTimeMillis();
 
-        TagNode node = cleaner.clean(new File("c:/temp/htmlcleanertest/mama.html"), "UTF-8");
+        final String urlToTest = "http://www.b92.net/";
+//        TagNode node = cleaner.clean(new File("c:/temp/htmlcleanertest/mama.html"), "UTF-8");
+        TagNode node = cleaner.clean(new URL(urlToTest));
+
+        System.out.println("Cleanup time: " + (System.currentTimeMillis() - start));
+        start = System.currentTimeMillis();
+
         node.traverse(new TagNodeVisitor() {
-            int changesCount = 0;
             public boolean visit(TagNode tagNode) {
-                if ("a".equals(tagNode.getName())) {
-//                    tagNode.removeFromTree();
-                    tagNode.setAttribute("href", "#" + tagNode.getAttributeByName("href") + "#");
-                    changesCount++;
+                if ( "a".equals(tagNode.getName()) || "link".equals(tagNode.getName()) ) {
+                    String href = tagNode.getAttributeByName("href");
+                    if (href != null) {
+                        tagNode.setAttribute("href", Utils.fullUrl(urlToTest, href));
+                    }
+                } else if ( "img".equals(tagNode.getName()) ) {
+                    String src = tagNode.getAttributeByName("src");
+                    if (src != null) {
+                        tagNode.setAttribute("src", Utils.fullUrl(urlToTest, src));
+                    }
                 }
-                return changesCount <= 2;
+                return true;
             }
         });
-        simpleHtmlSerializer.writeToFile(node, "c:/temp/htmlcleanertest/mamaout.html", "UTF-8");
+
+        System.out.println("Traverse time: " + (System.currentTimeMillis() - start));
+        start = System.currentTimeMillis();
+
+        new PrettyXmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/prettymamaout.xml", "UTF-8");
+        new SimpleHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/simplemamaout.html", "UTF-8");
+        new CompactHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/compactmamaout.html", "UTF-8");
+        new PrettyHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/prettymamaout.html", "UTF-8");
+
+        System.out.println("Serialize time: " + (System.currentTimeMillis() - start));
+        start = System.currentTimeMillis();
+
 
 //        for (int i = 0; i < resources.length; i++) {
 //            TagNode node = cleaner.clean(new URL(resources[i]));

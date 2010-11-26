@@ -67,36 +67,34 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
             ListIterator childrenIt = tagChildren.listIterator();
             while ( childrenIt.hasNext() ) {
                 Object item = childrenIt.next();
-                if (item != null) {
-                    if ( item instanceof ContentToken ) {
-                        String content = ((ContentToken) item).getContent();
-                        boolean startsWithSpace = content.length() > 0 && Character.isWhitespace( content.charAt(0) );
-                        boolean endsWithSpace = content.length() > 1 && Character.isWhitespace( content.charAt(content.length() - 1) );
-                        content = dontEscape(tagNode) ? content.trim().replaceAll("]]>", "]]&gt;") : escapeXml(content.trim());
+                if (item instanceof ContentToken) {
+                    String content = ((ContentToken) item).getContent();
+                    boolean startsWithSpace = content.length() > 0 && Character.isWhitespace( content.charAt(0) );
+                    boolean endsWithSpace = content.length() > 1 && Character.isWhitespace( content.charAt(content.length() - 1) );
+                    content = dontEscape(tagNode) ? content.trim().replaceAll("]]>", "]]&gt;") : escapeXml(content.trim());
 
-                        if (startsWithSpace) {
+                    if (startsWithSpace) {
+                        writer.write(' ');
+                    }
+
+                    if (content.length() != 0) {
+                        writer.write(content);
+                        if (endsWithSpace) {
                             writer.write(' ');
                         }
-
-                        if (content.length() != 0) {
-                            writer.write(content);
-                            if (endsWithSpace) {
-                                writer.write(' ');
-                            }
-                        }
-
-                        if (childrenIt.hasNext()) {
-                            if ( !Utils.isWhitespaceString(childrenIt.next()) ) {
-                                writer.write("\n");
-                            }
-                            childrenIt.previous();
-                        }
-                    } else if (item instanceof CommentToken) {
-                    	String content = ((CommentToken) item).getCommentedContent().trim();
-                    	writer.write(content);
-                    } else {
-                    	((BaseToken)item).serialize(this, writer);
                     }
+
+                    if (childrenIt.hasNext()) {
+                        if ( !Utils.isWhitespaceString(childrenIt.next()) ) {
+                            writer.write("\n");
+                        }
+                        childrenIt.previous();
+                    }
+                } else if (item instanceof CommentToken) {
+                    String content = ((CommentToken) item).getCommentedContent().trim();
+                    writer.write(content);
+                } else if (item instanceof BaseToken) {
+                    ((BaseToken)item).serialize(this, writer);
                 }
             }
 
