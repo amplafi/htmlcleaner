@@ -61,8 +61,8 @@ public class WorkingTest {
         long start = System.currentTimeMillis();
 
         final String urlToTest = "http://edition.cnn.com/";
-//        TagNode node = cleaner.clean(new File("c:/temp/htmlcleanertest/mama.html"), "UTF-8");
-        TagNode node = cleaner.clean(new URL(urlToTest));
+        TagNode node = cleaner.clean(new File("c:/temp/htmlcleanertest/mama.html"), "UTF-8");
+//        TagNode node = cleaner.clean(new URL(urlToTest));
 
         System.out.println("Cleanup time: " + (System.currentTimeMillis() - start));
         start = System.currentTimeMillis();
@@ -90,6 +90,7 @@ public class WorkingTest {
         new SimpleHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/simplemamaout.html", "utf-8");
         new CompactHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/compactmamaout.html", "utf-8");
         new PrettyHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/prettymamaout.html", "utf-8");
+        new PrettyXmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/prettymamaout.xml", "utf-8");
 
         System.out.println("Serialize time: " + (System.currentTimeMillis() - start));
         start = System.currentTimeMillis();

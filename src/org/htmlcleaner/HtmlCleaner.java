@@ -273,8 +273,13 @@ public class HtmlCleaner {
         this.properties.tagInfoProvider = this.tagInfoProvider;
     }
 
-    public TagNode clean(String htmlContent) throws IOException {
-        return clean( new StringReader(htmlContent) );
+    public TagNode clean(String htmlContent) {
+        try {
+            return clean( new StringReader(htmlContent) );
+        } catch (IOException e) {
+            // should never happen because reading from StringReader
+            throw new HtmlCleanerException(e);
+        }
     }
 
     public TagNode clean(File file, String charset) throws IOException {
@@ -877,14 +882,10 @@ public class HtmlCleaner {
                 parent = parent.getParent();
             }
 
-            try {
-                TagNode rootNode = clean( html.toString() );
-                TagNode cleanedNode = rootNode.findElementHavingAttribute("marker", true);
-                if (cleanedNode != null) {
-                    node.setChildren( cleanedNode.getChildren() );
-                }
-            } catch (IOException e) {
-                throw new HtmlCleanerException(e);
+            TagNode rootNode = clean( html.toString() );
+            TagNode cleanedNode = rootNode.findElementHavingAttribute("marker", true);
+            if (cleanedNode != null) {
+                node.setChildren( cleanedNode.getChildren() );
             }
         }
     }
