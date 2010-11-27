@@ -3,7 +3,7 @@
 	<description>HtmlCleaner</description>
 
 	<property name="version" value="2_2"/>
-	<property name="dir.src" value="src"/>
+	<property name="dir.src" value="src/main/java"/>
     <property name="dir.lib" value="lib"/>
     <property name="dir.doc" value="doc"/>
     <property name="dir.dist" value="dist"/>
