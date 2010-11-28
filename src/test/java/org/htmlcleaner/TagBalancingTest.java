@@ -30,7 +30,7 @@ public class TagBalancingTest extends TestCase {
         assertHtml(new File("src/test/resources/test3.html"), "count(/head/*)", "24");
         assertHtml(new File("src/test/resources/test3.html"), "/head/meta[1]/@name", "verify-v1");
         assertHtml(new File("src/test/resources/test3.html"), "/head/script[last()]/@language", "javascript1.1");
-        assertHtml(new File("src/test/resources/test3.html"), "/head/noscript/meta/@http-equiv", "refresh");
+        assertHtml(new File("src/test/resources/test7.html"), "/head/noscript/meta/@http-equiv", "refresh");
     }
 
     public void testTagProviders() throws XPatherException, IOException {
@@ -38,20 +38,20 @@ public class TagBalancingTest extends TestCase {
         HtmlCleaner cleaner2 = new HtmlCleaner(new ConfigFileTagProvider(new File("default.xml")));
         SimpleXmlSerializer serializer = new SimpleXmlSerializer(cleaner1.getProperties());
 
-        String s1 = serializer.getAsString(cleaner1.clean(new File("test/org/htmlcleaner/files/test5.html")));
-        String s2 = serializer.getAsString(cleaner2.clean(new File("test/org/htmlcleaner/files/test5.html")));
+        String s1 = serializer.getAsString(cleaner1.clean(new File("src/test/resources/test5.html")));
+        String s2 = serializer.getAsString(cleaner2.clean(new File("src/test/resources/test5.html")));
         assertEquals(s1, s2);
 
-        s1 = serializer.getAsString(cleaner1.clean(new File("test/org/htmlcleaner/files/test1.html")));
-        s2 = serializer.getAsString(cleaner2.clean(new File("test/org/htmlcleaner/files/test1.html")));
+        s1 = serializer.getAsString(cleaner1.clean(new File("src/test/resources/test1.html")));
+        s2 = serializer.getAsString(cleaner2.clean(new File("src/test/resources/test1.html")));
         assertEquals(s1, s2);
 
-        s1 = serializer.getAsString(cleaner1.clean(new File("test/org/htmlcleaner/files/test2.html")));
-        s2 = serializer.getAsString(cleaner2.clean(new File("test/org/htmlcleaner/files/test2.html")));
+        s1 = serializer.getAsString(cleaner1.clean(new File("src/test/resources/test2.html")));
+        s2 = serializer.getAsString(cleaner2.clean(new File("src/test/resources/test2.html")));
         assertEquals(s1, s2);
 
-        s1 = serializer.getAsString(cleaner1.clean(new File("test/org/htmlcleaner/files/test3.html")));
-        s2 = serializer.getAsString(cleaner2.clean(new File("test/org/htmlcleaner/files/test3.html")));
+        s1 = serializer.getAsString(cleaner1.clean(new File("src/test/resources/test3.html")));
+        s2 = serializer.getAsString(cleaner2.clean(new File("src/test/resources/test3.html")));
         assertEquals(s1, s2);
     }
 
