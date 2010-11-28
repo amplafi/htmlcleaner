@@ -26,11 +26,11 @@ public class TagBalancingTest extends TestCase {
                 "<html><head /><body><u>a<big>a<i>a<b>at<sup /></b></i></big></u><big><i><b><sup>fi</sup>" +
                         "</b></i></big><i><b><sup>rst</sup></b><sup>text</sup></i></body></html>"
         );
-        assertHtml(new File("test/org/htmlcleaner/files/test3.html"), "/head/noscript/meta/@http-equiv", "Refresh");
-        assertHtml(new File("test/org/htmlcleaner/files/test3.html"), "count(/head/*)", "24");
-        assertHtml(new File("test/org/htmlcleaner/files/test3.html"), "/head/meta[1]/@name", "verify-v1");
-        assertHtml(new File("test/org/htmlcleaner/files/test3.html"), "/head/script[last()]/@language", "javascript1.1");
-        assertHtml(new File("test/org/htmlcleaner/files/test7.html"), "/head/noscript/meta/@http-equiv", "refresh");
+        assertHtml(new File("src/test/resources/test3.html"), "/head/noscript/meta/@http-equiv", "Refresh");
+        assertHtml(new File("src/test/resources/test3.html"), "count(/head/*)", "24");
+        assertHtml(new File("src/test/resources/test3.html"), "/head/meta[1]/@name", "verify-v1");
+        assertHtml(new File("src/test/resources/test3.html"), "/head/script[last()]/@language", "javascript1.1");
+        assertHtml(new File("src/test/resources/test3.html"), "/head/noscript/meta/@http-equiv", "refresh");
     }
 
     public void testTagProviders() throws XPatherException, IOException {

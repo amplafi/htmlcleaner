@@ -23,7 +23,7 @@ public class SerializationTest extends TestCase {
     }
 
     public void testSerialization() throws XPatherException, IOException, ParserConfigurationException {
-        TagNode node = cleaner.clean( new File("test/org/htmlcleaner/files/test6.html"), "UTF-8" );
+        TagNode node = cleaner.clean( new File("src/test/resources/test6.html"), "UTF-8" );
         final Document dom1 = new DomSerializer(properties, true).createDOM(node);
         final Document dom2 = new DomSerializer(properties, false).createDOM(node);
         final org.jdom.Document jdom1 = new JDomSerializer(properties, true).createJDom(node);

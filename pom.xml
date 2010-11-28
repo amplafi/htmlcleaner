@@ -65,13 +65,10 @@
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <!-- suggestion: move test sources to src/test/java :-) -->
-        <testSourceDirectory>src/test/resources</testSourceDirectory>
-        <!-- suggestion: move test sources to src/test/resources :-) -->
+        <testSourceDirectory>src/test/java</testSourceDirectory>
         <testResources>
             <testResource>
-                <directory>test</directory>
+                <directory>src/test/resources</directory>
             </testResource>
         </testResources>
 

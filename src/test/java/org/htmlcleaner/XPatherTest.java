@@ -13,7 +13,7 @@ public class XPatherTest extends TestCase {
 
     protected void setUp() throws Exception {
         HtmlCleaner cleaner = new HtmlCleaner();
-        rootNode = cleaner.clean( new File("test/org/htmlcleaner/files/test5.html") );
+        rootNode = cleaner.clean( new File("src/test/resources/test5.html") );
     }
 
     public void testPathExpression() throws XPatherException {
