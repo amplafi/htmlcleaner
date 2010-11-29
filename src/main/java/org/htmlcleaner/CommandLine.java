@@ -84,6 +84,7 @@ public class CommandLine {
             System.err.println("where options include:");
             System.err.println("    outputtype=simple* | compact | browser-compact | pretty | htmlsimple | htmlcompact | htmlpretty");
             System.err.println("    advancedxmlescape=true* | false");
+            System.err.println("    transrescharstoncr=true | false*");
             System.err.println("    usecdata=true* | false");
             System.err.println("    specialentities=true* | false");
             System.err.println("    unicodechars=true* | false");
