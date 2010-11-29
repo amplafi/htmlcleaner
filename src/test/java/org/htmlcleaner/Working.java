@@ -18,7 +18,7 @@ import java.net.URL;
  * Vladimir Nikic
  * Date: Apr 13, 2007
  */
-public class WorkingTest {
+public class Working {
 
     public static void main(String[] args) throws IOException, XPatherException, ParserConfigurationException {
         String html = "<script src=\"a\" type=\"text/javascript\" /><script src=\"b\" type=\"text/javascript\"/>";
