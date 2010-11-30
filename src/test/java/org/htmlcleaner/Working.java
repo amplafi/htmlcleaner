@@ -49,18 +49,18 @@ public class Working {
 //                "c:/temp/htmlcleanertest/5.htm",
 //        };
 
-        props.setTransResCharsToNCR(false);
-        props.setIgnoreQuestAndExclam(true);
+//        props.setTransResCharsToNCR(false);
+//        props.setIgnoreQuestAndExclam(true);
         props.setUseCdataForScriptAndStyle(false);
-        props.setRecognizeUnicodeChars(false);
+        props.setRecognizeUnicodeChars(true);
         props.setTranslateSpecialEntities(false);
+        props.setUseEmptyElementTags(false);
         props.setOmitXmlDeclaration(true);
-        final PrettyXmlSerializer prettySerializer = new PrettyXmlSerializer(props);
-        final SimpleHtmlSerializer simpleHtmlSerializer = new SimpleHtmlSerializer(props);
+        props.setOmitDoctypeDeclaration(false);
 
         long start = System.currentTimeMillis();
 
-        final String urlToTest = "http://edition.cnn.com/";
+        final String urlToTest = "http://htmlcleaner.sf.net/";
         TagNode node = cleaner.clean(new File("c:/temp/htmlcleanertest/mama.html"), "UTF-8");
 //        TagNode node = cleaner.clean(new URL(urlToTest));
 

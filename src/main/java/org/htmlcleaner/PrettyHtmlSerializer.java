@@ -60,7 +60,7 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
 	}
 
 	protected void serialize(TagNode tagNode, Writer writer) throws IOException {
-		serializePrettyHtml(tagNode, writer, 0, false);
+		serializePrettyHtml(tagNode, writer, 0, false, false);
 	}
 
 	/**
@@ -132,12 +132,14 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
         return result.toString();
     }
 
-    protected void serializePrettyHtml(TagNode tagNode, Writer writer, int level, boolean isPreserveWhitespaces) throws IOException {
+    protected void serializePrettyHtml(TagNode tagNode, Writer writer, int level, boolean isPreserveWhitespaces, boolean isLastNewLine) throws IOException {
         List tagChildren = tagNode.getChildren();
         String indent = getIndent(level);
 
         if (!isPreserveWhitespaces) {
-            writer.write("\n");
+            if (!isLastNewLine) {
+                writer.write("\n");
+            }
             writer.write(indent);
         }
         serializeOpenTag(tagNode, writer, true);
@@ -152,9 +154,11 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
             if (!preserveWhitespaces && singleLine != null) {
                 writer.write( !dontEscape(tagNode) ? escapeText(singleLine) : singleLine );
             } else {
-                for (Object child: tagChildren) {
+                Iterator childIterator = tagChildren.iterator();
+                while (childIterator.hasNext()) {
+                    Object child = childIterator.next();
                     if (child instanceof TagNode) {
-                        serializePrettyHtml((TagNode)child, writer, level + 1, preserveWhitespaces);
+                        serializePrettyHtml((TagNode)child, writer, level + 1, preserveWhitespaces, lastWasNewLine);
                         lastWasNewLine = false;
                     } else if (child instanceof ContentToken) {
                         ContentToken contentToken = (ContentToken) child;
@@ -176,8 +180,10 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
                                 if (content.trim().length() > 0) {
                                     writer.write(Utils.rtrim(content));
                                 }
-                                writer.write("\n");
-                                lastWasNewLine = true;
+                                if (!childIterator.hasNext()) {
+                                    writer.write("\n");
+                                    lastWasNewLine = true;
+                                }
                             }
                         }
                     } else if (child instanceof CommentToken) {
@@ -187,7 +193,7 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
                         }
                         CommentToken commentToken = (CommentToken) child;
                         String content = commentToken.getCommentedContent();
-                        writer.write( getIndentedText(content, level + 1) );
+                        writer.write( dontEscape ? content : getIndentedText(content, level + 1) );
                     }
                 }
             }
