@@ -259,7 +259,7 @@ public class TagNode extends TagToken {
         for (int i = 0; i < children.size(); i++) {
             Object item = children.get(i);
             if (item instanceof ContentToken) {
-                text.append( ((ContentToken)item).getContent() );
+                text.append(item.toString());
             } else if (item instanceof TagNode) {
                 StringBuffer subtext = ((TagNode)item).getText();
                 text.append(subtext);
@@ -555,7 +555,7 @@ public class TagNode extends TagToken {
     private boolean traverseInternally(TagNodeVisitor visitor) {
         if (visitor != null) {
             boolean hasParent = parent != null;
-            boolean toContinue = visitor.visit(this);
+            boolean toContinue = visitor.visit(parent, this);
 
             if (!toContinue) {
                 return false; // if visitor stops traversal
@@ -565,9 +565,13 @@ public class TagNode extends TagToken {
             for (Object child: children.toArray()) {  // make an array to avoid ConcurrentModificationException when some node is cut 
                 if (child instanceof TagNode) {
                     toContinue = ((TagNode)child).traverseInternally(visitor);
-                    if (!toContinue) {
-                        return false;
-                    }
+                } else if (child instanceof ContentToken) {
+                    toContinue = visitor.visit(this, (ContentToken)child);
+                } else if (child instanceof CommentToken) {
+                    toContinue = visitor.visit(this, (CommentToken)child);
+                }
+                if (!toContinue) {
+                    return false;
                 }
             }
         }

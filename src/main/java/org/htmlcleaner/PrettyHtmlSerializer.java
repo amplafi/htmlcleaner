@@ -107,8 +107,7 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
             if ( !(child instanceof ContentToken) ) {
                 return null;
             } else {
-                ContentToken contentToken = (ContentToken) child;
-                String content = contentToken.getContent();
+                String content = child.toString();
 
                 // if first item trims it from left
                 if (isFirst) {
@@ -161,8 +160,7 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
                         serializePrettyHtml((TagNode)child, writer, level + 1, preserveWhitespaces, lastWasNewLine);
                         lastWasNewLine = false;
                     } else if (child instanceof ContentToken) {
-                        ContentToken contentToken = (ContentToken) child;
-                        String content = dontEscape ? contentToken.getContent() : escapeText(contentToken.getContent());
+                        String content = dontEscape ? child.toString() : escapeText(child.toString());
                         if (content.length() > 0) {
                             if (dontEscape || preserveWhitespaces) {
                                 writer.write(content);

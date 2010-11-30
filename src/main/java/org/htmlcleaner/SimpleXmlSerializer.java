@@ -59,7 +59,7 @@ public class SimpleXmlSerializer extends XmlSerializer {
         if ( !isMinimizedTagSyntax(tagNode) ) {
             for (Object item: tagNode.getChildren()) {
                 if ( item instanceof ContentToken ) {
-                    String content = ((ContentToken) item).getContent();
+                    String content = item.toString();
                     writer.write( dontEscape(tagNode) ? content.replaceAll("]]>", "]]&gt;") : escapeXml(content) );
                 } else if (item instanceof BaseToken) {
                     ((BaseToken)item).serialize(this, writer);

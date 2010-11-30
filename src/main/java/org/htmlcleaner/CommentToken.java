@@ -50,17 +50,17 @@ import org.htmlcleaner.BaseToken;
  */
 public class CommentToken implements BaseToken {
 
-    private String content;
+    private StringBuilder content;
 
     public CommentToken(String content) {
-        this.content = content;
+        this.content = new StringBuilder(content);
     }
 
     public String getCommentedContent() {
         return "<!--" + content + "-->";
     }
 
-    public String getContent() {
+    public StringBuilder getContent() {
         return content;
     }
 

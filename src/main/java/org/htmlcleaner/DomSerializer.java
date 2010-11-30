@@ -58,12 +58,11 @@ public class DomSerializer {
                 Object item = it.next();
                 if (item instanceof CommentToken) {
                     CommentToken commentToken = (CommentToken) item;
-                    Comment comment = document.createComment( commentToken.getContent() );
+                    Comment comment = document.createComment( commentToken.getContent().toString() );
                     element.appendChild(comment);
                 } else if (item instanceof ContentToken) {
                     String nodeName = element.getNodeName();
-                    ContentToken contentToken = (ContentToken) item;
-                    String content = contentToken.getContent();
+                    String content = item.toString();
                     boolean specialCase = props.isUseCdataForScriptAndStyle() &&
                                           ("script".equalsIgnoreCase(nodeName) || "style".equalsIgnoreCase(nodeName));
                     if (escapeXml && !specialCase) {

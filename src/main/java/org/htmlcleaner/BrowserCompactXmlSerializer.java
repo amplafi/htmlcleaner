@@ -68,7 +68,7 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
             while ( childrenIt.hasNext() ) {
                 Object item = childrenIt.next();
                 if (item instanceof ContentToken) {
-                    String content = ((ContentToken) item).getContent();
+                    String content = item.toString();
                     boolean startsWithSpace = content.length() > 0 && Character.isWhitespace( content.charAt(0) );
                     boolean endsWithSpace = content.length() > 1 && Character.isWhitespace( content.charAt(content.length() - 1) );
                     content = dontEscape(tagNode) ? content.trim().replaceAll("]]>", "]]&gt;") : escapeXml(content.trim());

@@ -65,7 +65,7 @@ public class CompactHtmlSerializer extends HtmlSerializer {
             while ( childrenIt.hasNext() ) {
                 Object item = childrenIt.next();
                 if (item instanceof ContentToken) {
-                    String content = ((ContentToken) item).getContent();
+                    String content = item.toString();
                     if (openPreTags > 0) {
                         writer.write(content);
                     } else {

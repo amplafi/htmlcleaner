@@ -68,7 +68,7 @@ public class Working {
         start = System.currentTimeMillis();
 
         node.traverse(new TagNodeVisitor() {
-            public boolean visit(TagNode tagNode) {
+            public boolean visit(TagNode parentNode, TagNode tagNode) {
                 if ( "a".equals(tagNode.getName()) || "link".equals(tagNode.getName()) ) {
                     String href = tagNode.getAttributeByName("href");
                     if (href != null) {
@@ -80,6 +80,20 @@ public class Working {
                         tagNode.setAttribute("src", Utils.fullUrl(urlToTest, src));
                     }
                 }
+                return true;
+            }
+
+            public boolean visit(TagNode parentNode, ContentToken contentToken) {
+                StringBuilder content = contentToken.getContent();
+                if (content.indexOf("one") >= 0) {
+                    content.insert(0, "MY TEXT: ");
+                }
+                return true;
+            }
+
+            public boolean visit(TagNode parentNode, CommentToken commentToken) {
+                parentNode.removeChild(commentToken);
+//                commentToken.getContent().insert(0, "MY COMMENT: ");
                 return true;
             }
         });

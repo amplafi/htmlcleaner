@@ -54,12 +54,12 @@ public class ContentToken implements BaseToken {
         this.content = new StringBuilder(content);
     }
 
-    public String getContent() {
+    public String toString() {
         return content.toString();
     }
 
-    public String toString() {
-        return content.toString();
+    public StringBuilder getContent() {
+        return content;
     }
 
     public void serialize(Serializer serializer, Writer writer) throws IOException {
