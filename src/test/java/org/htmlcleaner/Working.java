@@ -109,7 +109,8 @@ public class Working {
         System.out.println("Serialize time: " + (System.currentTimeMillis() - start));
         start = System.currentTimeMillis();
 
-        org.jdom.Document doc = new JDomSerializer (props).createJDom (node);
+        new JDomSerializer(props).createJDom(node);
+        new DomSerializer(props).createDOM(node);
 
 
 //        for (int i = 0; i < resources.length; i++) {

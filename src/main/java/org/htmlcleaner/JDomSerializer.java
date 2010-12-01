@@ -2,6 +2,7 @@ package org.htmlcleaner;
 
 import org.jdom.*;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,8 @@ public class JDomSerializer {
     protected CleanerProperties props;
     protected boolean escapeXml = true;
 
+    private Map<String, Namespace> namespaces = new HashMap<String, Namespace>();
+
     public JDomSerializer(CleanerProperties props, boolean escapeXml) {
         this.props = props;
         this.escapeXml = escapeXml;
@@ -30,7 +33,7 @@ public class JDomSerializer {
 
     public Document createJDom(TagNode rootNode) {
         this.factory = new DefaultJDOMFactory();
-        Element rootElement = this.factory.element(rootNode.getName());
+        Element rootElement = createElement(rootNode);
         Document document = this.factory.document(rootElement);
         
         for (Map.Entry<String, String> entry: rootNode.getAttributes().entrySet()) {
@@ -39,12 +42,42 @@ public class JDomSerializer {
             if (escapeXml) {
                 attrValue = Utils.escapeXml(attrValue, props, true);
             }
-            rootElement.setAttribute(attrName, attrValue);
+            setAttribute(rootElement, attrName, attrValue);
         }
 
         createSubnodes(rootElement, rootNode.getChildren());
 
         return document;
+    }
+
+    private Element createElement(TagNode node) {
+        String name = node.getName();
+        String prefix = Utils.getXmlNSPrefix(name);
+        if (prefix != null) {
+            return factory.element(Utils.getXmlName(name), namespaces.get(prefix));
+        } else {
+            return factory.element(name);
+        }
+    }
+
+    private void setAttribute(Element element, String attrName, String attrValue) {
+        if (attrName.equals("xmlns")) {
+            Namespace namespace = Namespace.getNamespace(attrValue);
+            namespaces.put("", namespace);
+            element.addNamespaceDeclaration(namespace);
+        } else if (attrName.startsWith("xmlns:")) {
+            String prefix = attrName.substring(6);
+            Namespace namespace = Namespace.getNamespace(prefix, attrValue);
+            namespaces.put(prefix, namespace);
+            element.addNamespaceDeclaration(namespace);
+        } else {
+            String prefix = Utils.getXmlNSPrefix(attrName);
+            if (prefix != null) {
+                element.setAttribute( Utils.getXmlName(attrName), attrValue, namespaces.get(prefix) );
+            } else {
+                element.setAttribute(attrName, attrValue);
+            }
+        }
     }
 
     private void createSubnodes(Element element, List tagChildren) {
@@ -68,11 +101,11 @@ public class JDomSerializer {
                     element.addContent(text);
                 } else if (item instanceof TagNode) {
                     TagNode subTagNode = (TagNode) item;
-                    Element subelement = factory.element( subTagNode.getName() );
+                    Element subelement = createElement(subTagNode);
                     for (Map.Entry<String, String> entry: subTagNode.getAttributes().entrySet()) {
                         String attrName = entry.getKey();
                         String attrValue = entry.getValue();
-                        subelement.setAttribute(attrName, attrValue);
+                        setAttribute(subelement, attrName, attrValue);
                     }
 
                     // recursively create subnodes
