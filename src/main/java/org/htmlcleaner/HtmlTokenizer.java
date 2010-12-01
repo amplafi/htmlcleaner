@@ -67,8 +67,7 @@ abstract public class HtmlTokenizer {
     private transient DoctypeToken _docType = null;
     private transient TagToken _currentTagToken = null;
     private transient List<BaseToken> _tokenList = new ArrayList<BaseToken>();
-    private transient Set _namespacePrefixes = new HashSet();
-    
+
     private boolean _asExpected = true;
 
     private boolean _isScriptContext = false;
@@ -138,10 +137,6 @@ abstract public class HtmlTokenizer {
 
     List<BaseToken> getTokenList() {
     	return this._tokenList;
-    }
-
-    Set getNamespacePrefixes() {
-        return _namespacePrefixes;
     }
 
     private void go() throws IOException {
@@ -332,7 +327,6 @@ abstract public class HtmlTokenizer {
         _asExpected = true;
         _isScriptContext = false;
         _isLateForDoctype = false;
-        _namespacePrefixes.clear();
 
         this._pos = WORKING_BUFFER_SIZE;
         readIfNeeded(0);
@@ -567,14 +561,7 @@ abstract public class HtmlTokenizer {
             if (nextColumnIndex >= 0) {
                 suffix = suffix.substring(0, nextColumnIndex);
             }
-            if (props.isNamespacesAware()) {
-                id = prefix + ":" + suffix;
-                if ( !"xmlns".equalsIgnoreCase(prefix) ) {
-                    _namespacePrefixes.add( prefix.toLowerCase() );
-                }
-            } else {
-                id = suffix;
-            }
+            id = props.isNamespacesAware() ? (prefix + ":" + suffix) : suffix;
         }
 
         return id;

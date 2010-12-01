@@ -361,7 +361,7 @@ public class HtmlCleaner {
         closeAll(nodeList, cleanTimeValues);
         createDocumentNodes(nodeList, cleanTimeValues);
 
-        calculateRootNode( htmlTokenizer.getNamespacePrefixes(), cleanTimeValues );
+        calculateRootNode(cleanTimeValues);
 
         // if there are some nodes to prune from tree
         if ( cleanTimeValues.pruneNodeSet != null && !cleanTimeValues.pruneNodeSet.isEmpty() ) {
@@ -397,15 +397,12 @@ public class HtmlCleaner {
     }
 
     /**
-     * Assigns root node to internal variable and adds neccessery xmlns
-     * attributes if cleaner if namespaces aware.
+     * Assigns root node to internal variable.
      * Root node of the result depends on parameter "omitHtmlEnvelope".
      * If it is set, then first child of the body will be root node,
      * or html will be root node otherwise.
-     *
-     * @param namespacePrefixes
      */
-    private void calculateRootNode(Set namespacePrefixes, CleanTimeValues cleanTimeValues) {
+    private void calculateRootNode(CleanTimeValues cleanTimeValues) {
         cleanTimeValues.rootNode =  cleanTimeValues.htmlNode;
 
         if (properties.omitHtmlEnvelope) {
@@ -417,19 +414,6 @@ public class HtmlCleaner {
                         cleanTimeValues.rootNode = (TagNode)child;
                         break;
                     }
-                }
-            }
-        }
-
-        Map atts = cleanTimeValues.rootNode.getAttributes();
-
-        if (properties.namespacesAware && namespacePrefixes != null) {
-            Iterator iterator = namespacePrefixes.iterator();
-            while (iterator.hasNext()) {
-                String prefix = (String) iterator.next();
-                String xmlnsAtt = "xmlns:" + prefix;
-                if ( !atts.containsKey(xmlnsAtt) ) {
-                    cleanTimeValues.rootNode.setAttribute(xmlnsAtt, prefix);
                 }
             }
         }

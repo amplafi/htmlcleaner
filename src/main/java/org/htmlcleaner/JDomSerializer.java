@@ -51,6 +51,8 @@ public class JDomSerializer {
     }
 
     private Element createElement(TagNode node) {
+        defineNamespaces(node, null);
+
         String name = node.getName();
         String prefix = Utils.getXmlNSPrefix(name);
         if (prefix != null) {
@@ -60,17 +62,31 @@ public class JDomSerializer {
         }
     }
 
+    private void defineNamespaces(TagNode node, Element element) {
+        for (Map.Entry<String, String> attEntry: node.getAttributes().entrySet()) {
+            String attName = attEntry.getKey();
+            if (attName.startsWith("xmlns")) {
+                String attValue = attEntry.getValue();
+                if (attName.length() == 5) {
+                    Namespace namespace = Namespace.getNamespace(attValue);
+                    namespaces.put("", namespace);
+                    if (element != null) {
+                        element.addNamespaceDeclaration(namespace);
+                    }
+                } else if (attName.charAt(5) == ':') {
+                    String attPrefix = attName.substring(6);
+                    Namespace namespace = Namespace.getNamespace(attPrefix, attValue);
+                    namespaces.put(attPrefix, namespace);
+                    if (element != null) {
+                        element.addNamespaceDeclaration(namespace);
+                    }
+                }
+            }
+        }
+    }
+
     private void setAttribute(Element element, String attrName, String attrValue) {
-        if (attrName.equals("xmlns")) {
-            Namespace namespace = Namespace.getNamespace(attrValue);
-            namespaces.put("", namespace);
-            element.addNamespaceDeclaration(namespace);
-        } else if (attrName.startsWith("xmlns:")) {
-            String prefix = attrName.substring(6);
-            Namespace namespace = Namespace.getNamespace(prefix, attrValue);
-            namespaces.put(prefix, namespace);
-            element.addNamespaceDeclaration(namespace);
-        } else {
+        if (!attrName.startsWith("xmlns")) {
             String prefix = Utils.getXmlNSPrefix(attrName);
             if (prefix != null) {
                 element.setAttribute( Utils.getXmlName(attrName), attrValue, namespaces.get(prefix) );

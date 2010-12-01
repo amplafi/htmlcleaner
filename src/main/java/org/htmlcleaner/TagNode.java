@@ -130,7 +130,7 @@ public class TagNode extends TagToken implements HtmlNode {
     private List children = new ArrayList();
     private DoctypeToken docType = null;
     private List<BaseToken> itemsToMove = null;
-    
+
     private transient boolean isFormed = false;
 
 
@@ -183,9 +183,7 @@ public class TagNode extends TagToken implements HtmlNode {
      */
     @Deprecated
     public void addAttribute(String attName, String attValue) {
-        if ( attName != null && !"".equals(attName.trim()) ) {
-            attributes.put( attName.toLowerCase(), attValue == null ? "" : attValue );
-        }
+        setAttribute(attName, attValue);
     }
 
     /**
@@ -194,7 +192,9 @@ public class TagNode extends TagToken implements HtmlNode {
      * @param attValue
      */
     public void setAttribute(String attName, String attValue) {
-        addAttribute(attName, attValue);
+        if ( attName != null && !"".equals(attName.trim()) ) {
+            attributes.put( attName.toLowerCase(), attValue == null ? "" : attValue );
+        }
     }
 
     /**
