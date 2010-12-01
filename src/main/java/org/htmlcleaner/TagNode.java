@@ -52,7 +52,7 @@ import java.util.*;
  * Created by: Vladimir Nikic<br/>
  * Date: November, 2006.
  */
-public class TagNode extends TagToken {
+public class TagNode extends TagToken implements HtmlNode {
 
     /**
      * Used as base for different node checkers.
@@ -488,6 +488,25 @@ public class TagNode extends TagToken {
      */
     public void removeAllChildren() {
         this.children.clear();
+    }
+
+    /**
+     * Replaces specified child node with specified replacement node.
+     * @param childToReplace Child node to be replaced
+     * @param replacement Replacement node
+     */
+    public void replaceChild(HtmlNode childToReplace, HtmlNode replacement) {
+        if (replacement == null) {
+            return;
+        }
+        ListIterator it = children.listIterator();
+        while (it.hasNext()) {
+            Object curr = it.next();
+            if (curr == childToReplace) {
+                it.set(replacement);
+                break;
+            }
+        }
     }
     
     void addItemForMoving(BaseToken item) {

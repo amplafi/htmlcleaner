@@ -46,7 +46,7 @@ import java.io.Writer;
  * Created by: Vladimir Nikic<br/>
  * Date: November, 2006.
  */
-public class ContentToken implements BaseToken {
+public class ContentToken implements BaseToken, HtmlNode {
 
     private StringBuilder content;
 

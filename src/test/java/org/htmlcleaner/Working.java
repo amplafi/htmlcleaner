@@ -25,15 +25,6 @@ public class Working {
         final HtmlCleaner cleaner = new HtmlCleaner();
         final CleanerProperties props = cleaner.getProperties();
 
-//        props.setOmitUnknownTags(false);
-//        props.setUseCdataForScriptAndStyle(true);
-//        props.setRecognizeUnicodeChars(false);
-//        props.setUseEmptyElementTags(true);
-//        props.setAdvancedXmlEscape(true);
-//        props.setTranslateSpecialEntities(true);
-//        props.setBooleanAttributeValues("empty");
-//        props.setNamespacesAware(false);
-
 //        final String resources[] = {
 //                "http://www.b92.net",
 //                "http://www.nba.com",
@@ -57,6 +48,7 @@ public class Working {
         props.setUseEmptyElementTags(false);
         props.setOmitXmlDeclaration(true);
         props.setOmitDoctypeDeclaration(false);
+        props.setNamespacesAware(true);
 
         long start = System.currentTimeMillis();
 
@@ -68,32 +60,35 @@ public class Working {
         start = System.currentTimeMillis();
 
         node.traverse(new TagNodeVisitor() {
-            public boolean visit(TagNode parentNode, TagNode tagNode) {
-                if ( "a".equals(tagNode.getName()) || "link".equals(tagNode.getName()) ) {
-                    String href = tagNode.getAttributeByName("href");
-                    if (href != null) {
-                        tagNode.setAttribute("href", Utils.fullUrl(urlToTest, href));
+            public boolean visit(TagNode parentNode, HtmlNode node) {
+                if (node instanceof TagNode) {
+                    TagNode tagNode = (TagNode) node;
+                    if ( "a".equals(tagNode.getName()) || "link".equals(tagNode.getName()) ) {
+                        String href = tagNode.getAttributeByName("href");
+                        if (href != null) {
+                            tagNode.setAttribute("href", Utils.fullUrl(urlToTest, href));
+                        }
+                    } else if ( "img".equals(tagNode.getName()) ) {
+                        String src = tagNode.getAttributeByName("src");
+                        if (src != null) {
+                            tagNode.setAttribute("src", Utils.fullUrl(urlToTest, src));
+                        }
+                    } else if ("b".equals(tagNode.getName())) {
+                        TagNode spanNode = new TagNode("span");
+                        spanNode.setAttribute("style", "font-weight:bold;");
+                        spanNode.addChild(new ContentToken("BOLD: "));
+                        spanNode.addChildren(tagNode.getChildren());
+                        parentNode.replaceChild(tagNode, spanNode);
                     }
-                } else if ( "img".equals(tagNode.getName()) ) {
-                    String src = tagNode.getAttributeByName("src");
-                    if (src != null) {
-                        tagNode.setAttribute("src", Utils.fullUrl(urlToTest, src));
+                } else if (node instanceof ContentToken) {
+                    StringBuilder content = ((ContentToken)node).getContent();
+                    if (content.indexOf("one") >= 0) {
+                        content.insert(0, "MY TEXT: ");
                     }
+                } else if (node instanceof CommentToken) {
+                    parentNode.removeChild(node);
                 }
-                return true;
-            }
 
-            public boolean visit(TagNode parentNode, ContentToken contentToken) {
-                StringBuilder content = contentToken.getContent();
-                if (content.indexOf("one") >= 0) {
-                    content.insert(0, "MY TEXT: ");
-                }
-                return true;
-            }
-
-            public boolean visit(TagNode parentNode, CommentToken commentToken) {
-                parentNode.removeChild(commentToken);
-//                commentToken.getContent().insert(0, "MY COMMENT: ");
                 return true;
             }
         });
