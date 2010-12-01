@@ -508,7 +508,55 @@ public class TagNode extends TagToken implements HtmlNode {
             }
         }
     }
-    
+
+    /**
+     * @param child Child to find index of
+     * @return Index of the specified child node inside this node's children, -1 if node is not the child 
+     */
+    public int getChildIndex(HtmlNode child) {
+        int index = 0;
+        for (Object curr: children) {
+            if (curr == child) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+
+    /**
+     * Inserts specified node at specified position in array of children  
+     * @param index
+     * @param childToAdd
+     */
+    public void insertChild(int index, HtmlNode childToAdd) {
+        children.add(index, childToAdd);
+    }
+
+    /**
+     * Inserts specified node in the list of children before specified child
+     * @param node Child before which to insert new node
+     * @param nodeToInsert Node to be inserted at specified position
+     */
+    public void insertChildBefore(HtmlNode node, HtmlNode nodeToInsert) {
+        int index = getChildIndex(node);
+        if (index >= 0) {
+            insertChild(index, nodeToInsert);
+        }
+    }
+
+    /**
+     * Inserts specified node in the list of children after specified child
+     * @param node Child after which to insert new node
+     * @param nodeToInsert Node to be inserted at specified position
+     */
+    public void insertChildAfter(HtmlNode node, HtmlNode nodeToInsert) {
+        int index = getChildIndex(node);
+        if (index >= 0) {
+            insertChild(index + 1, nodeToInsert);
+        }
+    }
+
     void addItemForMoving(BaseToken item) {
     	if (itemsToMove == null) {
     		itemsToMove = new ArrayList<BaseToken>();

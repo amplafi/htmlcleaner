@@ -79,6 +79,11 @@ public class Working {
                         spanNode.addChild(new ContentToken("BOLD: "));
                         spanNode.addChildren(tagNode.getChildren());
                         parentNode.replaceChild(tagNode, spanNode);
+                    } else if ("h4".equals(tagNode.getName())) {
+                        System.out.println("H4 index: " + parentNode.getChildIndex(tagNode));
+                        parentNode.insertChild(0, new CommentToken("very first comment"));
+                        parentNode.insertChildBefore(tagNode, new CommentToken("before H4"));
+                        parentNode.insertChildAfter(tagNode, new CommentToken("after H4"));
                     }
                 } else if (node instanceof ContentToken) {
                     StringBuilder content = ((ContentToken)node).getContent();
@@ -103,6 +108,8 @@ public class Working {
 
         System.out.println("Serialize time: " + (System.currentTimeMillis() - start));
         start = System.currentTimeMillis();
+
+        org.jdom.Document doc = new JDomSerializer (props).createJDom (node);
 
 
 //        for (int i = 0; i < resources.length; i++) {
