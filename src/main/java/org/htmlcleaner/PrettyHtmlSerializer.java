@@ -104,7 +104,7 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
         while (childrenIt.hasNext()) {
             Object child = childrenIt.next();
 
-            if ( !(child instanceof ContentToken) ) {
+            if ( !(child instanceof ContentNode) ) {
                 return null;
             } else {
                 String content = child.toString();
@@ -159,7 +159,7 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
                     if (child instanceof TagNode) {
                         serializePrettyHtml((TagNode)child, writer, level + 1, preserveWhitespaces, lastWasNewLine);
                         lastWasNewLine = false;
-                    } else if (child instanceof ContentToken) {
+                    } else if (child instanceof ContentNode) {
                         String content = dontEscape ? child.toString() : escapeText(child.toString());
                         if (content.length() > 0) {
                             if (dontEscape || preserveWhitespaces) {
@@ -184,13 +184,13 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
                                 }
                             }
                         }
-                    } else if (child instanceof CommentToken) {
+                    } else if (child instanceof CommentNode) {
                         if (!lastWasNewLine && !preserveWhitespaces) {
                             writer.write("\n");
                             lastWasNewLine = false;
                         }
-                        CommentToken commentToken = (CommentToken) child;
-                        String content = commentToken.getCommentedContent();
+                        CommentNode commentNode = (CommentNode) child;
+                        String content = commentNode.getCommentedContent();
                         writer.write( dontEscape ? content : getIndentedText(content, level + 1) );
                     }
                 }

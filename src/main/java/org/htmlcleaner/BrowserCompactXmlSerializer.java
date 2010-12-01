@@ -67,7 +67,7 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
             ListIterator childrenIt = tagChildren.listIterator();
             while ( childrenIt.hasNext() ) {
                 Object item = childrenIt.next();
-                if (item instanceof ContentToken) {
+                if (item instanceof ContentNode) {
                     String content = item.toString();
                     boolean startsWithSpace = content.length() > 0 && Character.isWhitespace( content.charAt(0) );
                     boolean endsWithSpace = content.length() > 1 && Character.isWhitespace( content.charAt(content.length() - 1) );
@@ -90,8 +90,8 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
                         }
                         childrenIt.previous();
                     }
-                } else if (item instanceof CommentToken) {
-                    String content = ((CommentToken) item).getCommentedContent().trim();
+                } else if (item instanceof CommentNode) {
+                    String content = ((CommentNode) item).getCommentedContent().trim();
                     writer.write(content);
                 } else if (item instanceof BaseToken) {
                     ((BaseToken)item).serialize(this, writer);

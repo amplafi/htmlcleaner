@@ -48,11 +48,11 @@ import org.htmlcleaner.BaseToken;
  * Created by: Vladimir Nikic<br/>
  * Date: November, 2006.
  */
-public class CommentToken implements BaseToken, HtmlNode {
+public class CommentNode implements BaseToken, HtmlNode {
 
     private StringBuilder content;
 
-    public CommentToken(String content) {
+    public CommentNode(String content) {
         this.content = new StringBuilder(content);
     }
 

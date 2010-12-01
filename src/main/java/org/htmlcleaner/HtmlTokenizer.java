@@ -308,7 +308,7 @@ abstract public class HtmlTokenizer {
 
     private boolean addSavedAsContent() {
         if (_saved.length() > 0) {
-            addToken( new ContentToken(_saved.toString()) );
+            addToken( new ContentNode(_saved.toString()) );
             _saved.delete(0, _saved.length());
             return true;
         }
@@ -607,7 +607,7 @@ abstract public class HtmlTokenizer {
             }
 
             if (_asExpected) {
-                _currentTagToken.addAttribute(attName, attValue);
+                _currentTagToken.setAttribute(attName, attValue);
             }
         }
     }
@@ -721,7 +721,7 @@ abstract public class HtmlTokenizer {
         			comment = comment.substring(0, len - 1) + hyphenRepl;
         		}
 
-        		addToken( new CommentToken(comment) );
+        		addToken( new CommentNode(comment) );
         	}
             _saved.delete(0, _saved.length());
         }

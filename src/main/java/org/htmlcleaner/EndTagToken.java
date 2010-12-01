@@ -55,7 +55,7 @@ public class EndTagToken extends TagToken {
         super(name == null ? null : name.toLowerCase());
     }
 
-    void addAttribute(String attName, String attValue) {
+    void setAttribute(String attName, String attValue) {
         // do nothing - simply ignore attributes in closing tag
     }
     

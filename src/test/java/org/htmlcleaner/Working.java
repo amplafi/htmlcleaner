@@ -1,18 +1,8 @@
 package org.htmlcleaner;
 
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-import org.htmlcleaner.*;
-import org.w3c.dom.Document;
-
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.stream.StreamResult;
-import java.util.List;
-import java.util.Map;
-import java.util.Iterator;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.File;
-import java.net.URL;
 
 /**
  * Vladimir Nikic
@@ -48,7 +38,7 @@ public class Working {
         props.setUseEmptyElementTags(false);
         props.setOmitXmlDeclaration(true);
         props.setOmitDoctypeDeclaration(false);
-        props.setNamespacesAware(true);
+        props.setNamespacesAware(false);
 
         long start = System.currentTimeMillis();
 
@@ -76,21 +66,21 @@ public class Working {
                     } else if ("b".equals(tagNode.getName())) {
                         TagNode spanNode = new TagNode("span");
                         spanNode.setAttribute("style", "font-weight:bold;");
-                        spanNode.addChild(new ContentToken("BOLD: "));
+                        spanNode.addChild(new ContentNode("BOLD: "));
                         spanNode.addChildren(tagNode.getChildren());
                         parentNode.replaceChild(tagNode, spanNode);
                     } else if ("h4".equals(tagNode.getName())) {
                         System.out.println("H4 index: " + parentNode.getChildIndex(tagNode));
-                        parentNode.insertChild(0, new CommentToken("very first comment"));
-                        parentNode.insertChildBefore(tagNode, new CommentToken("before H4"));
-                        parentNode.insertChildAfter(tagNode, new CommentToken("after H4"));
+                        parentNode.insertChild(0, new CommentNode("very first comment"));
+                        parentNode.insertChildBefore(tagNode, new CommentNode("before H4"));
+                        parentNode.insertChildAfter(tagNode, new CommentNode("after H4"));
                     }
-                } else if (node instanceof ContentToken) {
-                    StringBuilder content = ((ContentToken)node).getContent();
+                } else if (node instanceof ContentNode) {
+                    StringBuilder content = ((ContentNode)node).getContent();
                     if (content.indexOf("one") >= 0) {
                         content.insert(0, "MY TEXT: ");
                     }
-                } else if (node instanceof CommentToken) {
+                } else if (node instanceof CommentNode) {
                     parentNode.removeChild(node);
                 }
 

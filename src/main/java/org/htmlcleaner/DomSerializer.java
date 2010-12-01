@@ -56,11 +56,11 @@ public class DomSerializer {
             Iterator it = tagChildren.iterator();
             while (it.hasNext()) {
                 Object item = it.next();
-                if (item instanceof CommentToken) {
-                    CommentToken commentToken = (CommentToken) item;
-                    Comment comment = document.createComment( commentToken.getContent().toString() );
+                if (item instanceof CommentNode) {
+                    CommentNode commentNode = (CommentNode) item;
+                    Comment comment = document.createComment( commentNode.getContent().toString() );
                     element.appendChild(comment);
-                } else if (item instanceof ContentToken) {
+                } else if (item instanceof ContentNode) {
                     String nodeName = element.getNodeName();
                     String content = item.toString();
                     boolean specialCase = props.isUseCdataForScriptAndStyle() &&

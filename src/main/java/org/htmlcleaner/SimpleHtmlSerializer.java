@@ -53,7 +53,7 @@ public class SimpleHtmlSerializer extends HtmlSerializer {
 
         if ( !isMinimizedTagSyntax(tagNode) ) {
             for (Object item: tagNode.getChildren()) {
-                if ( item instanceof ContentToken ) {
+                if ( item instanceof ContentNode) {
                     String content = item.toString();
                     writer.write( dontEscape(tagNode) ? content : escapeText(content) );
                 } else if (item instanceof BaseToken) {

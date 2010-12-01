@@ -129,11 +129,21 @@ public abstract class XmlSerializer extends Serializer {
 
         writer.write("<" + tagName);
         for (Map.Entry<String, String> entry: tagNode.getAttributes().entrySet()) {
-            String attName = entry.getKey();
-            if ( !props.isNamespacesAware() && ("xmlns".equals(attName) || attName.startsWith("xmlns:")) ) {
-                continue;
+            writer.write(" " + entry.getKey() + "=\"" + escapeXml(entry.getValue()) + "\"");
+        }
+
+        if (props.isNamespacesAware()) {
+            Map<String, String> nsDeclarations = tagNode.getNamespaceDeclarations();
+            if (nsDeclarations != null) {
+                for (Map.Entry<String, String> entry: nsDeclarations.entrySet()) {
+                    String prefix = entry.getKey();
+                    String att = "xmlns";
+                    if (prefix.length() > 0) {
+                         att += ":" + prefix;
+                    }
+                    writer.write(" " + att + "=\"" + escapeXml(entry.getValue()) + "\"");
+                }
             }
-            writer.write(" " + attName + "=\"" + escapeXml(entry.getValue()) + "\"");
         }
 
         if ( isMinimizedTagSyntax(tagNode) ) {

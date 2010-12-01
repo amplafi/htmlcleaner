@@ -673,7 +673,7 @@ public class HtmlCleaner {
                 TagInfo tag = tagInfoProvider.getTagInfo( node.getName() );
                 addPossibleHeadCandidate(tag, node, cleanTimeValues);
 			} else {
-				if (child instanceof ContentToken) {
+				if (child instanceof ContentNode) {
 					toAdd = !"".equals(child.toString());
 				}
 			}

@@ -46,11 +46,11 @@ import java.io.Writer;
  * Created by: Vladimir Nikic<br/>
  * Date: November, 2006.
  */
-public class ContentToken implements BaseToken, HtmlNode {
+public class ContentNode implements BaseToken, HtmlNode {
 
     private StringBuilder content;
 
-    public ContentToken(String content) {
+    public ContentNode(String content) {
         this.content = new StringBuilder(content);
     }
 

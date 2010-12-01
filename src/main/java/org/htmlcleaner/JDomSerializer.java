@@ -101,11 +101,11 @@ public class JDomSerializer {
             Iterator it = tagChildren.iterator();
             while (it.hasNext()) {
                 Object item = it.next();
-                if (item instanceof CommentToken) {
-                    CommentToken commentToken = (CommentToken) item;
-                    Comment comment = factory.comment( commentToken.getContent().toString() );
+                if (item instanceof CommentNode) {
+                    CommentNode commentNode = (CommentNode) item;
+                    Comment comment = factory.comment( commentNode.getContent().toString() );
                     element.addContent(comment);
-                } else if (item instanceof ContentToken) {
+                } else if (item instanceof ContentNode) {
                     String nodeName = element.getName();
                     String content = item.toString();
                     boolean specialCase = props.isUseCdataForScriptAndStyle() &&

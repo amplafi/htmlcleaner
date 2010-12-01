@@ -39,7 +39,6 @@ package org.htmlcleaner;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.*;
 
 /**
  * <p>Simple XML serializer - creates resulting XML without indenting lines.</p>
@@ -58,7 +57,7 @@ public class SimpleXmlSerializer extends XmlSerializer {
 
         if ( !isMinimizedTagSyntax(tagNode) ) {
             for (Object item: tagNode.getChildren()) {
-                if ( item instanceof ContentToken ) {
+                if ( item instanceof ContentNode) {
                     String content = item.toString();
                     writer.write( dontEscape(tagNode) ? content.replaceAll("]]>", "]]&gt;") : escapeXml(content) );
                 } else if (item instanceof BaseToken) {

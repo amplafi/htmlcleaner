@@ -63,6 +63,6 @@ public abstract class TagToken implements BaseToken {
 		return name;
 	}
 
-    abstract void addAttribute(String attName, String attValue);
+    abstract void setAttribute(String attName, String attValue);
 
 }

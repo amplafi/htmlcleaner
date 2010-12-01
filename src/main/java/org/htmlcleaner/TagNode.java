@@ -37,15 +37,14 @@
 
 package org.htmlcleaner;
 
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.util.*;
 
 /**
  * <p>
  *      XML node tag - basic node of the cleaned HTML tree. At the same time, it represents start tag token
  *      after HTML parsing phase and before cleaning phase. After cleaning process, tree structure remains
- *      containing tag nodes (TagNode class), content (text nodes - ContentToken), comments (CommentToken) 
+ *      containing tag nodes (TagNode class), content (text nodes - ContentNode), comments (CommentNode)
  *      and optionally doctype node (DoctypeToken).
  * </p>
  *
@@ -129,6 +128,7 @@ public class TagNode extends TagToken implements HtmlNode {
     private Map<String, String> attributes = new LinkedHashMap<String, String>();
     private List children = new ArrayList();
     private DoctypeToken docType = null;
+    private Map<String, String> nsDeclarations = null;
     private List<BaseToken> itemsToMove = null;
 
     private transient boolean isFormed = false;
@@ -191,10 +191,36 @@ public class TagNode extends TagToken implements HtmlNode {
      * @param attName
      * @param attValue
      */
-    public void setAttribute(String attName, String attValue) {
+    void setAttribute(String attName, String attValue) {
         if ( attName != null && !"".equals(attName.trim()) ) {
-            attributes.put( attName.toLowerCase(), attValue == null ? "" : attValue );
+            attName = attName.toLowerCase();
+            if ("xmlns".equals(attName)) {
+                addNamespaceDeclaration("", attValue);    
+            } else if (attName.startsWith("xmlns:")) {
+                addNamespaceDeclaration( attName.substring(6), attValue );
+            } else {
+                attributes.put(attName, attValue == null ? "" : attValue );
+            }
         }
+    }
+
+    /**
+     * Adds namespace declaration to the node
+     * @param nsPrefix Namespace prefix
+     * @param nsURI Namespace URI
+     */
+    public void addNamespaceDeclaration(String nsPrefix, String nsURI) {
+        if (nsDeclarations == null) {
+            nsDeclarations = new TreeMap<String, String>();
+        }
+        nsDeclarations.put(nsPrefix, nsURI);
+    }
+
+    /**
+     * @return Map of namespace declarations for this node
+     */
+    public Map<String, String> getNamespaceDeclarations() {
+        return nsDeclarations;
     }
 
     /**
@@ -258,7 +284,7 @@ public class TagNode extends TagToken implements HtmlNode {
         StringBuffer text = new StringBuffer();
         for (int i = 0; i < children.size(); i++) {
             Object item = children.get(i);
-            if (item instanceof ContentToken) {
+            if (item instanceof ContentNode) {
                 text.append(item.toString());
             } else if (item instanceof TagNode) {
                 StringBuffer subtext = ((TagNode)item).getText();
@@ -632,10 +658,10 @@ public class TagNode extends TagToken implements HtmlNode {
             for (Object child: children.toArray()) {  // make an array to avoid ConcurrentModificationException when some node is cut 
                 if (child instanceof TagNode) {
                     toContinue = ((TagNode)child).traverseInternally(visitor);
-                } else if (child instanceof ContentToken) {
-                    toContinue = visitor.visit(this, (ContentToken)child);
-                } else if (child instanceof CommentToken) {
-                    toContinue = visitor.visit(this, (CommentToken)child);
+                } else if (child instanceof ContentNode) {
+                    toContinue = visitor.visit(this, (ContentNode)child);
+                } else if (child instanceof CommentNode) {
+                    toContinue = visitor.visit(this, (CommentNode)child);
                 }
                 if (!toContinue) {
                     return false;
