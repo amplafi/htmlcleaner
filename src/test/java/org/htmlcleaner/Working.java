@@ -110,7 +110,7 @@ public class Working {
         new XMLOutputter(Format.getPrettyFormat()).output(jDom, System.out);
 
         org.w3c.dom.Document dom = new DomSerializer(props).createDOM(node);
-        OutputFormat of = new OutputFormat("XML","ISO-8859-1",true);
+        OutputFormat of = new OutputFormat("XML","utf-8",true);
         of.setIndent(1);
         of.setIndenting(true);
         XMLSerializer serializer = new XMLSerializer(System.out, of);
