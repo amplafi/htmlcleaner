@@ -1,5 +1,11 @@
 package org.htmlcleaner;
 
+import com.sun.org.apache.xml.internal.serialize.*;
+import org.jdom.*;
+import org.jdom.Document;
+import org.jdom.output.*;
+import org.w3c.dom.*;
+
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.File;
@@ -38,7 +44,7 @@ public class Working {
         props.setUseEmptyElementTags(false);
         props.setOmitXmlDeclaration(true);
         props.setOmitDoctypeDeclaration(false);
-        props.setNamespacesAware(false);
+        props.setNamespacesAware(true);
 
         long start = System.currentTimeMillis();
 
@@ -91,6 +97,7 @@ public class Working {
         System.out.println("Traverse time: " + (System.currentTimeMillis() - start));
         start = System.currentTimeMillis();
 
+//        props.setNamespacesAware(false);
         new SimpleHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/simplemamaout.html", "utf-8");
         new CompactHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/compactmamaout.html", "utf-8");
         new PrettyHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/prettymamaout.html", "utf-8");
@@ -99,8 +106,16 @@ public class Working {
         System.out.println("Serialize time: " + (System.currentTimeMillis() - start));
         start = System.currentTimeMillis();
 
-        new JDomSerializer(props).createJDom(node);
-        new DomSerializer(props).createDOM(node);
+        Document jDom = new JDomSerializer(props).createJDom(node);
+        new XMLOutputter(Format.getPrettyFormat()).output(jDom, System.out);
+
+        org.w3c.dom.Document dom = new DomSerializer(props).createDOM(node);
+        OutputFormat of = new OutputFormat("XML","ISO-8859-1",true);
+        of.setIndent(1);
+        of.setIndenting(true);
+        XMLSerializer serializer = new XMLSerializer(System.out, of);
+        serializer.asDOMSerializer();
+        serializer.serialize(dom);
 
 
 //        for (int i = 0; i < resources.length; i++) {

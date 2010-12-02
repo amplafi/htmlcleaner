@@ -148,12 +148,22 @@ public abstract class HtmlSerializer extends Serializer {
     protected void serializeOpenTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
         String tagName = tagNode.getName();
 
-        writer.write("<" + tagName);
-        for (Map.Entry<String, String> entry: tagNode.getAttributes().entrySet()) {
-            writer.write(" " + entry.getKey() + "=\"" + escapeText(entry.getValue()) + "\"");
+        boolean nsAware = props.isNamespacesAware();
+
+        if (!nsAware && Utils.getXmlNSPrefix(tagName) != null ) {
+            tagName = Utils.getXmlName(tagName);
         }
 
-        if (props.isNamespacesAware()) {
+        writer.write("<" + tagName);
+        for (Map.Entry<String, String> entry: tagNode.getAttributes().entrySet()) {
+            String attName = entry.getKey();
+            if (!nsAware && Utils.getXmlNSPrefix(attName) != null ) {
+                attName = Utils.getXmlName(attName);
+            }
+            writer.write(" " + attName + "=\"" + escapeText(entry.getValue()) + "\"");
+        }
+
+        if (nsAware) {
             Map<String, String> nsDeclarations = tagNode.getNamespaceDeclarations();
             if (nsDeclarations != null) {
                 for (Map.Entry<String, String> entry: nsDeclarations.entrySet()) {
@@ -179,6 +189,10 @@ public abstract class HtmlSerializer extends Serializer {
 
     protected void serializeEndTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
         String tagName = tagNode.getName();
+        if (Utils.getXmlNSPrefix(tagName) != null && !props.isNamespacesAware()) {
+            tagName = Utils.getXmlName(tagName);
+        }
+
         writer.write( "</" + tagName + ">" );
         if (newLine) {
             writer.write("\n");

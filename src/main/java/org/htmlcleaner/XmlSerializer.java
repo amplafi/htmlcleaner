@@ -38,9 +38,7 @@
 package org.htmlcleaner;
 
 import java.io.*;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>Abstract XML serializer - contains common logic for descendants.</p>
@@ -127,12 +125,54 @@ public abstract class XmlSerializer extends Serializer {
     protected void serializeOpenTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
         String tagName = tagNode.getName();
 
-        writer.write("<" + tagName);
-        for (Map.Entry<String, String> entry: tagNode.getAttributes().entrySet()) {
-            writer.write(" " + entry.getKey() + "=\"" + escapeXml(entry.getValue()) + "\"");
+        boolean nsAware = props.isNamespacesAware();
+
+        Set<String> definedNSPrefixes = null;
+        Set<String> additionalNSDeclNeeded = null;
+
+        String tagPrefix = Utils.getXmlNSPrefix(tagName);
+        if (tagPrefix != null) {
+            if (nsAware) {
+                definedNSPrefixes = new HashSet<String>();
+                tagNode.collectNamespacePrefixesOnPath(definedNSPrefixes);
+                if ( !definedNSPrefixes.contains(tagPrefix) ) {
+                    additionalNSDeclNeeded = new TreeSet<String>();
+                    additionalNSDeclNeeded.add(tagPrefix);
+                }
+            } else {
+                tagName = Utils.getXmlName(tagName);
+            }
         }
 
-        if (props.isNamespacesAware()) {
+        writer.write("<" + tagName);
+
+        // write attributes
+        for (Map.Entry<String, String> entry: tagNode.getAttributes().entrySet()) {
+            String attName = entry.getKey();
+            String attPrefix = Utils.getXmlNSPrefix(attName);
+            if (attPrefix != null) {
+                if (nsAware) {
+                    // collect used namespace prefixes in attributes in order to explicitly define
+                    // ns declaration if needed; otherwise it would be ill-formed xml
+                    if (definedNSPrefixes == null) {
+                        definedNSPrefixes = new HashSet<String>();
+                        tagNode.collectNamespacePrefixesOnPath(definedNSPrefixes);
+                    }
+                    if ( !definedNSPrefixes.contains(attPrefix) ) {
+                        if (additionalNSDeclNeeded == null) {
+                            additionalNSDeclNeeded = new TreeSet<String>();
+                        }
+                        additionalNSDeclNeeded.add(attPrefix);
+                    }
+                } else {
+                    attName = Utils.getXmlName(attName);
+                }
+            }
+            writer.write(" " + attName + "=\"" + escapeXml(entry.getValue()) + "\"");
+        }
+
+        // write namespace declarations 
+        if (nsAware) {
             Map<String, String> nsDeclarations = tagNode.getNamespaceDeclarations();
             if (nsDeclarations != null) {
                 for (Map.Entry<String, String> entry: nsDeclarations.entrySet()) {
@@ -143,6 +183,13 @@ public abstract class XmlSerializer extends Serializer {
                     }
                     writer.write(" " + att + "=\"" + escapeXml(entry.getValue()) + "\"");
                 }
+            }
+        }
+
+        // write additional namespace declarations needed for this tag in order xml to be well-formed
+        if (additionalNSDeclNeeded != null) {
+            for (String prefix: additionalNSDeclNeeded) {
+                writer.write(" xmlns:" + prefix + "=\"" + prefix + "\"");
             }
         }
 
@@ -165,6 +212,9 @@ public abstract class XmlSerializer extends Serializer {
             writer.write("]]>");
         }
 
+        if (Utils.getXmlNSPrefix(tagName) != null && !props.isNamespacesAware()) {
+            tagName = Utils.getXmlName(tagName);
+        }
         writer.write( "</" + tagName + ">" );
 
         if (newLine) {

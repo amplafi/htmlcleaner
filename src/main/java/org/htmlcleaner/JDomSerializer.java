@@ -20,8 +20,6 @@ public class JDomSerializer {
     protected CleanerProperties props;
     protected boolean escapeXml = true;
 
-    private Map<String, Namespace> namespaces = new HashMap<String, Namespace>();
-
     public JDomSerializer(CleanerProperties props, boolean escapeXml) {
         this.props = props;
         this.escapeXml = escapeXml;
@@ -35,15 +33,8 @@ public class JDomSerializer {
         this.factory = new DefaultJDOMFactory();
         Element rootElement = createElement(rootNode);
         Document document = this.factory.document(rootElement);
-        
-        for (Map.Entry<String, String> entry: rootNode.getAttributes().entrySet()) {
-            String attrName = entry.getKey();
-            String attrValue = entry.getValue();
-            if (escapeXml) {
-                attrValue = Utils.escapeXml(attrValue, props, true);
-            }
-            setAttribute(rootElement, attrName, attrValue);
-        }
+
+        setAttributes(rootNode, rootElement);
 
         createSubnodes(rootElement, rootNode.getChildren());
 
@@ -51,47 +42,81 @@ public class JDomSerializer {
     }
 
     private Element createElement(TagNode node) {
-        defineNamespaces(node, null);
-
         String name = node.getName();
+        boolean nsAware = props.isNamespacesAware();
         String prefix = Utils.getXmlNSPrefix(name);
+        Map<String, String> nsDeclarations = node.getNamespaceDeclarations();
+        String nsURI = null;
         if (prefix != null) {
-            return factory.element(Utils.getXmlName(name), namespaces.get(prefix));
+            name = Utils.getXmlName(name);
+            if (nsAware) {
+                if (nsDeclarations != null) {
+                    nsURI = nsDeclarations.get(prefix);
+                }
+                if (nsURI == null) {
+                    nsURI = node.getNamespaceURIOnPath(prefix);
+                }
+                if (nsURI == null) {
+                    nsURI = prefix;
+                }
+            }
         } else {
-            return factory.element(name);
+            if (nsAware) {
+                if (nsDeclarations != null) {
+                    nsURI = nsDeclarations.get("");
+                }
+                if (nsURI == null) {
+                    nsURI = node.getNamespaceURIOnPath(prefix);
+                }
+            }
         }
+
+        Element element;
+        if (nsAware && nsURI != null) {
+            Namespace ns = prefix == null ? Namespace.getNamespace(nsURI) : Namespace.getNamespace(prefix, nsURI);
+            element = factory.element(name, ns);
+        } else {
+            element = factory.element(name);
+        }
+
+        if (nsAware) {
+            defineNamespaceDeclarations(node, element);
+        }
+        return element;
     }
 
-    private void defineNamespaces(TagNode node, Element element) {
-        for (Map.Entry<String, String> attEntry: node.getAttributes().entrySet()) {
-            String attName = attEntry.getKey();
-            if (attName.startsWith("xmlns")) {
-                String attValue = attEntry.getValue();
-                if (attName.length() == 5) {
-                    Namespace namespace = Namespace.getNamespace(attValue);
-                    namespaces.put("", namespace);
-                    if (element != null) {
-                        element.addNamespaceDeclaration(namespace);
-                    }
-                } else if (attName.charAt(5) == ':') {
-                    String attPrefix = attName.substring(6);
-                    Namespace namespace = Namespace.getNamespace(attPrefix, attValue);
-                    namespaces.put(attPrefix, namespace);
-                    if (element != null) {
-                        element.addNamespaceDeclaration(namespace);
-                    }
-                }
+    private void defineNamespaceDeclarations(TagNode node, Element element) {
+        Map<String, String> nsDeclarations = node.getNamespaceDeclarations();
+        if (nsDeclarations != null) {
+            for (Map.Entry<String, String> nsEntry: nsDeclarations.entrySet()) {
+                String nsPrefix = nsEntry.getKey();
+                String nsURI = nsEntry.getValue();
+                Namespace ns = nsPrefix == null || "".equals(nsPrefix) ? Namespace.getNamespace(nsURI) : Namespace.getNamespace(nsPrefix, nsURI);
+                element.addNamespaceDeclaration(ns);
             }
         }
     }
 
-    private void setAttribute(Element element, String attrName, String attrValue) {
-        if (!attrName.startsWith("xmlns")) {
-            String prefix = Utils.getXmlNSPrefix(attrName);
-            if (prefix != null) {
-                element.setAttribute( Utils.getXmlName(attrName), attrValue, namespaces.get(prefix) );
-            } else {
+    private void setAttributes(TagNode node, Element element) {
+        for (Map.Entry<String, String> entry: node.getAttributes().entrySet()) {
+            String attrName = entry.getKey();
+            String attrValue = entry.getValue();
+            String attPrefix = Utils.getXmlNSPrefix(attrName);
+            Namespace ns = null;
+            if (attPrefix != null) {
+                attrName = Utils.getXmlName(attrName);
+                if (props.isNamespacesAware()) {
+                    String nsURI = node.getNamespaceURIOnPath(attPrefix);
+                    if (nsURI == null) {
+                        nsURI = attPrefix;
+                    }
+                    ns = Namespace.getNamespace(attPrefix, nsURI);
+                }
+            }
+            if (ns == null) {
                 element.setAttribute(attrName, attrValue);
+            } else {
+                element.setAttribute(attrName, attrValue, ns);
             }
         }
     }
@@ -118,11 +143,8 @@ public class JDomSerializer {
                 } else if (item instanceof TagNode) {
                     TagNode subTagNode = (TagNode) item;
                     Element subelement = createElement(subTagNode);
-                    for (Map.Entry<String, String> entry: subTagNode.getAttributes().entrySet()) {
-                        String attrName = entry.getKey();
-                        String attrValue = entry.getValue();
-                        setAttribute(subelement, attrName, attrValue);
-                    }
+
+                    setAttributes(subTagNode, subelement);
 
                     // recursively create subnodes
                     createSubnodes(subelement, subTagNode.getChildren());

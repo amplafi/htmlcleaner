@@ -127,8 +127,7 @@ public class PropertiesTest extends TestCase {
         assertTrue( getXmlString().indexOf("&lt;?INSTRUCTION2 id=&quot;bbb&quot;&gt;") >= 0 );
 
         properties.setNamespacesAware(true);
-        assertTrue( getXmlString().indexOf("<html xmlns:my=\"my\">") >= 0 );
-        assertTrue( getXmlString().indexOf("<my:tag id=\"xxx\">aaa</my:tag>") >= 0 );
+        assertTrue( getXmlString().indexOf("<my:tag id=\"xxx\" xmlns:my=\"my\">aaa</my:tag>") >= 0 );
         properties.setNamespacesAware(false);
         assertTrue( getXmlString().indexOf("<html") >= 0 );
         assertTrue( getXmlString().indexOf("<tag id=\"xxx\">aaa</tag>") >= 0 );

@@ -671,6 +671,39 @@ public class TagNode extends TagToken implements HtmlNode {
         return true;
     }
 
+
+    /**
+     * Collect all prefixes in namespace declarations up the path to the document root from the specified node
+     * @param prefixes Set of prefixes to be collected
+     */
+    void collectNamespacePrefixesOnPath(Set<String> prefixes) {
+        Map<String, String> nsDeclarations = getNamespaceDeclarations();
+        if (nsDeclarations != null) {
+            for (String prefix: nsDeclarations.keySet()) {
+                prefixes.add(prefix);
+            }
+        }
+        if (parent != null) {
+            parent.collectNamespacePrefixesOnPath(prefixes);
+        }
+    }
+
+    String getNamespaceURIOnPath(String nsPrefix) {
+        if (nsDeclarations != null) {
+            for (Map.Entry<String, String> nsEntry: nsDeclarations.entrySet()) {
+                String currName = nsEntry.getKey();
+                if ( currName.equals(nsPrefix) || ("".equals(currName) && nsPrefix == null) ) {
+                    return nsEntry.getValue();
+                }
+            }
+        }
+        if (parent != null) {
+            return parent.getNamespaceURIOnPath(nsPrefix);
+        }
+
+        return null;
+    }
+
     public void serialize(Serializer serializer, Writer writer) throws IOException {
     	serializer.serialize(this, writer);
     }
