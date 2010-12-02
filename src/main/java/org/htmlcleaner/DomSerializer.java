@@ -34,21 +34,77 @@ public class DomSerializer {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
         Document document = factory.newDocumentBuilder().newDocument();
-        Element rootElement = document.createElement(rootNode.getName());
+        Element rootElement = createElement(rootNode, document);
         document.appendChild(rootElement);
 
-        for (Map.Entry<String, String> entry: rootNode.getAttributes().entrySet()) {
+        setAttributes(rootNode, rootElement);
+
+        createSubnodes(document, rootElement, rootNode.getChildren());
+
+        return document;
+    }
+
+    private Element createElement(TagNode node, Document document) {
+        String name = node.getName();
+        boolean nsAware = props.isNamespacesAware();
+        String prefix = Utils.getXmlNSPrefix(name);
+        Map<String, String> nsDeclarations = node.getNamespaceDeclarations();
+        String nsURI = null;
+        if (prefix != null) {
+            if (nsAware) {
+                if (nsDeclarations != null) {
+                    nsURI = nsDeclarations.get(prefix);
+                }
+                if (nsURI == null) {
+                    nsURI = node.getNamespaceURIOnPath(prefix);
+                }
+                if (nsURI == null) {
+                    nsURI = prefix;
+                }
+            } else {
+                name = Utils.getXmlName(name);
+            }
+        } else {
+            if (nsAware) {
+                if (nsDeclarations != null) {
+                    nsURI = nsDeclarations.get("");
+                }
+                if (nsURI == null) {
+                    nsURI = node.getNamespaceURIOnPath(prefix);
+                }
+            }
+        }
+
+        if (nsAware && nsURI != null) {
+            return document.createElementNS(nsURI, name);
+        } else {
+            return document.createElement(name);
+        }
+    }
+
+    private void setAttributes(TagNode node, Element element) {
+        for (Map.Entry<String, String> entry: node.getAttributes().entrySet()) {
             String attrName = entry.getKey();
             String attrValue = entry.getValue();
             if (escapeXml) {
                 attrValue = Utils.escapeXml(attrValue, props, true);
             }
-            rootElement.setAttribute(attrName, attrValue);
+            
+            String attPrefix = Utils.getXmlNSPrefix(attrName);
+            if (attPrefix != null) {
+                if (props.isNamespacesAware()) {
+                    String nsURI = node.getNamespaceURIOnPath(attPrefix);
+                    if (nsURI == null) {
+                        nsURI = attPrefix;
+                    }
+                    element.setAttributeNS(nsURI, attrName, attrValue);
+                } else {
+                    element.setAttribute(Utils.getXmlName(attrName), attrValue);
+                }
+            } else {
+                element.setAttribute(attrName, attrValue);
+            }
         }
-
-        createSubnodes(document, rootElement, rootNode.getChildren());
-
-        return document;
     }
 
     private void createSubnodes(Document document, Element element, List tagChildren) {
@@ -71,15 +127,9 @@ public class DomSerializer {
                     element.appendChild( specialCase ? document.createCDATASection(content) : document.createTextNode(content) );
                 } else if (item instanceof TagNode) {
                     TagNode subTagNode = (TagNode) item;
-                    Element subelement = document.createElement( subTagNode.getName() );
-                    for ( Map.Entry<String, String> entry: subTagNode.getAttributes().entrySet() ) {
-                        String attrName = entry.getKey();
-                        String attrValue = entry.getValue();
-                        if (escapeXml) {
-                            attrValue = Utils.escapeXml(attrValue, props, true);
-                        }
-                        subelement.setAttribute(attrName, attrValue);
-                    }
+                    Element subelement = createElement(subTagNode, document);
+
+                    setAttributes(subTagNode, subelement);
 
                     // recursively create subnodes
                     createSubnodes(document, subelement, subTagNode.getChildren());

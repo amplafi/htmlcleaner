@@ -101,6 +101,9 @@ public class JDomSerializer {
         for (Map.Entry<String, String> entry: node.getAttributes().entrySet()) {
             String attrName = entry.getKey();
             String attrValue = entry.getValue();
+            if (escapeXml) {
+                attrValue = Utils.escapeXml(attrValue, props, true);
+            }
             String attPrefix = Utils.getXmlNSPrefix(attrName);
             Namespace ns = null;
             if (attPrefix != null) {
