@@ -55,6 +55,7 @@ public class CleanerProperties {
     boolean transResCharsToNCR = false;
     boolean useCdataForScriptAndStyle = true;
     boolean translateSpecialEntities = true;
+    boolean transSpecialEntitiesToNCR = false;
     boolean recognizeUnicodeChars = true;
     boolean omitUnknownTags = false;
     boolean treatUnknownTagsAsContent = false;
@@ -107,6 +108,14 @@ public class CleanerProperties {
 
     public void setTranslateSpecialEntities(boolean translateSpecialEntities) {
         this.translateSpecialEntities = translateSpecialEntities;
+    }
+
+    public boolean isTransSpecialEntitiesToNCR() {
+        return transSpecialEntitiesToNCR;
+    }
+
+    public void setTransSpecialEntitiesToNCR(boolean transSpecialEntitiesToNCR) {
+        this.transSpecialEntitiesToNCR = transSpecialEntitiesToNCR;
     }
 
     public boolean isRecognizeUnicodeChars() {

@@ -65,6 +65,7 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
     private boolean transrescharstoncr = false;
     private boolean usecdata = true;
     private boolean specialentities = true;
+    private boolean transspecialentitiestoncr = false;
     private boolean unicodechars = true;
     private boolean omitunknowntags = false;
     private boolean treatunknowntagsascontent = false;
@@ -128,6 +129,10 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
 
     public void setSpecialentities(boolean specialentities) {
         this.specialentities = specialentities;
+    }
+
+    public void setTransspecialentitiestoncr(boolean transspecialentitiestoncr) {
+        this.transspecialentitiestoncr = transspecialentitiestoncr;
     }
 
     public void setUnicodechars(boolean unicodechars) {
@@ -234,6 +239,7 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
         props.setTransResCharsToNCR(this.transrescharstoncr);
         props.setUseCdataForScriptAndStyle(this.usecdata);
         props.setTranslateSpecialEntities(this.specialentities);
+        props.setTransSpecialEntitiesToNCR(this.transspecialentitiestoncr);
         props.setRecognizeUnicodeChars(this.unicodechars);
         props.setOmitUnknownTags(this.omitunknowntags);
         props.setTreatUnknownTagsAsContent(this.treatunknowntagsascontent);

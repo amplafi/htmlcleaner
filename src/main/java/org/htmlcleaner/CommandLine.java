@@ -87,6 +87,7 @@ public class CommandLine {
             System.err.println("    transrescharstoncr=true | false*");
             System.err.println("    usecdata=true* | false");
             System.err.println("    specialentities=true* | false");
+            System.err.println("    transspecialentitiestoncr=true | false*");
             System.err.println("    unicodechars=true* | false");
             System.err.println("    omitunknowntags=true | false*");
             System.err.println("    treatunknowntagsascontent=true | false*");
@@ -126,6 +127,7 @@ public class CommandLine {
         String transResCharsToNCR = getArgValue(args, "transrescharstoncr");
         String useCData = getArgValue(args, "usecdata");
         String translateSpecialEntities = getArgValue(args, "specialentities");
+        String transSpecialEntitiesToNCR = getArgValue(args, "transspecialentitiestoncr");
         String unicodeChars = getArgValue(args, "unicodechars");
         String omitUnknownTags = getArgValue(args, "omitunknowntags");
         String treatUnknownTagsAsContent = getArgValue(args, "treatunknowntagsascontent");
@@ -186,6 +188,10 @@ public class CommandLine {
 
         if ( !"".equals(translateSpecialEntities) ) {
             props.setTranslateSpecialEntities( toBoolean(translateSpecialEntities) );
+        }
+
+        if ( !"".equals(transSpecialEntitiesToNCR) ) {
+            props.setTransSpecialEntitiesToNCR( toBoolean(transSpecialEntitiesToNCR) );
         }
 
         if ( !"".equals(unicodeChars) ) {

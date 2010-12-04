@@ -111,7 +111,12 @@ public abstract class HtmlSerializer extends Serializer {
                             String entityKey = seq.substring(1, semiIndex);
                             SpecialEntity entity = SpecialEntity.getEntity(entityKey);
                             if (entity != null) {
-                                result.append( translateSpecialEntities ? entity.getCharacter() : entity.getEscapedValue() );
+                                if (translateSpecialEntities) {
+                                    result.append(props.isTransSpecialEntitiesToNCR() ? entity.getDecimalNCR() : entity.getCharacter());
+                                } else {
+                                    result.append(entity.getEscapedValue());
+                                }
+
                                 i += entityKey.length() + 1;
                                 continue;
                             }

@@ -40,7 +40,8 @@ public class Working {
 //        props.setIgnoreQuestAndExclam(true);
         props.setUseCdataForScriptAndStyle(false);
         props.setRecognizeUnicodeChars(true);
-        props.setTranslateSpecialEntities(false);
+        props.setTranslateSpecialEntities(true);
+        props.setTransSpecialEntitiesToNCR(true);
         props.setUseEmptyElementTags(false);
         props.setOmitXmlDeclaration(true);
         props.setOmitDoctypeDeclaration(false);
