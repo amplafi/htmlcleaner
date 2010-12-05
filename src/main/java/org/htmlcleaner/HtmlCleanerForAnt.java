@@ -84,6 +84,7 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
     private String prunetags = "";
     private String booleanatts = CleanerProperties.BOOL_ATT_SELF;
     private String nodebyxpath = null;
+    private boolean omitenvelope = false;
 
     private String transform = null;
 
@@ -208,6 +209,10 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
         this.nodebyxpath = nodebyxpath;
     }
 
+    public void setOmitenvelope(boolean omitenvelope) {
+        this.omitenvelope = omitenvelope;
+    }
+
     public void setTransform(String transform) {
         this.transform = transform;
     }
@@ -317,19 +322,19 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
             }
                 
             if ( "compact".equals(outputtype) ) {
-                new CompactXmlSerializer(props).writeToStream(node, out, outcharset);
+                new CompactXmlSerializer(props).writeToStream(node, out, outcharset, omitenvelope);
             } else if ( "browser-compact".equals(outputtype) ) {
-                new BrowserCompactXmlSerializer(props).writeToStream(node, out, outcharset);
+                new BrowserCompactXmlSerializer(props).writeToStream(node, out, outcharset, omitenvelope);
             } else if ( "pretty".equals(outputtype) ) {
-                new PrettyXmlSerializer(props).writeToStream(node, out, outcharset);
+                new PrettyXmlSerializer(props).writeToStream(node, out, outcharset, omitenvelope);
             } else if ( "htmlsimple".equals(outputtype) ) {
-                new SimpleHtmlSerializer(props).writeToStream(node, out, outcharset);
+                new SimpleHtmlSerializer(props).writeToStream(node, out, outcharset, omitenvelope);
             } else if ( "htmlcompact".equals(outputtype) ) {
-                new CompactHtmlSerializer(props).writeToStream(node, out, outcharset);
+                new CompactHtmlSerializer(props).writeToStream(node, out, outcharset, omitenvelope);
             } else if ( "htmlpretty".equals(outputtype) ) {
-                new PrettyHtmlSerializer(props).writeToStream(node, out, outcharset);
+                new PrettyHtmlSerializer(props).writeToStream(node, out, outcharset, omitenvelope);
             } else {
-                new SimpleXmlSerializer(props).writeToStream(node, out, outcharset);
+                new SimpleXmlSerializer(props).writeToStream(node, out, outcharset, omitenvelope);
             }
         } catch (IOException e) {
              throw new BuildException(e);
