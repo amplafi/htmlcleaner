@@ -125,6 +125,10 @@ public abstract class XmlSerializer extends Serializer {
     protected void serializeOpenTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
         String tagName = tagNode.getName();
 
+        if (Utils.isEmptyString(tagName)) {
+            return;
+        }
+        
         boolean nsAware = props.isNamespacesAware();
 
         Set<String> definedNSPrefixes = null;
@@ -207,6 +211,10 @@ public abstract class XmlSerializer extends Serializer {
 
     protected void serializeEndTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
         String tagName = tagNode.getName();
+
+        if (Utils.isEmptyString(tagName)) {
+            return;
+        }
 
         if (dontEscape(tagNode)) {
             writer.write("]]>");

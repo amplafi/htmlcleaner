@@ -137,7 +137,8 @@ public class PrettyXmlSerializer extends XmlSerializer {
 
     protected void serializePrettyXml(TagNode tagNode, Writer writer, int level) throws IOException {
         List tagChildren = tagNode.getChildren();
-        String indent = getIndent(level);
+        boolean isHeadlessNode = Utils.isEmptyString(tagNode.getName());
+        String indent = isHeadlessNode ? "" : getIndent(level);
 
         writer.write(indent);
         serializeOpenTag(tagNode, writer, true);
@@ -152,17 +153,19 @@ public class PrettyXmlSerializer extends XmlSerializer {
             		writer.write( singleLine.replaceAll("]]>", "]]&gt;") );
             	}
             } else {
-            	writer.write("\n");
+                if (!isHeadlessNode) {
+            	    writer.write("\n");
+                }
                 for (Object child: tagChildren) {
                     if (child instanceof TagNode) {
-                        serializePrettyXml( (TagNode)child, writer, level + 1 );
+                        serializePrettyXml( (TagNode)child, writer, isHeadlessNode ? level : level + 1 );
                     } else if (child instanceof ContentNode) {
                         String content = dontEscape ? child.toString().replaceAll("]]>", "]]&gt;") : escapeXml(child.toString());
-                        writer.write( getIndentedText(content, level + 1) );
+                        writer.write( getIndentedText(content, isHeadlessNode ? level : level + 1) );
                     } else if (child instanceof CommentNode) {
                         CommentNode commentNode = (CommentNode) child;
                         String content = commentNode.getCommentedContent();
-                        writer.write( getIndentedText(content, level + 1) );
+                        writer.write( getIndentedText(content, isHeadlessNode ? level : level + 1) );
                     }
                 }
             }

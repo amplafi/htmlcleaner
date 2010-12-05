@@ -41,7 +41,7 @@ public class Working {
         props.setUseCdataForScriptAndStyle(false);
         props.setRecognizeUnicodeChars(true);
         props.setTranslateSpecialEntities(true);
-        props.setTransSpecialEntitiesToNCR(true);
+        props.setTransSpecialEntitiesToNCR(false);
         props.setUseEmptyElementTags(false);
         props.setOmitXmlDeclaration(true);
         props.setOmitDoctypeDeclaration(false);
@@ -99,10 +99,13 @@ public class Working {
         start = System.currentTimeMillis();
 
 //        props.setNamespacesAware(false);
-        new SimpleHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/simplemamaout.html", "utf-8");
-        new CompactHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/compactmamaout.html", "utf-8");
-        new PrettyHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/prettymamaout.html", "utf-8");
-        new PrettyXmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/prettymamaout.xml", "utf-8");
+        new SimpleHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/simplemamaout.html", "utf-8", true);
+        new CompactHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/compactmamaout.html", "utf-8", true);
+        new PrettyHtmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/prettymamaout.html", "utf-8", true);
+        new SimpleXmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/simplemamaout.xml", "utf-8", true);
+        new CompactXmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/compactmamaout.xml", "utf-8", true);
+        new BrowserCompactXmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/browsercompactmamaout.xml", "utf-8", true);
+        new PrettyXmlSerializer(props).writeToFile(node, "c:/temp/htmlcleanertest/prettymamaout.xml", "utf-8", true);
 
         System.out.println("Serialize time: " + (System.currentTimeMillis() - start));
         start = System.currentTimeMillis();

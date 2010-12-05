@@ -153,6 +153,10 @@ public abstract class HtmlSerializer extends Serializer {
     protected void serializeOpenTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
         String tagName = tagNode.getName();
 
+        if (Utils.isEmptyString(tagName)) {
+            return;
+        }
+
         boolean nsAware = props.isNamespacesAware();
 
         if (!nsAware && Utils.getXmlNSPrefix(tagName) != null ) {
@@ -194,6 +198,11 @@ public abstract class HtmlSerializer extends Serializer {
 
     protected void serializeEndTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
         String tagName = tagNode.getName();
+
+        if (Utils.isEmptyString(tagName)) {
+            return;
+        }
+
         if (Utils.getXmlNSPrefix(tagName) != null && !props.isNamespacesAware()) {
             tagName = Utils.getXmlName(tagName);
         }

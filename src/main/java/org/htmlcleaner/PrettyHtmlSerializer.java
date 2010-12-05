@@ -60,7 +60,7 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
 	}
 
 	protected void serialize(TagNode tagNode, Writer writer) throws IOException {
-		serializePrettyHtml(tagNode, writer, 0, false, false);
+		serializePrettyHtml(tagNode, writer, 0, false, true);
 	}
 
 	/**
@@ -133,7 +133,9 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
 
     protected void serializePrettyHtml(TagNode tagNode, Writer writer, int level, boolean isPreserveWhitespaces, boolean isLastNewLine) throws IOException {
         List tagChildren = tagNode.getChildren();
-        String indent = getIndent(level);
+        String tagName = tagNode.getName();
+        boolean isHeadlessNode = Utils.isEmptyString(tagName);
+        String indent = isHeadlessNode ? "" : getIndent(level);
 
         if (!isPreserveWhitespaces) {
             if (!isLastNewLine) {
@@ -143,7 +145,7 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
         }
         serializeOpenTag(tagNode, writer, true);
 
-        boolean preserveWhitespaces = isPreserveWhitespaces || "pre".equalsIgnoreCase(tagNode.getName());
+        boolean preserveWhitespaces = isPreserveWhitespaces || "pre".equalsIgnoreCase(tagName);
 
         boolean lastWasNewLine = false;
 
@@ -157,7 +159,7 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
                 while (childIterator.hasNext()) {
                     Object child = childIterator.next();
                     if (child instanceof TagNode) {
-                        serializePrettyHtml((TagNode)child, writer, level + 1, preserveWhitespaces, lastWasNewLine);
+                        serializePrettyHtml((TagNode)child, writer, isHeadlessNode ? level : level + 1, preserveWhitespaces, lastWasNewLine);
                         lastWasNewLine = false;
                     } else if (child instanceof ContentNode) {
                         String content = dontEscape ? child.toString() : escapeText(child.toString());
@@ -170,7 +172,7 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
                                     lastWasNewLine = false;
                                 }
                                 if (content.trim().length() > 0) {
-                                    writer.write( getIndentedText(Utils.rtrim(content), level + 1) );
+                                    writer.write( getIndentedText(Utils.rtrim(content), isHeadlessNode ? level : level + 1) );
                                 } else {
                                     lastWasNewLine = true;
                                 }
@@ -191,7 +193,7 @@ public class PrettyHtmlSerializer extends HtmlSerializer {
                         }
                         CommentNode commentNode = (CommentNode) child;
                         String content = commentNode.getCommentedContent();
-                        writer.write( dontEscape ? content : getIndentedText(content, level + 1) );
+                        writer.write( dontEscape ? content : getIndentedText(content, isHeadlessNode ? level : level + 1) );
                     }
                 }
             }

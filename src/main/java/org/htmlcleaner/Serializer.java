@@ -45,39 +45,91 @@ import java.util.*;
  */
 public abstract class Serializer {
 
+    /**
+     * Used to implement serialization with missing envelope - omiting open and close tags, just
+     * serialize children.
+     */
+    private class HeadlessTagNode extends TagNode {
+        private HeadlessTagNode(TagNode wrappedNode) {
+            super("");
+            getAttributes().putAll(wrappedNode.getAttributes());
+            getChildren().addAll(wrappedNode.getChildren());
+            setDocType(wrappedNode.getDocType());
+            Map<String, String> nsDecls = getNamespaceDeclarations();
+            if (nsDecls != null) {
+                Map<String, String> wrappedNSDecls = wrappedNode.getNamespaceDeclarations();
+                if (wrappedNSDecls != null) {
+                    nsDecls.putAll(wrappedNSDecls);
+                }
+            }
+
+        }
+    }
+
 	protected CleanerProperties props;
 
 	protected Serializer(CleanerProperties props) {
 		this.props = props;
     }
 
+    public void writeToStream(TagNode tagNode, OutputStream out, String charset, boolean omitEnvelope) throws IOException {
+         write( tagNode, new OutputStreamWriter(out, charset), charset, omitEnvelope );
+    }
+
     public void writeToStream(TagNode tagNode, OutputStream out, String charset) throws IOException {
-         write( tagNode, new OutputStreamWriter(out, charset), charset );
+         writeToStream(tagNode, out, charset, false);
+    }
+
+    public void writeToStream(TagNode tagNode, OutputStream out, boolean omitEnvelope) throws IOException {
+         writeToStream( tagNode, out, HtmlCleaner.DEFAULT_CHARSET, omitEnvelope );
     }
 
     public void writeToStream(TagNode tagNode, OutputStream out) throws IOException {
-         writeToStream( tagNode, out, HtmlCleaner.DEFAULT_CHARSET );
+         writeToStream(tagNode, out, false);
+    }
+
+    public void writeToFile(TagNode tagNode, String fileName, String charset, boolean omitEnvelope) throws IOException {
+        writeToStream(tagNode, new FileOutputStream(fileName), charset, omitEnvelope );
     }
 
     public void writeToFile(TagNode tagNode, String fileName, String charset) throws IOException {
-        writeToStream(tagNode, new FileOutputStream(fileName), charset );
+        writeToFile(tagNode, fileName, charset, false);
+    }
+
+    public void writeToFile(TagNode tagNode, String fileName, boolean omitEnvelope) throws IOException {
+        writeToFile(tagNode,fileName, HtmlCleaner.DEFAULT_CHARSET, omitEnvelope);
     }
 
     public void writeToFile(TagNode tagNode, String fileName) throws IOException {
-        writeToFile(tagNode,fileName, HtmlCleaner.DEFAULT_CHARSET);
+        writeToFile(tagNode, fileName, false);
     }
 
-    public String getAsString(TagNode tagNode, String charset) throws IOException {
+    public String getAsString(TagNode tagNode, String charset, boolean omitEnvelope) throws IOException {
         StringWriter writer = new StringWriter();
-        write(tagNode, writer, charset);
+        write(tagNode, writer, charset, omitEnvelope);
         return writer.getBuffer().toString();
     }
 
-    public String getAsString(TagNode tagNode) throws IOException {
-        return getAsString(tagNode, HtmlCleaner.DEFAULT_CHARSET);
+    public String getAsString(TagNode tagNode, String charset) throws IOException {
+        return getAsString(tagNode, charset, false);
     }
-	
+
+    public String getAsString(TagNode tagNode, boolean omitEnvelope) throws IOException {
+        return getAsString(tagNode, HtmlCleaner.DEFAULT_CHARSET, omitEnvelope);
+    }
+
+    public String getAsString(TagNode tagNode) throws IOException {
+        return getAsString(tagNode, false);
+    }
+
     public void write(TagNode tagNode, Writer writer, String charset) throws IOException {
+        write(tagNode, writer, charset, false);
+    }
+
+    public void write(TagNode tagNode, Writer writer, String charset, boolean omitEnvelope) throws IOException {
+        if (omitEnvelope) {
+            tagNode = new HeadlessTagNode(tagNode);
+        }
         writer = new BufferedWriter(writer);
         if ( !props.isOmitXmlDeclaration() ) {
             String declaration = "<?xml version=\"1.0\"";
