@@ -28,6 +28,15 @@ public class SerializationTest extends TestCase {
         final Document dom2 = new DomSerializer(properties, false).createDOM(node);
         final org.jdom.Document jdom1 = new JDomSerializer(properties, true).createJDom(node);
         final org.jdom.Document jdom2 = new JDomSerializer(properties, false).createJDom(node);
+
+        String xml1 = new PrettyXmlSerializer(properties, "----").getAsString(node);
+        assertTrue(xml1.indexOf("--------<mama:div xmlns:mama=\"http://www.helloworld.com\">") > 0);
+        assertTrue(xml1.indexOf("----------------<sub>a</sub>") > 0);
+        assertTrue(xml1.indexOf("--------<!-- ZANZIBAR '\"&<>' -->") > 0);
+        assertTrue(xml1.indexOf("------------<x:button onclick=\"micko()\" xmlns:x=\"x\">PRITISNI</x:button>") > 0);
+
+        String xml2 = new PrettyXmlSerializer(properties, "").getAsString(node);
+        assertTrue(xml2.indexOf("\n<mama:div xmlns:mama=\"http://www.helloworld.com\">\n") > 0);
     }
 
 }

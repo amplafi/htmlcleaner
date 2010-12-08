@@ -255,7 +255,7 @@ public class Utils {
     					result.append("&amp;");
     				}
     			} else if (isReservedXmlChar(ch)) {
-    				result.append( props.transResCharsToNCR ? "&#" + (int)ch + ";" : RESERVED_XML_CHARS.get(ch) );
+    				result.append( props.transResCharsToNCR ? "&#" + (int)ch + ";" : (isDomCreation ? ch : RESERVED_XML_CHARS.get(ch)) );
     			} else {
     				result.append(ch);
     			}

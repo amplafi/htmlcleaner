@@ -36,7 +36,7 @@ public class Working {
 //                "c:/temp/htmlcleanertest/5.htm",
 //        };
 
-//        props.setTransResCharsToNCR(false);
+        props.setTransResCharsToNCR(false);
 //        props.setIgnoreQuestAndExclam(true);
         props.setUseCdataForScriptAndStyle(false);
         props.setRecognizeUnicodeChars(true);
