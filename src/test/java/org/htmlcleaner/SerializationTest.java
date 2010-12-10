@@ -37,6 +37,10 @@ public class SerializationTest extends TestCase {
 
         String xml2 = new PrettyXmlSerializer(properties, "").getAsString(node);
         assertTrue(xml2.indexOf("\n<mama:div xmlns:mama=\"http://www.helloworld.com\">\n") > 0);
+
+        node = cleaner.clean( new File("src/test/resources/test9.html") );
+        String xml3 = new CompactXmlSerializer(properties).getAsString(node);
+        assertTrue(xml3.indexOf("Moja mala nema mane...") >= 0);
     }
 
 }
