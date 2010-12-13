@@ -2,6 +2,7 @@ package org.htmlcleaner;
 
 import junit.framework.TestCase;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
@@ -25,6 +26,10 @@ public class ConstructorTest extends TestCase {
         props.setOmitComments(false);
         TagNode node3 = cleaner3.clean("<a href=index3.htm><b><!--COMMENT 3--><x>EEEEEEE text<body>");
         assertTrue( new SimpleXmlSerializer(props).getAsString(node3).indexOf("<!--COMMENT 3-->") > 0 );
+
+        TagNode node4 = cleaner3.clean( new ByteArrayInputStream( ("FIRST" + (char)0x2 + (char)0x3 + "SECOND").getBytes() ), "ASCII" );
+        assertTrue( new CompactXmlSerializer(props).getAsString(node4).indexOf("FIRST  SECOND") >= 0 );
+
     }
 
 }
