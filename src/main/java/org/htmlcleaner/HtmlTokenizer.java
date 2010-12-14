@@ -61,7 +61,8 @@ abstract public class HtmlTokenizer {
     private transient int _pos = 0;
     private transient int _len = -1;
 
-    private transient StringBuilder _saved = new StringBuilder(512);
+    private transient char _saved[] = new char[512];
+    private transient int _savedLen = 0;
 
     private transient boolean _isLateForDoctype = false;
     private transient DoctypeToken _docType = null;
@@ -284,7 +285,12 @@ abstract public class HtmlTokenizer {
      * @param ch
      */
     private void save(char ch) {
-        _saved.append(ch);
+        if (_savedLen >= _saved.length) {
+            char newSaved[] = new char[_saved.length + 512];
+            System.arraycopy(_saved, 0, newSaved, 0, _saved.length);
+            _saved = newSaved;
+        }
+        _saved[_savedLen++] = ch;
     }
 
     /**
@@ -323,9 +329,9 @@ abstract public class HtmlTokenizer {
     }
 
     private boolean addSavedAsContent() {
-        if (_saved.length() > 0) {
-            addToken( new ContentNode(_saved.toString()) );
-            _saved.delete(0, _saved.length());
+        if (_savedLen > 0) {
+            addToken( new ContentNode(new String(_saved, 0, _savedLen)) );
+            _savedLen = 0;
             return true;
         }
 
@@ -351,7 +357,7 @@ abstract public class HtmlTokenizer {
 
         while ( !isAllRead() ) {
             // resets all the runtime values
-            _saved.delete(0, _saved.length());
+            _savedLen = 0;
             _currentTagToken = null;
             _asExpected = true;
 
@@ -724,10 +730,10 @@ abstract public class HtmlTokenizer {
         	go(3);
         }
 
-        if (_saved.length() > 0) {
+        if (_savedLen > 0) {
             if ( !props.isOmitComments() ) {
                 String hyphenRepl = props.getHyphenReplacementInComment();
-                String comment = _saved.toString().replaceAll("--", hyphenRepl + hyphenRepl);
+                String comment = new String(_saved, 0, _savedLen).replaceAll("--", hyphenRepl + hyphenRepl);
 
         		if ( comment.length() > 0 && comment.charAt(0) == '-' ) {
         			comment = hyphenRepl + comment.substring(1);
@@ -739,7 +745,7 @@ abstract public class HtmlTokenizer {
 
         		addToken( new CommentNode(comment) );
         	}
-            _saved.delete(0, _saved.length());
+            _savedLen = 0;
         }
     }
     
