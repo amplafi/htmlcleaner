@@ -217,6 +217,22 @@ abstract public class HtmlTokenizer {
         return isChar(_pos, ch);
     }
 
+    private boolean isCharSimple(char ch) {
+        return (_len < 0 || _pos < _len) && (ch == _working[_pos]);
+    }
+
+    /**
+     * @return Current character to be read, but first it must be checked if it exists.
+     * This method is made for performance reasons to be used instead of isChar(...).
+     */
+    private char getCurrentChar() {
+        return _working[_pos];
+    }
+
+    private boolean isCharEquals(char ch) {
+        return _working[_pos] == ch;
+    }
+
     /**
      * Checks if character at specified position can be identifier start.
      * @param position
@@ -380,7 +396,7 @@ abstract public class HtmlTokenizer {
                     tagStart();
                 } else if ( props.isIgnoreQuestAndExclam() && (startsWith("<!") || startsWith("<?")) ) {
                     ignoreUntil('>');
-                    if (isChar('>')) {
+                    if (isCharSimple('>')) {
                         go();
                     }
                 } else {
@@ -448,7 +464,7 @@ abstract public class HtmlTokenizer {
                 addToken(_currentTagToken);
             }
 
-            if ( isChar('>') ) {
+            if ( isCharSimple('>') ) {
             	go();
                 if ( "script".equalsIgnoreCase(tagName) ) {
                     _isScriptContext = true;
@@ -508,7 +524,7 @@ abstract public class HtmlTokenizer {
                 addToken(_currentTagToken);
             }
 
-            if ( isChar('>') ) {
+            if ( isCharSimple('>') ) {
             	go();
             }
 
@@ -572,19 +588,19 @@ abstract public class HtmlTokenizer {
      * @throws IOException
      */
     private void tagAttributes() throws IOException {
-        while( !isAllRead() && _asExpected && !isChar('>') && !startsWith("/>") ) {
+        while( !isAllRead() && _asExpected && !isCharSimple('>') && !startsWith("/>") ) {
             skipWhitespaces();
             String attName = identifier();
 
             if (!_asExpected) {
-                if ( !isChar('<') && !isChar('>') && !startsWith("/>") ) {
+                if ( !isCharSimple('<') && !isCharSimple('>') && !startsWith("/>") ) {
                     if (isValidXmlChar()) {
                         saveCurrent();
                     }
                     go();
                 }
 
-                if (!isChar('<')) {
+                if (!isCharSimple('<')) {
                     _asExpected = true;
                 }
 
@@ -594,7 +610,7 @@ abstract public class HtmlTokenizer {
             String attValue;
 
             skipWhitespaces();
-            if ( isChar('=') ) {
+            if ( isCharSimple('=') ) {
                 saveCurrent();
                 go();
                 attValue = attributeValue();
@@ -623,7 +639,7 @@ abstract public class HtmlTokenizer {
     private String attributeValue() throws IOException {
         skipWhitespaces();
         
-        if ( isChar('<') || isChar('>') || startsWith("/>") ) {
+        if ( isCharSimple('<') || isCharSimple('>') || startsWith("/>") ) {
         	return "";
         }
 
@@ -632,11 +648,11 @@ abstract public class HtmlTokenizer {
 
         StringBuilder result = new StringBuilder();
 
-        if ( isChar('\'') ) {
+        if ( isCharSimple('\'') ) {
             isAposMode = true;
             saveCurrent();
             go();
-        } else if ( isChar('\"') ) {
+        } else if ( isCharSimple('\"') ) {
             isQuoteMode = true;
             saveCurrent();
             go();
@@ -647,9 +663,9 @@ abstract public class HtmlTokenizer {
         boolean allowHtml = props.isAllowHtmlInsideAttributes();
 
         while ( !isAllRead() &&
-                ( (isAposMode && !isChar('\'') && (allowHtml || !isChar('>') && !isChar('<')) && (isMultiWord || !isWhitespace())) ||
-                  (isQuoteMode && !isChar('\"') && (allowHtml || !isChar('>') && !isChar('<')) && (isMultiWord || !isWhitespace())) ||
-                  (!isAposMode && !isQuoteMode && !isWhitespace() && !isChar('>') && !isChar('<'))
+                ( (isAposMode && !isCharEquals('\'') && (allowHtml || !isCharEquals('>') && !isCharEquals('<')) && (isMultiWord || !isWhitespace())) ||
+                  (isQuoteMode && !isCharEquals('\"') && (allowHtml || !isCharEquals('>') && !isCharEquals('<')) && (isMultiWord || !isWhitespace())) ||
+                  (!isAposMode && !isQuoteMode && !isWhitespace() && !isCharEquals('>') && !isCharEquals('<'))
                 )
               ) {
             if (isValidXmlChar()) {
@@ -659,10 +675,10 @@ abstract public class HtmlTokenizer {
             go();
         }
 
-        if ( isChar('\'') && isAposMode ) {
+        if ( isCharSimple('\'') && isAposMode ) {
             saveCurrent();
             go();
-        } else if ( isChar('\"') && isQuoteMode ) {
+        } else if ( isCharSimple('\"') && isQuoteMode ) {
             saveCurrent();
             go();
         }
@@ -678,7 +694,7 @@ abstract public class HtmlTokenizer {
             }
             go();
 
-            if ( isChar('<') ) {
+            if ( isCharSimple('<') ) {
                 break;
             }
         }
