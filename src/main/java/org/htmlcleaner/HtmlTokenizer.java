@@ -174,6 +174,22 @@ abstract public class HtmlTokenizer {
         return true;
     }
 
+    private boolean startsWithSimple(String value) throws IOException {
+        int valueLen = value.length();
+        readIfNeeded(valueLen);
+        if (_len >= 0 && _pos + valueLen  > _len) {
+            return false;
+        }
+
+        for (int i = 0; i < valueLen; i++) {
+        	if (value.charAt(i) != _working[_pos + i]) {
+        		return false;
+        	}
+        }
+
+        return true;
+    }
+
     /**
      * Checks if character at specified position is whitespace.
      * @param position
@@ -367,7 +383,7 @@ abstract public class HtmlTokenizer {
             if (_isScriptContext) {
                 if ( startsWith("</script") && (isWhitespace(_pos + 8) || isChar(_pos + 8, '>')) ) {
                     tagEnd();
-                } else if ( isScriptEmpty && startsWith("<!--") ) {
+                } else if ( isScriptEmpty && startsWithSimple("<!--") ) {
                     comment();
                 } else {
                     boolean isTokenAdded = content();
@@ -392,15 +408,15 @@ abstract public class HtmlTokenizer {
                 	} else {
                 		ignoreUntil('<');
                 	}
-                } else if ( startsWith("</") && isIdentifierStartChar(_pos + 2) ) {
+                } else if ( startsWithSimple("</") && isIdentifierStartChar(_pos + 2) ) {
                 	_isLateForDoctype = true;
                     tagEnd();
-                } else if ( startsWith("<!--") ) {
+                } else if ( startsWithSimple("<!--") ) {
                     comment();
-                } else if ( startsWith("<") && isIdentifierStartChar(_pos + 1) ) {
+                } else if ( startsWithSimple("<") && isIdentifierStartChar(_pos + 1) ) {
                 	_isLateForDoctype = true;
                     tagStart();
-                } else if ( props.isIgnoreQuestAndExclam() && (startsWith("<!") || startsWith("<?")) ) {
+                } else if ( props.isIgnoreQuestAndExclam() && (startsWithSimple("<!") || startsWithSimple("<?")) ) {
                     ignoreUntil('>');
                     if (isCharSimple('>')) {
                         go();
@@ -475,7 +491,7 @@ abstract public class HtmlTokenizer {
                 if ( "script".equalsIgnoreCase(tagName) ) {
                     _isScriptContext = true;
                 }
-            } else if ( startsWith("/>") ) {
+            } else if ( startsWithSimple("/>") ) {
             	go(2);
                 if ( "script".equalsIgnoreCase(tagName) ) {
                     addToken( new EndTagToken(tagName) );
@@ -594,12 +610,12 @@ abstract public class HtmlTokenizer {
      * @throws IOException
      */
     private void tagAttributes() throws IOException {
-        while( !isAllRead() && _asExpected && !isCharSimple('>') && !startsWith("/>") ) {
+        while( !isAllRead() && _asExpected && !isCharSimple('>') && !startsWithSimple("/>") ) {
             skipWhitespaces();
             String attName = identifier();
 
             if (!_asExpected) {
-                if ( !isCharSimple('<') && !isCharSimple('>') && !startsWith("/>") ) {
+                if ( !isCharSimple('<') && !isCharSimple('>') && !startsWithSimple("/>") ) {
                     if (isValidXmlChar()) {
                         saveCurrent();
                     }
@@ -645,7 +661,7 @@ abstract public class HtmlTokenizer {
     private String attributeValue() throws IOException {
         skipWhitespaces();
         
-        if ( isCharSimple('<') || isCharSimple('>') || startsWith("/>") ) {
+        if ( isCharSimple('<') || isCharSimple('>') || startsWithSimple("/>") ) {
         	return "";
         }
 
@@ -719,14 +735,14 @@ abstract public class HtmlTokenizer {
 
     private void comment() throws IOException {
     	go(4);
-        while ( !isAllRead() && !startsWith("-->") ) {
+        while ( !isAllRead() && !startsWithSimple("-->") ) {
             if (isValidXmlChar()) {
                 saveCurrent();
             }
             go();
         }
 
-        if (startsWith("-->")) {
+        if (startsWithSimple("-->")) {
         	go(3);
         }
 
