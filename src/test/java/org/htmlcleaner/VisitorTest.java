@@ -19,6 +19,7 @@ public class VisitorTest extends TestCase {
     }
 
     public void testNodeTraverse() throws IOException, XPatherException {
+        final StringBuffer superstar = new StringBuffer();
         node.traverse(new TagNodeVisitor() {
             public boolean visit(TagNode parentNode, HtmlNode node) {
                 if (node instanceof TagNode) {
@@ -26,6 +27,11 @@ public class VisitorTest extends TestCase {
                     String name = tagNode.getName();
                     if ( "p".equals(name) ) {
                         tagNode.removeAllChildren();
+                    } else if ("h1".equals(name)) {
+                        if ("superstar".equals(tagNode.getAttributeByName("id"))) {
+                            superstar.append(tagNode.getText());
+                            return false;
+                        }
                     }
                 } else if (node instanceof ContentNode) {
                 } else if (node instanceof CommentNode) {
@@ -36,6 +42,8 @@ public class VisitorTest extends TestCase {
         });
 
         assertEquals(node.evaluateXPath("//p[1]/*").length, 0);
+        assertTrue("freestylo".equals(superstar.toString()));
+        assertEquals(node.evaluateXPath("//p[2]/*").length, 1);
     }
 
 }
