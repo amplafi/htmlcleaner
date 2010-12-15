@@ -54,6 +54,11 @@ public class ContentNode implements BaseToken, HtmlNode {
         this.content = new StringBuilder(content);
     }
 
+    ContentNode(char content[], int len) {
+        this.content = new StringBuilder(len + 16);
+        this.content.append(content, 0, len);
+    }
+
     public String toString() {
         return content.toString();
     }

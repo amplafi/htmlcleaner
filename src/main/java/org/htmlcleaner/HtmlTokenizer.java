@@ -74,8 +74,20 @@ abstract public class HtmlTokenizer {
     private boolean _isScriptContext = false;
 
     private CleanerProperties props;
+
+    private boolean isOmitUnknownTags;
+    private boolean isTreatUnknownTagsAsContent;
+    private boolean isOmitDeprecatedTags;
+    private boolean isTreatDeprecatedTagsAsContent;
+    private boolean isNamespacesAware;
+    private boolean isOmitComments;
+    private boolean isAllowMultiWordAttributes;
+    private boolean isAllowHtmlInsideAttributes;
+
     private CleanerTransformations transformations;
     private ITagInfoProvider tagInfoProvider;
+
+    private StringBuilder commonStr = new StringBuilder();
 
     /**
      * Constructor - cretes instance of the parser with specified content.
@@ -90,6 +102,14 @@ abstract public class HtmlTokenizer {
     public HtmlTokenizer(Reader reader, CleanerProperties props, CleanerTransformations transformations, ITagInfoProvider tagInfoProvider) throws IOException {
         this._reader = new BufferedReader(reader);
         this.props = props;
+        this.isOmitUnknownTags = props.isOmitUnknownTags();
+        this.isTreatUnknownTagsAsContent = props.isTreatUnknownTagsAsContent();
+        this.isOmitDeprecatedTags = props.isOmitDeprecatedTags();
+        this.isTreatDeprecatedTagsAsContent = props.isTreatDeprecatedTagsAsContent();
+        this.isNamespacesAware = props.isNamespacesAware();
+        this.isOmitComments = props.isOmitComments();
+        this.isAllowMultiWordAttributes = props.isAllowMultiWordAttributes();
+        this.isAllowHtmlInsideAttributes = props.isAllowHtmlInsideAttributes();
         this.transformations = transformations;
         this.tagInfoProvider = tagInfoProvider;
     }
@@ -211,6 +231,10 @@ abstract public class HtmlTokenizer {
         return isWhitespace(_pos);
     }
 
+    private boolean isWhitespaceSafe() {
+        return Character.isWhitespace( _working[_pos] );
+    }
+
     /**
      * Checks if character at specified position is equal to specified char.
      * @param position
@@ -286,7 +310,11 @@ abstract public class HtmlTokenizer {
     }
 
     private boolean isValidXmlChar() {
-        return (_len >= 0 && _pos >= _len) || Utils.isValidXmlChar(_working[_pos]);
+        return isAllRead() || Utils.isValidXmlChar(_working[_pos]);
+    }
+
+    private boolean isValidXmlCharSafe() {
+        return Utils.isValidXmlChar(_working[_pos]);
     }
 
     /**
@@ -318,6 +346,10 @@ abstract public class HtmlTokenizer {
         }
     }
 
+    private void saveCurrentSafe() {
+        save( _working[_pos] );
+    }
+
     /**
      * Saves specified number of characters at current runtime position to the temporary buffer.
      * @throws IOException
@@ -338,15 +370,15 @@ abstract public class HtmlTokenizer {
      * @throws IOException
      */
     private void skipWhitespaces() throws IOException {
-        while ( !isAllRead() && isWhitespace() ) {
-            saveCurrent();
+        while ( !isAllRead() && isWhitespaceSafe() ) {
+            saveCurrentSafe();
             go();
         }
     }
 
     private boolean addSavedAsContent() {
         if (_savedLen > 0) {
-            addToken( new ContentNode(new String(_saved, 0, _savedLen)) );
+            addToken(new ContentNode(_saved, _savedLen));
             _savedLen = 0;
             return true;
         }
@@ -436,7 +468,8 @@ abstract public class HtmlTokenizer {
      * @return
      */
     private boolean isReservedTag(String tagName) {
-        return "html".equalsIgnoreCase(tagName) || "head".equalsIgnoreCase(tagName) || "body".equalsIgnoreCase(tagName);
+        tagName = tagName.toLowerCase();
+        return "html".equals(tagName) || "head".equals(tagName) || "body".equals(tagName);
     }
 
     /**
@@ -465,8 +498,8 @@ abstract public class HtmlTokenizer {
 
         if (tagName != null) {
             TagInfo tagInfo = tagInfoProvider.getTagInfo(tagName);
-            if ( (tagInfo == null && !props.isOmitUnknownTags() && props.isTreatUnknownTagsAsContent() && !isReservedTag(tagName)) ||
-                 (tagInfo != null && tagInfo.isDeprecated() && !props.isOmitDeprecatedTags() && props.isTreatDeprecatedTagsAsContent()) ) {
+            if ( (tagInfo == null && !isOmitUnknownTags && isTreatUnknownTagsAsContent && !isReservedTag(tagName)) ||
+                 (tagInfo != null && tagInfo.isDeprecated() && !isOmitDeprecatedTags && isTreatDeprecatedTagsAsContent) ) {
                 content();
                 return;
             }
@@ -529,8 +562,8 @@ abstract public class HtmlTokenizer {
 
         if (tagName != null) {
             TagInfo tagInfo = tagInfoProvider.getTagInfo(tagName);
-            if ( (tagInfo == null && !props.isOmitUnknownTags() && props.isTreatUnknownTagsAsContent() && !isReservedTag(tagName)) ||
-                 (tagInfo != null && tagInfo.isDeprecated() && !props.isOmitDeprecatedTags() && props.isTreatDeprecatedTagsAsContent()) ) {
+            if ( (tagInfo == null && !isOmitUnknownTags && isTreatUnknownTagsAsContent && !isReservedTag(tagName)) ||
+                 (tagInfo != null && tagInfo.isDeprecated() && !isOmitDeprecatedTags && isTreatDeprecatedTagsAsContent) ) {
                 content();
                 return;
             }
@@ -572,24 +605,24 @@ abstract public class HtmlTokenizer {
             return null;
         }
 
-        StringBuilder identifierValue = new StringBuilder();
+        commonStr.delete(0, commonStr.length());
 
         while ( !isAllRead() && isIdentifierChar() ) {
-            saveCurrent();
-            identifierValue.append( _working[_pos] );
+            saveCurrentSafe();
+            commonStr.append( _working[_pos] );
             go();
         }
 
         // strip invalid characters from the end
-        while ( identifierValue.length() > 0 && Utils.isIdentifierHelperChar(identifierValue.charAt(identifierValue.length() - 1)) ) {
-            identifierValue.deleteCharAt( identifierValue.length() - 1 );
+        while ( commonStr.length() > 0 && Utils.isIdentifierHelperChar(commonStr.charAt(commonStr.length() - 1)) ) {
+            commonStr.deleteCharAt( commonStr.length() - 1 );
         }
 
-        if ( identifierValue.length() == 0 ) {
+        if ( commonStr.length() == 0 ) {
             return null;
         }
 
-        String id = identifierValue.toString();
+        String id = commonStr.toString();
 
         int columnIndex = id.indexOf(':');
         if (columnIndex >= 0) {
@@ -599,7 +632,7 @@ abstract public class HtmlTokenizer {
             if (nextColumnIndex >= 0) {
                 suffix = suffix.substring(0, nextColumnIndex);
             }
-            id = props.isNamespacesAware() ? (prefix + ":" + suffix) : suffix;
+            id = isNamespacesAware ? (prefix + ":" + suffix) : suffix;
         }
 
         return id;
@@ -633,7 +666,7 @@ abstract public class HtmlTokenizer {
 
             skipWhitespaces();
             if ( isCharSimple('=') ) {
-                saveCurrent();
+                saveCurrentSafe();
                 go();
                 attValue = attributeValue();
             } else if (CleanerProperties.BOOL_ATT_EMPTY.equals(props.booleanAttributeValues)) {
@@ -668,51 +701,47 @@ abstract public class HtmlTokenizer {
         boolean isQuoteMode = false;
         boolean isAposMode = false;
 
-        StringBuilder result = new StringBuilder();
+        commonStr.delete(0, commonStr.length());
 
         if ( isCharSimple('\'') ) {
             isAposMode = true;
-            saveCurrent();
+            saveCurrentSafe();
             go();
         } else if ( isCharSimple('\"') ) {
             isQuoteMode = true;
-            saveCurrent();
+            saveCurrentSafe();
             go();
         }
 
-        boolean isMultiWord = props.isAllowMultiWordAttributes();
-
-        boolean allowHtml = props.isAllowHtmlInsideAttributes();
-
         while ( !isAllRead() &&
-                ( (isAposMode && !isCharEquals('\'') && (allowHtml || !isCharEquals('>') && !isCharEquals('<')) && (isMultiWord || !isWhitespace())) ||
-                  (isQuoteMode && !isCharEquals('\"') && (allowHtml || !isCharEquals('>') && !isCharEquals('<')) && (isMultiWord || !isWhitespace())) ||
-                  (!isAposMode && !isQuoteMode && !isWhitespace() && !isCharEquals('>') && !isCharEquals('<'))
+                ( (isAposMode && !isCharEquals('\'') && (isAllowHtmlInsideAttributes || !isCharEquals('>') && !isCharEquals('<')) && (isAllowMultiWordAttributes || !isWhitespaceSafe())) ||
+                  (isQuoteMode && !isCharEquals('\"') && (isAllowHtmlInsideAttributes || !isCharEquals('>') && !isCharEquals('<')) && (isAllowMultiWordAttributes || !isWhitespaceSafe())) ||
+                  (!isAposMode && !isQuoteMode && !isWhitespaceSafe() && !isCharEquals('>') && !isCharEquals('<'))
                 )
               ) {
-            if (isValidXmlChar()) {
-                result.append( _working[_pos] );
-                saveCurrent();
+            if (isValidXmlCharSafe()) {
+                commonStr.append( _working[_pos] );
+                saveCurrentSafe();
             }
             go();
         }
 
         if ( isCharSimple('\'') && isAposMode ) {
-            saveCurrent();
+            saveCurrentSafe();
             go();
         } else if ( isCharSimple('\"') && isQuoteMode ) {
-            saveCurrent();
+            saveCurrentSafe();
             go();
         }
 
 
-        return result.toString();
+        return commonStr.toString();
     }
 
     private boolean content() throws IOException {
         while ( !isAllRead() ) {
-            if (isValidXmlChar()) {
-                saveCurrent();
+            if (isValidXmlCharSafe()) {
+                saveCurrentSafe();
             }
             go();
 
@@ -736,8 +765,8 @@ abstract public class HtmlTokenizer {
     private void comment() throws IOException {
     	go(4);
         while ( !isAllRead() && !startsWithSimple("-->") ) {
-            if (isValidXmlChar()) {
-                saveCurrent();
+            if (isValidXmlCharSafe()) {
+                saveCurrentSafe();
             }
             go();
         }
@@ -747,7 +776,7 @@ abstract public class HtmlTokenizer {
         }
 
         if (_savedLen > 0) {
-            if ( !props.isOmitComments() ) {
+            if (!isOmitComments) {
                 String hyphenRepl = props.getHyphenReplacementInComment();
                 String comment = new String(_saved, 0, _savedLen).replaceAll("--", hyphenRepl + hyphenRepl);
 
