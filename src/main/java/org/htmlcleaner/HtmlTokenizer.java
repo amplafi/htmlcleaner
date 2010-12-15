@@ -64,7 +64,6 @@ abstract public class HtmlTokenizer {
     private transient char _saved[] = new char[512];
     private transient int _savedLen = 0;
 
-    private transient boolean _isLateForDoctype = false;
     private transient DoctypeToken _docType = null;
     private transient TagToken _currentTagToken = null;
     private transient List<BaseToken> _tokenList = new ArrayList<BaseToken>();
@@ -131,7 +130,7 @@ abstract public class HtmlTokenizer {
 
             int expected = WORKING_BUFFER_SIZE - numToCopy;
             int size = 0;
-            int charsRead = 0;
+            int charsRead;
             int offset = numToCopy;
             do {
                 charsRead = _reader.read(_working, offset, expected);
@@ -396,7 +395,8 @@ abstract public class HtmlTokenizer {
         _tokenList.clear();
         _asExpected = true;
         _isScriptContext = false;
-        _isLateForDoctype = false;
+
+        boolean isLateForDoctype = false;
 
         this._pos = WORKING_BUFFER_SIZE;
         readIfNeeded(0);
@@ -434,19 +434,19 @@ abstract public class HtmlTokenizer {
                 }
             } else {
                 if ( startsWith("<!doctype") ) {
-                	if ( !_isLateForDoctype ) {
+                	if ( !isLateForDoctype ) {
                 		doctype();
-                		_isLateForDoctype = true;
+                		isLateForDoctype = true;
                 	} else {
                 		ignoreUntil('<');
                 	}
                 } else if ( startsWithSimple("</") && isIdentifierStartChar(_pos + 2) ) {
-                	_isLateForDoctype = true;
+                	isLateForDoctype = true;
                     tagEnd();
                 } else if ( startsWithSimple("<!--") ) {
                     comment();
                 } else if ( startsWithSimple("<") && isIdentifierStartChar(_pos + 1) ) {
-                	_isLateForDoctype = true;
+                	isLateForDoctype = true;
                     tagStart();
                 } else if ( props.isIgnoreQuestAndExclam() && (startsWithSimple("<!") || startsWithSimple("<?")) ) {
                     ignoreUntil('>');

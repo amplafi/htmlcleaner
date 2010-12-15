@@ -469,7 +469,7 @@ public class DefaultTagProvider extends HashMap<String, TagInfo> implements ITag
     }
 
     public TagInfo getTagInfo(String tagName) {
-        return (TagInfo) get(tagName);
+        return get(tagName);
     }
     
 }
