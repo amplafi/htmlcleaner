@@ -714,8 +714,7 @@ abstract public class HtmlTokenizer {
         }
 
         while ( !isAllRead() &&
-                ( (isAposMode && !isCharEquals('\'') && (isAllowHtmlInsideAttributes || !isCharEquals('>') && !isCharEquals('<')) && (isAllowMultiWordAttributes || !isWhitespaceSafe())) ||
-                  (isQuoteMode && !isCharEquals('\"') && (isAllowHtmlInsideAttributes || !isCharEquals('>') && !isCharEquals('<')) && (isAllowMultiWordAttributes || !isWhitespaceSafe())) ||
+                ( ((isAposMode && !isCharEquals('\'') || isQuoteMode && !isCharEquals('\"')) && (isAllowHtmlInsideAttributes || !isCharEquals('>') && !isCharEquals('<')) && (isAllowMultiWordAttributes || !isWhitespaceSafe())) ||
                   (!isAposMode && !isQuoteMode && !isWhitespaceSafe() && !isCharEquals('>') && !isCharEquals('<'))
                 )
               ) {
