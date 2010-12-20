@@ -43,9 +43,11 @@ public class SerializationTest extends TestCase {
         assertTrue(xml3.indexOf("Moja mala nema mane...") >= 0);
 
         node = cleaner.clean( new File("src/test/resources/test6.html") );
-        CompactXmlSerializer compactXmlSerializer = new CompactXmlSerializer(properties);
         properties.setTransSpecialEntitiesToNCR(true);
+        CompactXmlSerializer compactXmlSerializer = new CompactXmlSerializer(properties);
         assertTrue(compactXmlSerializer.getAsString(node).indexOf("<div>[&#945;][&#233;][&#8254;]</div>") >= 0);
+        properties.setTransSpecialEntitiesToNCR(false);
+        assertTrue(compactXmlSerializer.getAsString(node).indexOf("<div>[&#945;][&#233;][&#8254;]</div>") < 0);
     }
 
 }
