@@ -306,6 +306,15 @@ public class HtmlCleaner {
         return clean(url.openStream(), charset);
     }
 
+    /**
+     * Creates instance from the content downloaded from specified URL.
+     * HTML encoding is resolved following the attempts in the sequence:
+     * 1. reading Content-Type response header, 2. Analyzing META tags at the
+     * beginning of the html, 3. Using platform's default charset.
+     * @param url
+     * @return
+     * @throws IOException
+     */
     public TagNode clean(URL url) throws IOException {
         return clean(url, null);
     }
