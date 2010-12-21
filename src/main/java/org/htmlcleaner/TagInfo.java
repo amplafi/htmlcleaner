@@ -100,9 +100,6 @@ import java.util.*;
  *      <li>if previous open tag is one of <code>tr</code>, <code>caption</code> or <code>colgroup</code>, it will be implicitely closed.</li>
  *   </ul>
  * </p>
- * <br>
- * Created by Vladimir Nikic.<br/>
- * Date: November, 2006
  */
 public class TagInfo {
 

@@ -42,9 +42,6 @@ import java.io.Writer;
 
 /**
  * <p>HTML tag end token.</p>
- *
- * Created by: Vladimir Nikic<br/>
- * Date: November, 2006.
  */
 public class EndTagToken extends TagToken {
 

@@ -43,9 +43,6 @@ import java.util.*;
 
 /**
  * <p>Pretty XML serializer - creates resulting XML with indenting lines.</p>
- *
- * Created by: Vladimir Nikic<br/>
- * Date: November, 2006.
  */
 public class PrettyXmlSerializer extends XmlSerializer {
 

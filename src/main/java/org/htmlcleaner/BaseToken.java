@@ -44,9 +44,6 @@ import java.io.Writer;
  * <p>
  * 	Base token interface. Tokens are individual entities recognized by HTML parser.
  * </p>
- * 
- * Created by: Vladimir Nikic<br/>
- * Date: November, 2006.
  */
 public interface BaseToken {
 	
