@@ -93,11 +93,10 @@ public class CommandLine {
             System.err.println("    omitcomments=true | false*");
             System.err.println("    omitxmldecl=true | false*");
             System.err.println("    omitdoctypedecl=true* | false");
-            System.err.println("    omithtmlenvelope=true | false*");
             System.err.println("    useemptyelementtags=true* | false");
             System.err.println("    allowmultiwordattributes=true* | false");
             System.err.println("    allowhtmlinsideattributes=true | false*");
-            System.err.println("    ignoreqe=true | false*");
+            System.err.println("    ignoreqe=true* | false");
             System.err.println("    namespacesaware=true* | false");
             System.err.println("    hyphenreplacement=<string value> [=]");
             System.err.println("    prunetags=<string value> []");
