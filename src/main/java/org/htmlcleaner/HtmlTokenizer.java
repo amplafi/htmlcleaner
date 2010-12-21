@@ -46,10 +46,6 @@ import java.util.*;
  * open tag tokens, end tag tokens, contents (text) and comments.
  * As soon as new item is added to token list, cleaner is invoked
  * to clean current list at the end.</p>
- *
- * Created by: Vladimir Nikic.<br>
- * Date: November, 2006
-
  */
 abstract public class HtmlTokenizer {
 	

@@ -85,9 +85,6 @@ import java.util.*;
  *   myJDom = new JDomSerializer(props, true).createJDom(aNode);
  *   myDom = new DomSerializer(props, true).createDOM(aNode);
  * </xmp>
- *
- * Created by: Vladimir Nikic <br/>
- * Date: November, 2006
  */
 public class HtmlCleaner {
 

@@ -41,7 +41,7 @@
     <target name="javadoc">
         <javadoc access="protected"
                  author="true"
-                 source="1.4"
+                 source="1.5"
                  destdir="doc"
                  nodeprecated="false"
                  nodeprecatedlist="false"
@@ -49,7 +49,7 @@
                  nonavbar="false"
                  notree="false"
                  packagenames="org.htmlcleaner"
-                 sourcepath="src"
+                 sourcepath="${dir.src}"
                  splitindex="true"
                  use="true"
                  version="true"/>

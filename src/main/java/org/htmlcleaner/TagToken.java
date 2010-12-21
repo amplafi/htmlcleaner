@@ -40,9 +40,6 @@ package org.htmlcleaner;
 
 /**
  * <p>HTML tag token - descendants are start (TagNode) and end token (EndTagToken).</p>
- *
- * Created by: Vladimir Nikic<br/>
- * Date: November, 2006.
  */
 public abstract class TagToken implements BaseToken {
 

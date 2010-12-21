@@ -10,8 +10,7 @@ import java.util.Map;
 /**
  * <p>DOM serializer - creates xml DOM.</p>
  * 
- * Created by: Vladimir Nikic, Benson Margulies <br/>
- * Date: April, 2007.
+ * @author Vladimir Nikic, Benson Margulies <br/>
  */
 public class JDomSerializer {
 

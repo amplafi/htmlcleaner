@@ -48,9 +48,6 @@ import java.util.*;
 
 /**
  * <p>Support for ANT.</p>
- *
- * Created by: Vladimir Nikic <br/>
- * Date: December, 2006.
  */
 public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
 

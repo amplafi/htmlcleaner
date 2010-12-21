@@ -47,9 +47,6 @@ import java.util.*;
  *      containing tag nodes (TagNode class), content (text nodes - ContentNode), comments (CommentNode)
  *      and optionally doctype node (DoctypeToken).
  * </p>
- *
- * Created by: Vladimir Nikic<br/>
- * Date: November, 2006.
  */
 public class TagNode extends TagToken implements HtmlNode {
 

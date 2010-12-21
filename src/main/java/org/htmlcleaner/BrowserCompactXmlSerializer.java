@@ -49,9 +49,6 @@ import java.util.ListIterator;
  *  for web-browsers, which usualy treat multiple whitespaces as single one, but make diffrence
  *  between single whitespace and empty text.
  * </p>
- *
- * Created by: Vladimir Nikic<br/>
- * Date: November, 2006.
  */
 public class BrowserCompactXmlSerializer extends XmlSerializer {
 

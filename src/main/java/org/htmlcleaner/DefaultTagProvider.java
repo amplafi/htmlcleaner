@@ -45,9 +45,6 @@ import java.util.HashMap;
  * It is used as default tag info provider.
  * Class is created for performance purposes - parsing XML file requires some
  * processing time.
- *
- * Created by: Vladimir Nikic<br/>
- * Date: April, 2008.
  */
 public class DefaultTagProvider extends HashMap<String, TagInfo> implements ITagInfoProvider {
 
@@ -470,6 +467,26 @@ public class DefaultTagProvider extends HashMap<String, TagInfo> implements ITag
 
     public TagInfo getTagInfo(String tagName) {
         return get(tagName);
+    }
+
+    /**
+     * Removes tag info with specified name.
+     * @param tagName Name of the tag to be removed from the tag provider.
+     */
+    public void removeTagInfo(String tagName) {
+        if (tagName != null) {
+            remove(tagName.toLowerCase());
+        }
+    }
+
+    /**
+     * Sets new tag info.
+     * @param tagInfo tag info to be added to the provider.
+     */
+    public void addTagInfo(TagInfo tagInfo) {
+        if (tagInfo != null) {
+            put(tagInfo.getName().toLowerCase(), tagInfo);
+        }
     }
     
 }

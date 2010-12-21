@@ -42,9 +42,6 @@ import java.io.Writer;
 
 /**
  * <p>HTML text token.</p>
- *
- * Created by: Vladimir Nikic<br/>
- * Date: November, 2006.
  */
 public class ContentNode implements BaseToken, HtmlNode {
 

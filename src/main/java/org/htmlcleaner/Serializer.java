@@ -41,7 +41,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * <p>Basic abstract serializer - contains common logic for descendants.</p>
+ * <p>Basic abstract serializer - contains common logic for descendants (methods <code>writeXXX()</code>.</p>
  */
 public abstract class Serializer {
 
@@ -72,60 +72,159 @@ public abstract class Serializer {
 		this.props = props;
     }
 
+    /**
+     * Writes specified TagNode to the output stream, using specified charset and optionally omits node envelope
+     * (skips open and close tags of the node).
+     * @param tagNode Node to be written
+     * @param out Output stream
+     * @param charset Charset of the output
+     * @param omitEnvelope Tells whether to skip open and close tag of the node.
+     * @throws IOException
+     */
     public void writeToStream(TagNode tagNode, OutputStream out, String charset, boolean omitEnvelope) throws IOException {
          write( tagNode, new OutputStreamWriter(out, charset), charset, omitEnvelope );
     }
 
+    /**
+     * Writes specified TagNode to the output stream, using specified charset.
+     * @param tagNode Node to be written
+     * @param out Output stream
+     * @param charset Charset of the output
+     * @throws IOException
+     */
     public void writeToStream(TagNode tagNode, OutputStream out, String charset) throws IOException {
          writeToStream(tagNode, out, charset, false);
     }
 
+    /**
+     * Writes specified TagNode to the output stream, using system default charset and optionally omits node envelope
+     * (skips open and close tags of the node).
+     * @param tagNode Node to be written
+     * @param out Output stream
+     * @param omitEnvelope Tells whether to skip open and close tag of the node.
+     * @throws IOException
+     */
     public void writeToStream(TagNode tagNode, OutputStream out, boolean omitEnvelope) throws IOException {
          writeToStream( tagNode, out, HtmlCleaner.DEFAULT_CHARSET, omitEnvelope );
     }
 
+    /**
+     * Writes specified TagNode to the output stream, using system default charset.
+     * @param tagNode Node to be written
+     * @param out Output stream
+     * @throws IOException
+     */
     public void writeToStream(TagNode tagNode, OutputStream out) throws IOException {
          writeToStream(tagNode, out, false);
     }
 
+    /**
+     * Writes specified TagNode to the file, using specified charset and optionally omits node envelope
+     * (skips open and close tags of the node).
+     * @param tagNode Node to be written
+     * @param fileName Output file name
+     * @param charset Charset of the output
+     * @param omitEnvelope Tells whether to skip open and close tag of the node.
+     * @throws IOException
+     */
     public void writeToFile(TagNode tagNode, String fileName, String charset, boolean omitEnvelope) throws IOException {
         writeToStream(tagNode, new FileOutputStream(fileName), charset, omitEnvelope );
     }
 
+    /**
+     * Writes specified TagNode to the file, using specified charset.
+     * @param tagNode Node to be written
+     * @param fileName Output file name
+     * @param charset Charset of the output
+     * @throws IOException
+     */
     public void writeToFile(TagNode tagNode, String fileName, String charset) throws IOException {
         writeToFile(tagNode, fileName, charset, false);
     }
 
+    /**
+     * Writes specified TagNode to the file, using specified charset and optionally omits node envelope
+     * (skips open and close tags of the node).
+     * @param tagNode Node to be written
+     * @param fileName Output file name
+     * @param omitEnvelope Tells whether to skip open and close tag of the node.
+     * @throws IOException
+     */
     public void writeToFile(TagNode tagNode, String fileName, boolean omitEnvelope) throws IOException {
         writeToFile(tagNode,fileName, HtmlCleaner.DEFAULT_CHARSET, omitEnvelope);
     }
 
+    /**
+     * Writes specified TagNode to the file, using system default charset.
+     * @param tagNode Node to be written
+     * @param fileName Output file name
+     * @throws IOException
+     */
     public void writeToFile(TagNode tagNode, String fileName) throws IOException {
         writeToFile(tagNode, fileName, false);
     }
 
+    /**
+     * @param tagNode Node to serialize to string
+     * @param charset Charset of the output - stands in xml declaration part
+     * @param omitEnvelope Tells whether to skip open and close tag of the node.
+     * @return Output as string
+     * @throws IOException
+     */
     public String getAsString(TagNode tagNode, String charset, boolean omitEnvelope) throws IOException {
         StringWriter writer = new StringWriter();
         write(tagNode, writer, charset, omitEnvelope);
         return writer.getBuffer().toString();
     }
 
+    /**
+     * @param tagNode Node to serialize to string
+     * @param charset Charset of the output - stands in xml declaration part
+     * @return Output as string
+     * @throws IOException
+     */
     public String getAsString(TagNode tagNode, String charset) throws IOException {
         return getAsString(tagNode, charset, false);
     }
 
+    /**
+     * @param tagNode Node to serialize to string
+     * @param omitEnvelope Tells whether to skip open and close tag of the node.
+     * @return Output as string
+     * @throws IOException
+     */
     public String getAsString(TagNode tagNode, boolean omitEnvelope) throws IOException {
         return getAsString(tagNode, HtmlCleaner.DEFAULT_CHARSET, omitEnvelope);
     }
 
+    /**
+     * @param tagNode Node to serialize to string
+     * @return Output as string
+     * @throws IOException
+     */
     public String getAsString(TagNode tagNode) throws IOException {
         return getAsString(tagNode, false);
     }
 
+    /**
+     * Writes specified node using specified writer.
+     * @param tagNode Node to serialize.
+     * @param writer Writer instance
+     * @param charset Charset of the output
+     * @throws IOException
+     */
     public void write(TagNode tagNode, Writer writer, String charset) throws IOException {
         write(tagNode, writer, charset, false);
     }
 
+    /**
+     * Writes specified node using specified writer.
+     * @param tagNode Node to serialize.
+     * @param writer Writer instance
+     * @param charset Charset of the output
+     * @param omitEnvelope Tells whether to skip open and close tag of the node.
+     * @throws IOException
+     */
     public void write(TagNode tagNode, Writer writer, String charset, boolean omitEnvelope) throws IOException {
         if (omitEnvelope) {
             tagNode = new HeadlessTagNode(tagNode);

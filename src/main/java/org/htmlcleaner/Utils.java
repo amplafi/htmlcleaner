@@ -48,9 +48,6 @@ import java.util.regex.Pattern;
 
 /**
  * <p>Common utilities.</p>
- *
- * Created by: Vladimir Nikic<br/>
- * Date: November, 2006.
  */
 public class Utils {
 

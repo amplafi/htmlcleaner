@@ -42,9 +42,6 @@ import java.util.*;
 
 /**
  * <p>Abstract XML serializer - contains common logic for descendants.</p>
- *
- * Created by: Vladimir Nikic<br/>
- * Date: November, 2006.
  */
 public abstract class XmlSerializer extends Serializer {
 

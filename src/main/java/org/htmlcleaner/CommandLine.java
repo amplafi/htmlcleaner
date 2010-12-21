@@ -48,9 +48,6 @@ import java.util.Iterator;
 
 /**
  * <p>Command line usage class.</p>
- *
- * Created by: Vladimir Nikic <br/>
- * Date: November, 2006.
  */
 public class CommandLine {
 

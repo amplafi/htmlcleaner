@@ -39,9 +39,6 @@ package org.htmlcleaner;
 
 /**
  * Properties defining cleaner's behaviour
- *
- * Created by: Vladimir Nikic<br/>
- * Date: March, 2008.
  */
 public class CleanerProperties {
 

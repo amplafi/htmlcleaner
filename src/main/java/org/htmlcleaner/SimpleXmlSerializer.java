@@ -42,9 +42,6 @@ import java.io.Writer;
 
 /**
  * <p>Simple XML serializer - creates resulting XML without indenting lines.</p>
- *
- * Created by: Vladimir Nikic<br/>
- * Date: November, 2006.
  */
 public class SimpleXmlSerializer extends XmlSerializer {
 

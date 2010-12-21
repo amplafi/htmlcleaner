@@ -52,9 +52,6 @@ import java.net.URL;
 
 /**
  * Default tag provider - reads XML file in specified format and creates tag infos
- * 
- * Created by: Vladimir Nikic<br/>
- * Date: April, 2008.
  */
 public class ConfigFileTagProvider extends HashMap implements ITagInfoProvider {
 
