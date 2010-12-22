@@ -188,7 +188,7 @@ public class TagNode extends TagToken implements HtmlNode {
      * @param attName
      * @param attValue
      */
-    void setAttribute(String attName, String attValue) {
+    public void setAttribute(String attName, String attValue) {
         if ( attName != null && !"".equals(attName.trim()) ) {
             attName = attName.toLowerCase();
             if ("xmlns".equals(attName)) {
