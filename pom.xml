@@ -11,6 +11,8 @@
     <description>
         HtmlCleaner is an HTML parser written in Java. It transforms dirty HTML to well-formed XML following
         the same rules that most web-browsers use.
+        Fork From :
+    	http://htmlcleaner.sourceforge.net/
     </description>
     <url>http://htmlcleaner.sourceforge.net/</url>
     <inceptionYear>2006</inceptionYear>
@@ -53,11 +55,12 @@
         <url>http://htmlcleaner.svn.sourceforge.net/</url>
     </scm>
  -->
-     <scm>
-        <developerConnection>scm:svn:https://svn1.hosted-projects.com/transparentpolitics/modified-opensource/${artifactId}/trunk</developerConnection>
+    <scm>
+        <developerConnection>scm:git:${github-base}${project.artifactId}.git</developerConnection>
     </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <github-base>git@github.com:amplafi/</github-base>
     </properties>
 
     <dependencies>
@@ -162,7 +165,7 @@
     <distributionManagement>
         <repository>
             <id>amplafi.public</id>
-            <url>ftp://amplafi.com/httpdocs/repository</url>
+            <url>ftp://maven.amplafi.com/</url>
         </repository>
     </distributionManagement>
 </project>
