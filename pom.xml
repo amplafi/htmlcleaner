@@ -61,6 +61,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <github-base>git@github.com:amplafi/</github-base>
+        <wagon-build>1.0-beta-2</wagon-build>
     </properties>
 
     <dependencies>
@@ -161,6 +162,26 @@
 
             </plugin>            
         </plugins>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh-external</artifactId>
+                <version>${wagon-build}</version>
+            </extension>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ftp</artifactId>
+                <version>${wagon-build}</version>
+            </extension>
+            <!-- sftp patmoore,amplafi-flow@web.sourceforge.net
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-sftp</artifactId>
+                <version>${wagon-build}</version>
+            </extension>
+             -->
+        </extensions>
+
     </build>
     <distributionManagement>
         <repository>

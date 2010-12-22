@@ -55,7 +55,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.htmlcleaner.audit.ErrorType;
 
@@ -130,15 +129,15 @@ public class HtmlCleaner {
 
     /**
      * Contains information about nodes that were closed due to their child nodes.
-     * i.e. if 'p' tag was closed due to 'table' child tag. 
-     * 
+     * i.e. if 'p' tag was closed due to 'table' child tag.
+     *
      * @author Konstantin Burov
      *
      */
     private class ChildBreaks{
         private Stack < TagPos> closedByChildBreak = new Stack < TagPos >();
         private Stack < TagPos > breakingTags = new Stack < TagPos >();
-        
+
         /**
          * Adds the break info to the top of the stacks.
          *
@@ -163,7 +162,7 @@ public class HtmlCleaner {
 
         /**
          * pops out latest broken tag position.
-         * 
+         *
          * @return tag pos of the last parent that was broken.
          */
         public TagPos pop() {
@@ -178,7 +177,7 @@ public class HtmlCleaner {
             return breakingTags.isEmpty()?-1:breakingTags.peek().position;
         }
     }
-    
+
     /**
      * Class that contains information and methods for managing list of open,
      * but unhandled tags.
@@ -275,15 +274,11 @@ public class HtmlCleaner {
          * @param tags
          */
         private boolean someAlreadyOpen(Set<String> tags) {
-        	Iterator<TagPos> it = list.iterator();
-            while ( it.hasNext() ) {
-            	TagPos curr = (TagPos) it.next();
+        	for (TagPos curr : list) {
             	if ( tags.contains(curr.name) ) {
             		return true;
             	}
             }
-
-
             return false;
         }
     }
@@ -296,8 +291,7 @@ public class HtmlCleaner {
 
     private CleanerTransformations transformations;
 
-    private transient OpenTags _openTags;
-    private transient ChildBreaks _childBreaks;
+    private transient Stack<NestingState> nestingStates = new Stack<NestingState>();
     private transient boolean _headOpened;
     private transient boolean _bodyOpened;
     private transient Set<TagNode> _headTags = new LinkedHashSet<TagNode>();
@@ -307,13 +301,13 @@ public class HtmlCleaner {
     private TagNode bodyNode;
     private TagNode headNode;
     private TagNode rootNode;
-    
+
     private Set<TagNode> pruneNodeSet = new HashSet<TagNode>();
 
     private Set<ITagNodeCondition> pruneTagSet;
 
     private Set<ITagNodeCondition> allowTagSet;
- 
+
     /**
      * Constructor - creates cleaner instance with default tag info provider and default properties.
      */
@@ -392,8 +386,7 @@ public class HtmlCleaner {
      * @throws IOException
      */
     public TagNode clean(Reader reader) throws IOException {
-        _openTags = new OpenTags();
-        _childBreaks = new ChildBreaks();
+        pushNesting();
         _headOpened = false;
         _bodyOpened = false;
         _headTags.clear();
@@ -416,14 +409,16 @@ public class HtmlCleaner {
 
         List nodeList = htmlTokenizer.getTokenList();
         closeAll(nodeList);
-        
+
         createDocumentNodes(nodeList);
         calculateRootNode( htmlTokenizer.getNamespacePrefixes() );
 
         // Some transitions on resulting html require us to have the tag tree structure.
         // i.e. if we want to clear insignificant <br> tags. Thus this place is best for
         // marking nodes to be pruned.
-        while(markNodesToPrune(nodeList));
+        while(markNodesToPrune(nodeList)) {
+			// do them all
+		}
 
         // if there are some nodes to prune from tree
         if ( pruneNodeSet != null && !pruneNodeSet.isEmpty() ) {
@@ -438,14 +433,13 @@ public class HtmlCleaner {
         }
 
         rootNode.setDocType( htmlTokenizer.getDocType() );
-
+        popNesting();
         return rootNode;
     }
 
 	private boolean markNodesToPrune(List nodeList) {
 	    boolean nodesPruned = false;
-		for (Iterator iterator = nodeList.iterator(); iterator.hasNext();) {
-			Object next = iterator.next();
+		for (Object next :nodeList) {
 			if(next instanceof TagNode && !pruneNodeSet.contains(next)){
     			TagNode node = (TagNode) next;
     			if(addIfNeededToPruneSet(node)) {
@@ -498,7 +492,7 @@ public class HtmlCleaner {
         if (properties.isNamespacesAware() && namespacePrefixes != null) {
             Iterator<String> iterator = namespacePrefixes.iterator();
             while (iterator.hasNext()) {
-                String prefix = (String) iterator.next();
+                String prefix = iterator.next();
                 String xmlnsAtt = "xmlns:" + prefix;
                 if ( !atts.containsKey(xmlnsAtt) ) {
                     this.rootNode.addAttribute(xmlnsAtt, prefix);
@@ -516,12 +510,10 @@ public class HtmlCleaner {
 	private void addAttributesToTag(TagNode tag, Map<String, String> attributes) {
 		if (attributes != null) {
 			Map<String, String> tagAttributes = tag.getAttributes();
-			Iterator<Entry < String, String >> it = attributes.entrySet().iterator();
-			while (it.hasNext()) {
-				Map.Entry<String, String> currEntry = (Map.Entry<String, String>) it.next();
-				String attName = (String) currEntry.getKey();
+			for(Map.Entry< String, String > currEntry : attributes.entrySet()) {
+				String attName = currEntry.getKey();
 				if ( !tagAttributes.containsKey(attName) ) {
-					String attValue = (String) currEntry.getValue();
+					String attValue = currEntry.getValue();
 					tag.addAttribute(attName, attValue);
 				}
 			}
@@ -536,7 +528,7 @@ public class HtmlCleaner {
     private boolean isFatalTagSatisfied(TagInfo tag) {
     	if (tag != null) {
             String fatalTagName = tag.getFatalTag();
-            return fatalTagName == null ? true : _openTags.tagExists(fatalTagName);
+            return fatalTagName == null ? true : getOpenTags().tagExists(fatalTagName);
     	}
 
     	return true;
@@ -554,14 +546,14 @@ public class HtmlCleaner {
 	    		String fatalTag = tag.getFatalTag();
                 int fatalTagPositon = -1;
                 if (fatalTag != null) {
-                    TagPos tagPos = _openTags.findTag(fatalTag);
+                    TagPos tagPos = getOpenTags().findTag(fatalTag);
                     if (tagPos != null) {
                         fatalTagPositon = tagPos.position;
                     }
                 }
 
 	    		// iterates through the list of open tags from the end and check if there is some higher
-	    		ListIterator it = _openTags.list.listIterator( _openTags.list.size() );
+	    		ListIterator it = getOpenTags().list.listIterator( getOpenTags().list.size() );
 	            while ( it.hasPrevious() ) {
 	            	TagPos currTagPos = (TagPos) it.previous();
 	            	if (tag.isHigher(currTagPos.name)) {
@@ -575,7 +567,7 @@ public class HtmlCleaner {
 
     	return false;
     }
-    
+
     private TagNode newTagNode(String tagName) {
         TagNode tagNode = new TagNode(tagName);
         return tagNode;
@@ -587,7 +579,7 @@ public class HtmlCleaner {
     }
 
     private boolean isAllowedInLastOpenTag(BaseToken token) {
-        TagPos last = _openTags.getLastTagPos();
+        TagPos last = getOpenTags().getLastTagPos();
         if (last != null) {
 			 if (last.info != null) {
                  return last.info.allowsItem(token);
@@ -598,12 +590,12 @@ public class HtmlCleaner {
     }
 
     private void saveToLastOpenTag(List nodeList, Object tokenToAdd) {
-        TagPos last = _openTags.getLastTagPos();
+        TagPos last = getOpenTags().getLastTagPos();
         if ( last != null && last.info != null && last.info.isIgnorePermitted() ) {
             return;
         }
 
-        TagPos rubbishPos = _openTags.findTagToPlaceRubbish();
+        TagPos rubbishPos = getOpenTags().findTagToPlaceRubbish();
         if (rubbishPos != null) {
     		TagNode startTagToken = (TagNode) nodeList.get(rubbishPos.position);
             startTagToken.addItemForMoving(tokenToAdd);
@@ -616,7 +608,7 @@ public class HtmlCleaner {
 
 	/**
 	 * This method generally mutates flattened list of tokens into tree structure.
-	 * 
+	 *
 	 * @param nodeList
 	 * @param nodeIterator
 	 */
@@ -638,41 +630,41 @@ public class HtmlCleaner {
 					nodeIterator.set(null);
 				} else {
 				        //trying to find corresponding opened tag for the end token
-					TagPos matchingPosition = _openTags.findTag(tagName);
+					TagPos matchingPosition = getOpenTags().findTag(tagName);
 
                     if (matchingPosition != null) {
-                        //open tag found.. closing the node.. this will add all 
-                        //the nodes between open and end tokens to the children list of the tag node. 
+                        //open tag found.. closing the node.. this will add all
+                        //the nodes between open and end tokens to the children list of the tag node.
                         List closed = closeSnippet(nodeList, matchingPosition, endTagToken);
                         nodeIterator.set(null);
                         for (int i = closed.size() - 1; i >= 0; i--) {
                             TagNode closedTag = (TagNode) closed.get(i);
-                            
+
                             if ( i > 0 && tag != null && tag.isContinueAfter(closedTag.getName()) ) {
                                 // even if pruned still want to allow a continuation.
                                 // the nested tags that were also closed as part of the wrapping html closing.
-                                // TODO: look at reversing hierarchy ( for example, "<b><i></b></i>" reverse to <i><b></b></i> ) 
+                                // TODO: look at reversing hierarchy ( for example, "<b><i></b></i>" reverse to <i><b></b></i> )
                                 TagNode cloned = closedTag.makeCopy();
                                 cloned.setAutoGenerated(true);
                                 nodeIterator.add( cloned );
                                 nodeIterator.previous();
                             }
                         }
-                        if(!_childBreaks.isEmpty()){
-                            while(matchingPosition.position < _childBreaks.getLastBreakingTagPosition()){
+                        if(!getChildBreaks().isEmpty()){
+                            while(matchingPosition.position < getChildBreaks().getLastBreakingTagPosition()){
                                 //We're closing tag that is parent for the last closed by childbreak,
                                 //thus we no longer need this info.
-                                _childBreaks.pop();
+                                getChildBreaks().pop();
                             }
                         }
-                        if( !_childBreaks.isEmpty() && tagName.equals(_childBreaks.getLastBreakingTag())){
+                        if( !getChildBreaks().isEmpty() && tagName.equals(getChildBreaks().getLastBreakingTag())){
                             //this tag has broken it's parent, thus the parent tag should be reopened.
-                            TagNode closedByPresidence = (TagNode) nodeList.get(_childBreaks.pop().position);
+                            TagNode closedByPresidence = (TagNode) nodeList.get(getChildBreaks().pop().position);
                             TagNode copy = closedByPresidence.makeCopy();
                             copy.setAutoGenerated(true);
                             copy.removeAttribute("id");
                             nodeIterator.add(copy);
-                            _openTags.addTag(closedByPresidence.getName(), nodeIterator.previousIndex());
+                            getOpenTags().addTag(closedByPresidence.getName(), nodeIterator.previousIndex());
                         }
                     }
                 }
@@ -681,7 +673,7 @@ public class HtmlCleaner {
 				String tagName = startTagToken.getName();
 				TagInfo tag = getTagInfoProvider().getTagInfo(tagName);
 
-                TagPos lastTagPos = _openTags.isEmpty() ? null : _openTags.getLastTagPos();
+                TagPos lastTagPos = getOpenTags().isEmpty() ? null : getOpenTags().getLastTagPos();
                 TagInfo lastTagInfo = lastTagPos == null ? null : getTagInfoProvider().getTagInfo(lastTagPos.name);
 
                 // add tag to set of all tags
@@ -712,10 +704,10 @@ public class HtmlCleaner {
                 } else if ( tag == null && lastTagInfo != null && !lastTagInfo.allowsAnything() ) {
                     closeSnippet(nodeList, lastTagPos, startTagToken);
                     nodeIterator.previous();
-                } else if ( tag != null && tag.hasPermittedTags() && _openTags.someAlreadyOpen(tag.getPermittedTags()) ) {
+                } else if ( tag != null && tag.hasPermittedTags() && getOpenTags().someAlreadyOpen(tag.getPermittedTags()) ) {
                 	nodeIterator.set(null);
                 // if tag that must be unique, ignore this occurence
-                } else if ( tag != null && tag.isUnique() && _openTags.tagEncountered(tagName) ) {
+                } else if ( tag != null && tag.isUnique() && getOpenTags().tagEncountered(tagName) ) {
                     nodeIterator.set(null);
                     properties.fireHtmlError(true, startTagToken, ErrorType.UniqueTagDuplicated);
                     // if there is no required outer tag without that this open tag is ignored
@@ -735,7 +727,7 @@ public class HtmlCleaner {
                 } else if ( tag != null && lastTagPos != null && tag.isMustCloseTag(lastTagInfo) ) {
                                         //since tag is closed earlier due to incorrect child tag, we store this info
                                         //to reopen it later, on the child close.
-                                        _childBreaks.addBreak(lastTagPos, new TagPos(nodeIterator.previousIndex(), tag.getName()));
+                                        getChildBreaks().addBreak(lastTagPos, new TagPos(nodeIterator.previousIndex(), tag.getName()));
                                         boolean certainty = startTagToken.hasAttribute("id") ? false : true;
                                         properties.fireHtmlError(certainty, (TagNode)nodeList.get(lastTagPos.position), ErrorType.UnpermittedChild);
                                         List closed = closeSnippet(nodeList, lastTagPos, startTagToken);
@@ -782,12 +774,12 @@ public class HtmlCleaner {
                     nodeIterator.set(newTagNode);
 				// default case - just remember this open tag and go further
                 } else {
-                    _openTags.addTag( tagName, nodeIterator.previousIndex() );
+                    getOpenTags().addTag( tagName, nodeIterator.previousIndex() );
                 }
 			} else {
 				if (_headOpened && !_bodyOpened && properties.isKeepWhitespaceAndCommentsInHead()) {
 					if (token instanceof CommentToken) {
-						if (_openTags.getLastTagPos()==null) {
+						if (getOpenTags().getLastTagPos()==null) {
 							_headTags.add(new ProxyTagNode((CommentToken)token, bodyNode));
 						}
 					} else if (token instanceof ContentToken) {
@@ -798,9 +790,9 @@ public class HtmlCleaner {
 								_headTags.add(new ProxyTagNode(contentToken, bodyNode));
 							}
 						}
-					}					
+					}
 				}
-				
+
 				if ( !isAllowedInLastOpenTag(token) ) {
                     saveToLastOpenTag(nodeList, token);
                     nodeIterator.set(null);
@@ -873,12 +865,11 @@ public class HtmlCleaner {
                 closed.add(startTagToken);
                 List itemsToMove = startTagToken.getItemsToMove();
                 if (itemsToMove != null) {
-            		OpenTags prevOpenTags = _openTags;
-            		_openTags = new OpenTags();
+            		pushNesting();
             		makeTree(itemsToMove, itemsToMove.listIterator(0));
                     closeAll(itemsToMove);
                     startTagToken.setItemsToMove(null);
-                    _openTags = prevOpenTags;
+                    popNesting();
                 }
 
                 TagNode newTagNode = createTagNode(startTagToken);
@@ -897,7 +888,7 @@ public class HtmlCleaner {
                 	}
                 }
 
-                _openTags.removeTag( newTagNode.getName() );
+                getOpenTags().removeTag( newTagNode.getName() );
                 tagNode = newTagNode;
             } else {
             	if (tagNode != null) {
@@ -921,8 +912,8 @@ public class HtmlCleaner {
      * Close all unclosed tags if there are any.
      */
     private void closeAll(List nodeList) {
-        TagPos firstTagPos = _openTags.findFirstTagPos();
-        for (TagPos pos : _openTags.list) {
+        TagPos firstTagPos = getOpenTags().findFirstTagPos();
+        for (TagPos pos : getOpenTags().list) {
             properties.fireHtmlError(true, (TagNode)nodeList.get(pos.position), ErrorType.UnclosedTag);
         }
         if (firstTagPos != null) {
@@ -959,7 +950,7 @@ public class HtmlCleaner {
     	node.setPruned(true);
         this.pruneNodeSet.add(node);
     }
-    
+
     private boolean addIfNeededToPruneSet(TagNode tagNode) {
         if ( pruneTagSet != null ) {
             for(ITagNodeCondition condition: pruneTagSet) {
@@ -1053,4 +1044,31 @@ public class HtmlCleaner {
     public void initCleanerTransformations(Map transInfos) {
         transformations = new CleanerTransformations(transInfos);
     }
+
+	private OpenTags getOpenTags() {
+		return this.nestingStates.peek().getOpenTags();
+	}
+
+	private ChildBreaks getChildBreaks() {
+		return this.nestingStates.peek().getChildBreaks();
+	}
+
+	// TODO: better name
+	private NestingState pushNesting() {
+		return this.nestingStates.push(new NestingState());
+	}
+	private NestingState popNesting() {
+		return this.nestingStates.pop();
+	}
+	protected class NestingState {
+		private OpenTags openTags = new OpenTags();
+		private ChildBreaks childBreaks = new ChildBreaks();
+
+		public OpenTags getOpenTags() {
+			return this.openTags;
+		}
+		public ChildBreaks getChildBreaks() {
+			return this.childBreaks;
+		}
+	}
 }
