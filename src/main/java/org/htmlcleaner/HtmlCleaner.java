@@ -79,6 +79,7 @@ import java.util.*;
  *   aNode.removeAttribute(attName, attValue);
  *   // and/or
  *   cleaner.setInnerHtml(aNode, htmlContent);
+ *   // and/or do some other tree manipulation/traversal
  *
  *   // serialize a node to a file, output stream, DOM, JDom...
  *   new XXXSerializer(props).writeXmlXXX(aNode, ...);
