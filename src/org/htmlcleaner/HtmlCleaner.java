@@ -134,7 +134,7 @@ public class HtmlCleaner {
      * @author Konstantin Burov
      *
      */
-    private class ChildBreaks{
+    private static class ChildBreaks{
         private Stack < TagPos> closedByChildBreak = new Stack < TagPos >();
         private Stack < TagPos > breakingTags = new Stack < TagPos >();
 
