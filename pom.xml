@@ -61,7 +61,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <github-base>git@github.com:amplafi/</github-base>
-        <wagon-build>1.0-beta-2</wagon-build>
+        <wagon-build>1.0-beta-7</wagon-build>
     </properties>
 
     <dependencies>
