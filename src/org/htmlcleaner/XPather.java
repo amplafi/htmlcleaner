@@ -178,10 +178,10 @@ public class XPather {
                 Collection funcValue = evaluateFunction(object, from, to, position, last, isFilterContext);
                 return evaluateAgainst(funcValue, closingBracketIndex + 1, to, false, 1, last, isFilterContext, filterSource);
             } else if (isValidInteger(tokenArray[from])) {
-                Collection value = singleton(new Integer(tokenArray[from]));
+                Collection value = singleton(Integer.valueOf(tokenArray[from]));
                 return evaluateAgainst(value, from + 1, to, false, position, last, isFilterContext, filterSource);
             } else if (isValidDouble(tokenArray[from])) {
-                Collection value = singleton(new Double(tokenArray[from]));
+                Collection value = singleton(Double.valueOf(tokenArray[from]));
                 return evaluateAgainst(value, from + 1, to, false, position, last, isFilterContext, filterSource);
             } else {
                 return getElementsByName(object, from, to, isRecursive, isFilterContext);
@@ -289,9 +289,9 @@ public class XPather {
             Object curr = iterator.next();
             index++;
             if ( "last".equals(name) ) {
-                result.add( new Integer(isFilterContext ? last : size) );
+                result.add( Integer.valueOf(isFilterContext ? last : size) );
             } else if ( "position".equals(name) ) {
-                result.add( new Integer(isFilterContext ? position : index) );
+                result.add( Integer.valueOf(isFilterContext ? position : index) );
             } else if ( "text".equals(name) ) {
                 if (curr instanceof TagNode) {
                     result.add( ((TagNode)curr).getText() );
@@ -301,7 +301,7 @@ public class XPather {
             } else if ( "count".equals(name) ) {
                 Collection argumentEvaluated =
                         evaluateAgainst(source, from + 2, to - 1, false, position, 0, isFilterContext, null);
-                result.add( new Integer(argumentEvaluated.size()) );
+                result.add( Integer.valueOf(argumentEvaluated.size()) );
             } else if ( "data".equals(name) ) {
                 Collection argumentEvaluated = evaluateAgainst(source, from + 2, to - 1, false, position, 0, isFilterContext, null);
                 Iterator it = argumentEvaluated.iterator();
