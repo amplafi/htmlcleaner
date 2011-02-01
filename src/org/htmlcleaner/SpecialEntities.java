@@ -68,7 +68,7 @@ public class SpecialEntities {
 	private boolean math;
 
 	public static final char NON_BREAKABLE_SPACE = 160;
-	
+
 	public SpecialEntities(boolean greek, boolean math) {
 	    this.greek = greek;
 	    this.math = math;
@@ -457,13 +457,13 @@ public class SpecialEntities {
         SpecialEntity specialEntity = null;
         if (semiIndex > 0) {
             String entity = seq.substring(startIndex, semiIndex);
-            specialEntity  = (SpecialEntity)entities.get(entity);
+            specialEntity  = entities.get(entity);
         }
 	    return specialEntity;
 	}
-	
+
 	public SpecialEntity getSpecialEntityByUnicode(int unicodeCharcode) {
-	    return (SpecialEntity) this.entitiesByUnicodeCharcode.get(unicodeCharcode);
+	    return this.entitiesByUnicodeCharcode.get(unicodeCharcode);
 	}
 
 	public void put(SpecialEntity specialEntity) {
@@ -475,11 +475,11 @@ public class SpecialEntities {
      */
     private void _put(SpecialEntity specialEntity) {
         SpecialEntity old;
-        old = (SpecialEntity) entities.put(specialEntity.getKey(), specialEntity);
+        old = entities.put(specialEntity.getKey(), specialEntity);
         if ( old != null ) {
             throw new HtmlCleanerException("replaced "+old+" with "+specialEntity);
         }
-        old = (SpecialEntity) entitiesByUnicodeCharcode.put(specialEntity.intValue(), specialEntity);
+        old = entitiesByUnicodeCharcode.put(specialEntity.intValue(), specialEntity);
         if ( old != null ) {
             throw new HtmlCleanerException("replaced "+old+" with "+specialEntity);
         }
