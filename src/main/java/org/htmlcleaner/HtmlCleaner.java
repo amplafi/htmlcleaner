@@ -783,11 +783,11 @@ public class HtmlCleaner {
 							_headTags.add(new ProxyTagNode((CommentNode)token, bodyNode));
 						}
 					} else if (token instanceof ContentNode) {
-						ContentNode contentToken = (ContentNode)token;
-						if (contentToken.isBlank()) {
+						ContentNode contentNode = (ContentNode)token;
+						if (contentNode.isBlank()) {
 							BaseToken lastTok = (BaseToken)nodeList.get(nodeList.size()-1);
 							if (lastTok==token) {
-								_headTags.add(new ProxyTagNode(contentToken, bodyNode));
+								_headTags.add(new ProxyTagNode(contentNode, bodyNode));
 							}
 						}
 					}

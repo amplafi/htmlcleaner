@@ -43,13 +43,13 @@ public class JDomSerializer {
             while (it.hasNext()) {
                 Object item = it.next();
                 if (item instanceof CommentNode) {
-                    CommentNode commentToken = (CommentNode) item;
-                    Comment comment = factory.comment( commentToken.getContent() );
+                    CommentNode commentNode = (CommentNode) item;
+                    Comment comment = factory.comment( commentNode.getContent() );
                     element.addContent(comment);
                 } else if (item instanceof ContentNode) {
                     String nodeName = element.getName();
-                    ContentNode contentToken = (ContentNode) item;
-                    String content = contentToken.getContent();
+                    ContentNode contentNode = (ContentNode) item;
+                    String content = contentNode.getContent();
                     boolean specialCase = props.isUseCdataForScriptAndStyle() &&
                                           ("script".equalsIgnoreCase(nodeName) || "style".equalsIgnoreCase(nodeName));                    
                     if (escapeXml && !specialCase) {

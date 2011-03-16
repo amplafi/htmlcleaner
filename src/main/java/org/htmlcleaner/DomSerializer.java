@@ -62,12 +62,12 @@ public class DomSerializer {
             while (it.hasNext()) {
                 Object item = it.next();
                 if (item instanceof CommentNode) {
-                    CommentNode commentToken = (CommentNode) item;
-                    Comment comment = document.createComment( commentToken.getContent() );
+                    CommentNode commentNode = (CommentNode) item;
+                    Comment comment = document.createComment( commentNode.getContent() );
                     element.appendChild(comment);
                 } else if (item instanceof ContentNode) {
-                    ContentNode contentToken = (ContentNode) item;
-                    String content = contentToken.getContent();
+                    ContentNode contentNode = (ContentNode) item;
+                    String content = contentNode.getContent();
                     boolean specialCase = dontEscape(element);
                     if (escapeXml && !specialCase) {
                         content = Utils.escapeXml(content, props, true);
