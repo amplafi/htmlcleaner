@@ -96,10 +96,10 @@ public class PrettyXmlSerializer extends XmlSerializer {
         while (childrenIt.hasNext()) {
             Object child = childrenIt.next();
 
-            if ( !(child instanceof ContentToken) ) {
+            if ( !(child instanceof ContentNode) ) {
                 return null;
             } else {
-                ContentToken contentToken = (ContentToken) child;
+                ContentNode contentToken = (ContentNode) child;
                 String content = contentToken.getContent();
 
                 // if first item trims it from left
@@ -147,12 +147,12 @@ public class PrettyXmlSerializer extends XmlSerializer {
                     Object child = childrenIt.next();
                     if (child instanceof TagNode) {
                         serializePrettyXml( (TagNode)child, writer, level + 1 );
-                    } else if (child instanceof ContentToken) {
-                        ContentToken contentToken = (ContentToken) child;
+                    } else if (child instanceof ContentNode) {
+                        ContentNode contentToken = (ContentNode) child;
                         String content = dontEscape ? contentToken.getContent().replaceAll("]]>", "]]&gt;") : escapeXml(contentToken.getContent());
                         writer.write( getIndentedText(content, level + 1) );
-                    } else if (child instanceof CommentToken) {
-                        CommentToken commentToken = (CommentToken) child;
+                    } else if (child instanceof CommentNode) {
+                        CommentNode commentToken = (CommentNode) child;
                         String content = commentToken.getCommentedContent();
                         writer.write( getIndentedText(content, level + 1) );
                     }

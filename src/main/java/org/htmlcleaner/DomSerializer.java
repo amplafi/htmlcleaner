@@ -61,12 +61,12 @@ public class DomSerializer {
             Iterator it = tagChildren.iterator();
             while (it.hasNext()) {
                 Object item = it.next();
-                if (item instanceof CommentToken) {
-                    CommentToken commentToken = (CommentToken) item;
+                if (item instanceof CommentNode) {
+                    CommentNode commentToken = (CommentNode) item;
                     Comment comment = document.createComment( commentToken.getContent() );
                     element.appendChild(comment);
-                } else if (item instanceof ContentToken) {
-                    ContentToken contentToken = (ContentToken) item;
+                } else if (item instanceof ContentNode) {
+                    ContentNode contentToken = (ContentNode) item;
                     String content = contentToken.getContent();
                     boolean specialCase = dontEscape(element);
                     if (escapeXml && !specialCase) {

@@ -42,13 +42,13 @@ public class JDomSerializer {
             Iterator it = tagChildren.iterator();
             while (it.hasNext()) {
                 Object item = it.next();
-                if (item instanceof CommentToken) {
-                    CommentToken commentToken = (CommentToken) item;
+                if (item instanceof CommentNode) {
+                    CommentNode commentToken = (CommentNode) item;
                     Comment comment = factory.comment( commentToken.getContent() );
                     element.addContent(comment);
-                } else if (item instanceof ContentToken) {
+                } else if (item instanceof ContentNode) {
                     String nodeName = element.getName();
-                    ContentToken contentToken = (ContentToken) item;
+                    ContentNode contentToken = (ContentNode) item;
                     String content = contentToken.getContent();
                     boolean specialCase = props.isUseCdataForScriptAndStyle() &&
                                           ("script".equalsIgnoreCase(nodeName) || "style".equalsIgnoreCase(nodeName));                    

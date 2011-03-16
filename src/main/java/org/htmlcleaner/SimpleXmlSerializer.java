@@ -56,7 +56,7 @@ public class SimpleXmlSerializer extends XmlSerializer {
         super(props);
     }
 	
-	protected void serializeContentToken(ContentToken item, TagNode tagNode, Writer writer) throws IOException {
+	protected void serializeContentToken(ContentNode item, TagNode tagNode, Writer writer) throws IOException {
 		String content = item.getContent();
 		String trimmed = content.trim();
         boolean dontEscape = dontEscape(tagNode);                        
@@ -94,8 +94,8 @@ public class SimpleXmlSerializer extends XmlSerializer {
             while ( childrenIt.hasNext() ) {
                 Object item = childrenIt.next();
                 if (item != null) {
-                    if ( item instanceof ContentToken ) {
-                    	serializeContentToken((ContentToken)item, tagNode, writer);
+                    if ( item instanceof ContentNode ) {
+                    	serializeContentToken((ContentNode)item, tagNode, writer);
                     } else {
                         ((BaseToken)item).serialize(this, writer);
                     }

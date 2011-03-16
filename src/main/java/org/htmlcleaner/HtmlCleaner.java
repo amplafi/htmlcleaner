@@ -778,12 +778,12 @@ public class HtmlCleaner {
                 }
 			} else {
 				if (_headOpened && !_bodyOpened && properties.isKeepWhitespaceAndCommentsInHead()) {
-					if (token instanceof CommentToken) {
+					if (token instanceof CommentNode) {
 						if (getOpenTags().getLastTagPos()==null) {
-							_headTags.add(new ProxyTagNode((CommentToken)token, bodyNode));
+							_headTags.add(new ProxyTagNode((CommentNode)token, bodyNode));
 						}
-					} else if (token instanceof ContentToken) {
-						ContentToken contentToken = (ContentToken)token;
+					} else if (token instanceof ContentNode) {
+						ContentNode contentToken = (ContentNode)token;
 						if (contentToken.isBlank()) {
 							BaseToken lastTok = (BaseToken)nodeList.get(nodeList.size()-1);
 							if (lastTok==token) {
@@ -818,7 +818,7 @@ public class HtmlCleaner {
                 TagInfo tag = getTagInfoProvider().getTagInfo( node.getName() );
                 addPossibleHeadCandidate(tag, node);
 			} else {
-				if (child instanceof ContentToken) {
+				if (child instanceof ContentNode) {
 					toAdd = !"".equals(child.toString());
 				}
 			}

@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
  * <p>
  *      XML node tag - basic node of the cleaned HTML tree. At the same time, it represents start tag token
  *      after HTML parsing phase and before cleaning phase. After cleaning process, tree structure remains
- *      containing tag nodes (TagNode class), content (text nodes - ContentToken), comments (CommentToken)
+ *      containing tag nodes (TagNode class), content (text nodes - ContentNode), comments (CommentNode)
  *      and optionally doctype node (DoctypeToken).
  * </p>
  *
@@ -272,8 +272,8 @@ public class TagNode extends TagToken {
         StringBuffer text = new StringBuffer();
         for (int i = 0; i < children.size(); i++) {
             Object item = children.get(i);
-            if (item instanceof ContentToken) {
-                text.append( ((ContentToken)item).getContent() );
+            if (item instanceof ContentNode) {
+                text.append( ((ContentNode)item).getContent() );
             } else if (item instanceof TagNode) {
                 CharSequence subtext = ((TagNode)item).getText();
                 text.append(subtext);
@@ -555,11 +555,11 @@ public class TagNode extends TagToken {
                     if (!((TagNode)child).isPruned()) {
                         return false;
                     }
-                } else if( child instanceof ContentToken ) {
-                    if ( !((ContentToken)child).isBlank()) {
+                } else if( child instanceof ContentNode ) {
+                    if ( !((ContentNode)child).isBlank()) {
                         return false;
                     }
-                } else if ( child instanceof CommentToken) {
+                } else if ( child instanceof CommentNode) {
                     // ideally could be discarded - however standard practice is to include browser specific commands in comments. :-(
                     return false;
                 } else {

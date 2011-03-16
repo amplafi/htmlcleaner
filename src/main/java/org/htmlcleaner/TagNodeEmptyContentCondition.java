@@ -66,8 +66,8 @@ public class TagNodeEmptyContentCondition implements ITagNodeCondition {
                             if (!satisfy((TagNode)child, true)) {
                                 return false;
                             }
-                        } else if (child instanceof ContentToken ) {
-                            if ( !((ContentToken)child).isBlank()) {
+                        } else if (child instanceof ContentNode ) {
+                            if ( !((ContentNode)child).isBlank()) {
                                 return false;
                             }
                         } else {

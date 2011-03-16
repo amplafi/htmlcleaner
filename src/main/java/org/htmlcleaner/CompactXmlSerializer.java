@@ -62,8 +62,8 @@ public class CompactXmlSerializer extends XmlSerializer {
             while ( childrenIt.hasNext() ) {
                 Object item = childrenIt.next();
                 if (item != null) {
-                    if ( item instanceof ContentToken ) {
-                    	String content = ((ContentToken) item).getContent().trim();
+                    if ( item instanceof ContentNode ) {
+                    	String content = ((ContentNode) item).getContent().trim();
                         writer.write( dontEscape(tagNode) ? content.replaceAll("]]>", "]]&gt;") : escapeXml(content) );
 
                         if (childrenIt.hasNext()) {
@@ -72,8 +72,8 @@ public class CompactXmlSerializer extends XmlSerializer {
                             }
                             childrenIt.previous();
                         }
-                    } else if (item instanceof CommentToken) {
-                    	String content = ((CommentToken) item).getCommentedContent().trim();
+                    } else if (item instanceof CommentNode) {
+                    	String content = ((CommentNode) item).getCommentedContent().trim();
                     	writer.write(content);
                     } else {
                     	((BaseToken)item).serialize(this, writer);

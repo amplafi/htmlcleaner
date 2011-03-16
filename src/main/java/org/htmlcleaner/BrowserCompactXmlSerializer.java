@@ -76,8 +76,8 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
             while (childrenIt.hasNext()) {
                 Object item = childrenIt.next();
                 if (item != null) {
-                    if (item instanceof ContentToken && !PRE_TAG.equals(tagName)) {
-                        String content = ((ContentToken) item).getContent();
+                    if (item instanceof ContentNode && !PRE_TAG.equals(tagName)) {
+                        String content = ((ContentNode) item).getContent();
                         content = dontEscape(tagNode) ? content.replaceAll("]]>", "]]&gt;") : escapeXml(content);
                         content = content.replaceAll("^"+SpecialEntities.NON_BREAKABLE_SPACE+"+", " ");
                         content = content.replaceAll(SpecialEntities.NON_BREAKABLE_SPACE+"+$", " ");
@@ -125,11 +125,11 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
                         } else{
                             childrenIt.remove();
                         }
-                    } else if(item instanceof ContentToken){
-                        String content = ((ContentToken) item).getContent();
+                    } else if(item instanceof ContentNode){
+                        String content = ((ContentNode) item).getContent();
                         writer.write(content);
-                    } else if (item instanceof CommentToken) {
-                    	String content = ((CommentToken) item).getCommentedContent().trim();
+                    } else if (item instanceof CommentNode) {
+                    	String content = ((CommentNode) item).getCommentedContent().trim();
                     	writer.write(content);
                     } else {
                     	((BaseToken)item).serialize(this, writer);
@@ -143,7 +143,7 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
 
     private boolean isContentOrInline(Object node) {
         boolean result = false;
-        if (node instanceof ContentToken) {
+        if (node instanceof ContentNode) {
             result = true;
         } else if (node instanceof TagNode) {
             TagInfo nextInfo = props.getTagInfoProvider().getTagInfo(((TagNode) node).getName());

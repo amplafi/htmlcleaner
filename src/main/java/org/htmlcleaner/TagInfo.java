@@ -395,9 +395,9 @@ public class TagInfo {
         case text:
     		return !(token instanceof TagToken);
         case none:
-            if ( token instanceof ContentToken ) {
+            if ( token instanceof ContentNode ) {
                 // allow white space in outputed html
-                return ( (ContentToken)token).isBlank();
+                return ( (ContentNode)token).isBlank();
             } else if (!(token instanceof TagToken)) {
                 // allow directives.
                 return true;
