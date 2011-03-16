@@ -17,7 +17,7 @@ public class TagManipulationTest extends TestCase {
     }
 
     public void testInnerHtml() throws XPatherException, IOException {
-        TagNode node = cleaner.clean(new File("test/org/htmlcleaner/files/test2.html"));
+        TagNode node = cleaner.clean(new File("src/test/resources/test2.html"));
         cleaner.setInnerHtml((TagNode) (node.evaluateXPath("//table[1]")[0]), "<td>row1<td>row2<td>row3");
         assertEquals(node.evaluateXPath("//table[1]/tbody[1]/tr[1]/td").length, 3);
         assertEquals( cleaner.getInnerHtml((TagNode) (node.evaluateXPath("//table[1]")[0])),

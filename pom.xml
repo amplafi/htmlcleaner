@@ -68,7 +68,7 @@
         <dependency>
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
@@ -84,19 +84,7 @@
         </dependency>        
     </dependencies>
 
-    <build>
-        <!-- suggestion: move sources to src/main/java ;-)  -->
-        <sourceDirectory>src</sourceDirectory>
-        <!-- suggestion: move test sources to src/test/java :-) -->
-        <testSourceDirectory>test</testSourceDirectory>
-        <!-- suggestion: move test sources to src/test/resources :-) -->
-        <testResources>
-            <testResource>
-                <directory>test</directory>
-            </testResource>
-        </testResources>
-
-        
+    <build>        
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

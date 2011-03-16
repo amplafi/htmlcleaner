@@ -28,8 +28,8 @@ public class HtmlCleanerTest extends TestCase {
      * Test for #2901.  
      */
 	public void testWhitespaceInHead() throws IOException {
-		String initial = readFile("test/org/htmlcleaner/files/Real_1.html");
-		String expected = readFile("test/org/htmlcleaner/files/Expected_1.html");
+		String initial = readFile("src/test/resources/Real_1.html");
+		String expected = readFile("src/test/resources/Expected_1.html");
 		assertCleaned(initial, expected);
 	}
 	

@@ -9,11 +9,11 @@ public class RandomPageTest extends TestCase {
 	
 	public void testPage() throws IOException {
 	    HtmlCleaner cleaner = new HtmlCleaner();
-            cleaner.clean( new File("test/org/htmlcleaner/files/gg_prob.html") );
+            cleaner.clean( new File("src/test/resources/gg_prob.html") );
 	}
 	
 	public void testHtml() throws IOException{
 	    HtmlCleaner cleaner = new HtmlCleaner();
-	    cleaner.clean( new File("test/org/htmlcleaner/files/gg_prob_cleaned.html") );
+	    cleaner.clean( new File("src/test/resources/gg_prob_cleaned.html") );
 	}
 }

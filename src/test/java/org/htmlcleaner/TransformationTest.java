@@ -58,7 +58,7 @@ public class TransformationTest extends TestCase {
         t.addAttributeTransformation("name", "${face}_1");
         transformations.addTransformation(t);
 
-        TagNode node = cleaner.clean( new File("test/org/htmlcleaner/files/test8.html"), "UTF-8" );
+        TagNode node = cleaner.clean( new File("src/test/resources/test8.html"), "UTF-8" );
 
         String xml = new PrettyXmlSerializer(props).getXmlAsString(node);
 

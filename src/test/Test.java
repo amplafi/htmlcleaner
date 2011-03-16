@@ -51,7 +51,7 @@ public class Test {
         props.setBooleanAttributeValues("empty");
 
 //        TagNode node = cleaner.clean(html);
-        TagNode node = cleaner.clean(new File("test/org/htmlcleaner/files/test2.html"));
+        TagNode node = cleaner.clean(new File("src/test/resources/test2.html"));
         cleaner.setInnerHtml( (TagNode)(node.evaluateXPath("//table[1]")[0]), "<td>row1<td>row2<td>row3");
 //        Document document = new JDomSerializer(props).createJDom(node);
 //        XMLOutputter xmlOut = new XMLOutputter();
