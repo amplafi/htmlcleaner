@@ -62,7 +62,7 @@ public class CleanerProperties implements HtmlModificationListener{
 
     private ITagInfoProvider tagInfoProvider;
     /**
-     * If this parameter is set to true, ampersand sign (&) that proceeds valid XML character sequences (&XXX;) will not be escaped with &amp;XXX; 
+     * If this parameter is set to true, ampersand sign (&) that proceeds valid XML character sequences (&XXX;) will not be escaped with &amp;XXX;
      */
     private boolean advancedXmlEscape;
     private boolean useCdataForScriptAndStyle;
@@ -86,14 +86,14 @@ public class CleanerProperties implements HtmlModificationListener{
      * "cause the cleaner cannot keep track of whitespace at that level",
      * there are 2 lists built: one for the head , one for the body. So whitespace that falls outside of the head and body is not preserved
      * this creates at least a newline break.
-     * 
+     *
      * More work than really wanted at this point to "preserve" the whitespace.
      */
     private boolean addNewlineToHeadAndBody;
     /**
      * Tries to keep inside head all whitespace and comments that were originally there
      */
-    private boolean keepWhitespaceAndCommentsInHead;    
+    private boolean keepWhitespaceAndCommentsInHead;
     private String hyphenReplacementInComment;
     // comma separate list of tags pruned.
     private String pruneTags;
@@ -101,9 +101,9 @@ public class CleanerProperties implements HtmlModificationListener{
     private String allowTags;
 
     private CleanerTransformations cleanerTransformations = new CleanerTransformations();
-    
+
     private List < HtmlModificationListener > htmlModificationListeners;
-    
+
     /**
      * blacklist of tags
      */
@@ -117,7 +117,7 @@ public class CleanerProperties implements HtmlModificationListener{
     public CleanerProperties() {
         reset();
     }
-    
+
     /**
      * @param tagInfoProvider
      */
@@ -222,7 +222,7 @@ public class CleanerProperties implements HtmlModificationListener{
     }
 
     /**
-     * 
+     *
      * @return also return true if omitting the Html Envelope
      */
     public boolean isOmitDoctypeDeclaration() {
@@ -279,7 +279,7 @@ public class CleanerProperties implements HtmlModificationListener{
 
     public void setNamespacesAware(boolean namespacesAware) {
         this.namespacesAware = namespacesAware;
-    }    
+    }
 
     public boolean isAddNewlineToHeadAndBody() {
         return addNewlineToHeadAndBody;
@@ -287,7 +287,7 @@ public class CleanerProperties implements HtmlModificationListener{
 
     public void setAddNewlineToHeadAndBody(boolean addNewlineToHeadAndBody) {
         this.addNewlineToHeadAndBody = addNewlineToHeadAndBody;
-    }       
+    }
 
     public boolean isKeepWhitespaceAndCommentsInHead() {
         return keepWhitespaceAndCommentsInHead;
@@ -295,7 +295,7 @@ public class CleanerProperties implements HtmlModificationListener{
 
     public void setKeepWhitespaceAndCommentsInHead(boolean keepHeadWhitespace) {
         this.keepWhitespaceAndCommentsInHead = keepHeadWhitespace;
-    }     
+    }
 
     public String getHyphenReplacementInComment() {
         return hyphenReplacementInComment;
@@ -310,9 +310,9 @@ public class CleanerProperties implements HtmlModificationListener{
     }
 
     /**
-     * Resets prune tags set and adds tag name conditions to it. 
+     * Resets prune tags set and adds tag name conditions to it.
      * All the tags listed by pruneTags param are added.
-     * 
+     *
      * @param pruneTags
      */
     public void setPruneTags(String pruneTags) {
@@ -320,20 +320,20 @@ public class CleanerProperties implements HtmlModificationListener{
         this.resetPruneTagSet();
         this.addTagNameConditions(this.pruneTagSet, pruneTags);
     }
-    
+
     /**
      * Adds the condition to existing prune tag set.
-     * 
+     *
      * @param condition
      */
     public void addPruneTagNodeCondition(ITagNodeCondition condition){
         pruneTagSet.add(condition);
-    }    
-    
+    }
+
     public Set<ITagNodeCondition> getPruneTagSet() {
         return pruneTagSet;
     }
-    
+
     public String getAllowTags() {
         return allowTags;
     }
@@ -349,7 +349,7 @@ public class CleanerProperties implements HtmlModificationListener{
     }
 
     /**
-     * @param tagSet 
+     * @param tagSet
      * @param tagsNameStr
      */
     private void addTagNameConditions(Set<ITagNodeCondition> tagSet, String tagsNameStr) {
@@ -360,7 +360,7 @@ public class CleanerProperties implements HtmlModificationListener{
             }
         }
     }
-    
+
     public Set<ITagNodeCondition> getAllowTagSet() {
         return allowTagSet;
     }
@@ -462,7 +462,7 @@ public class CleanerProperties implements HtmlModificationListener{
     public CleanerTransformations getCleanerTransformations() {
         return cleanerTransformations;
     }
-    
+
     public void setCleanerTransformations(CleanerTransformations cleanerTransformations) {
         if ( cleanerTransformations == null ) {
             this.cleanerTransformations.clear();
@@ -470,30 +470,30 @@ public class CleanerProperties implements HtmlModificationListener{
             this.cleanerTransformations = cleanerTransformations;
         }
     }
-    
+
     /**
-     * Adds a listener to the list of objects that will be notified about changes that 
+     * Adds a listener to the list of objects that will be notified about changes that
      * cleaner does during cleanup process.
-     * 
+     *
      * @param listener -- listener object to be notified of the changes.
      */
     public void addHtmlModificationListener(HtmlModificationListener listener){
         htmlModificationListeners.add(listener);
     }
-   
+
     public void fireConditionModification(ITagNodeCondition condition, TagNode tagNode) {
         for (HtmlModificationListener listener : htmlModificationListeners) {
             listener.fireConditionModification(condition, tagNode);
         }
     }
-    
+
     public void fireHtmlError(boolean certainty, TagNode startTagToken, ErrorType type) {
         for (HtmlModificationListener listener : htmlModificationListeners) {
             listener.fireHtmlError(certainty, startTagToken, type);
         }
-        
+
     }
-   
+
     public void fireUglyHtml(boolean certainty, TagNode startTagToken, ErrorType errorType) {
         for (HtmlModificationListener listener : htmlModificationListeners) {
             listener.fireUglyHtml(certainty, startTagToken, errorType);

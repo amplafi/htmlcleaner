@@ -612,10 +612,10 @@ public class HtmlCleaner {
 	 * @param nodeList
 	 * @param nodeIterator
 	 */
-	void makeTree(List nodeList, ListIterator nodeIterator) {
+	void makeTree(List nodeList, ListIterator<BaseToken> nodeIterator) {
 		// process while not reach the end of the list
-		while ( nodeIterator.hasNext() ) {
-			BaseToken token = (BaseToken) nodeIterator.next();
+	    while ( nodeIterator.hasNext() ) {
+	        BaseToken token = nodeIterator.next();
 
             if (token instanceof EndTagToken) {
 				EndTagToken endTagToken = (EndTagToken) token;
@@ -763,12 +763,12 @@ public class HtmlCleaner {
 					}
 
                     nodeIterator.previous();
-				// if this open tag is not allowed inside last open tag, then it must be moved to the place where it can be
                 } else if ( !isAllowedInLastOpenTag(token) ) {
+                    // if this open tag is not allowed inside last open tag, then it must be moved to the place where it can be
                     saveToLastOpenTag(nodeList, token);
                     nodeIterator.set(null);
-				// if it is known HTML tag but doesn't allow body, it is immediately closed
                 } else if ( tag != null && !tag.allowsBody() ) {
+                    // if it is known HTML tag but doesn't allow body, it is immediately closed
 					TagNode newTagNode = createTagNode(startTagToken);
                     addPossibleHeadCandidate(tag, newTagNode);
                     nodeIterator.set(newTagNode);
@@ -799,6 +799,15 @@ public class HtmlCleaner {
 				}
 			}
 		}
+    }
+
+	/**
+	 *
+	 * @param startTagToken
+	 * @return true if no id attribute or class attribute
+	 */
+    protected boolean isRemovingNodeReasonablySafe(TagNode startTagToken) {
+        return !startTagToken.hasAttribute("id") && !startTagToken.hasAttribute("name") && !startTagToken.hasAttribute("class");
     }
 
 
@@ -851,8 +860,15 @@ public class HtmlCleaner {
         }
     }
 
-	private List closeSnippet(List nodeList, TagPos tagPos, Object toNode) {
-		List closed = new ArrayList();
+	/**
+	 * Forced closing
+	 * @param nodeList
+	 * @param tagPos
+	 * @param toNode
+	 * @return
+	 */
+	private List<TagNode> closeSnippet(List nodeList, TagPos tagPos, Object toNode) {
+		List<TagNode> closed = new ArrayList<TagNode>();
 		ListIterator it = nodeList.listIterator(tagPos.position);
 
 		TagNode tagNode = null;

@@ -43,7 +43,10 @@ import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.Map;
-import java.util.TreeMap; 
+import java.util.TreeMap;
+import java.util.logging.Logger;
+
+import org.htmlcleaner.audit.HtmlModificationListenerLogger;
 
 /**
  * <p>Command line usage class.</p>
@@ -53,9 +56,10 @@ import java.util.TreeMap;
  */
 public class CommandLine {
 
-    private static String getArgValue(String[] args, String name) {
-        for (int i = 0; i < args.length; i++) {
-            String curr = args[i];
+    private static final String OMITXMLDECL = "omitxmldecl";
+
+    private static String getArgValue(String[] args, String name, String defaultValue) {
+        for (String curr : args) {
             int eqIndex = curr.indexOf('=');
             if (eqIndex >= 0) {
                 String argName = curr.substring(0, eqIndex).trim();
@@ -67,7 +71,7 @@ public class CommandLine {
             }
         }
 
-        return "";
+        return defaultValue;
     }
 
     private static boolean toBoolean(String s) {
@@ -75,10 +79,10 @@ public class CommandLine {
     }
 
     public static void main(String[] args) throws IOException, XPatherException {
-        String source = getArgValue(args, "src");
+        String source = getArgValue(args, "src", "");
         if ( "".equals(source) ) {
-            System.err.println("Usage: java -jar htmlcleanerXX.jar src = <url | file> [incharset = <charset>] " +
-                               "[dest = <file>] [outcharset = <charset>] [taginfofile=<file>] [options...]");
+            System.err.println("Usage: java -jar htmlcleanerXX.jar src=<url | file> [incharset=<charset>] " +
+                               "[dest=<file>] [outcharset=<charset>] [taginfofile=<file>] [options...]");
             System.err.println("");
             System.err.println("where options include:");
             System.err.println("    outputtype=simple* | compact | browser-compact | pretty");
@@ -91,7 +95,7 @@ public class CommandLine {
             System.err.println("    omitdeprtags=true | false*");
             System.err.println("    treatdeprtagsascontent=true | false*");
             System.err.println("    omitcomments=true | false*");
-            System.err.println("    omitxmldecl=true | false*");
+            System.err.println("    " +OMITXMLDECL +"=true* | false");
             System.err.println("    omitdoctypedecl=true* | false");
             System.err.println("    omithtmlenvelope=true | false*");
             System.err.println("    useemptyelementtags=true* | false");
@@ -108,43 +112,43 @@ public class CommandLine {
             System.exit(1);
         }
 
-        String inCharset = getArgValue(args, "incharset");
+        String inCharset = getArgValue(args, "incharset", "");
         if ("".equals(inCharset)) {
             inCharset = CleanerProperties.DEFAULT_CHARSET;
         }
 
-        String outCharset = getArgValue(args, "outcharset");
+        String outCharset = getArgValue(args, "outcharset", "");
         if ("".equals(outCharset)) {
             outCharset = CleanerProperties.DEFAULT_CHARSET;
         }
 
-        String destination = getArgValue(args, "dest");
-        String outputType = getArgValue(args, "outputtype");
-        String advancedXmlEscape = getArgValue(args, "advancedxmlescape");
-        String useCData = getArgValue(args, "usecdata");
-        String translateSpecialEntities = getArgValue(args, "specialentities");
-        String unicodeChars = getArgValue(args, "unicodechars");
-        String omitUnknownTags = getArgValue(args, "omitunknowntags");
-        String treatUnknownTagsAsContent = getArgValue(args, "treatunknowntagsascontent");
-        String omitDeprecatedTags = getArgValue(args, "omitdeprtags");
-        String treatDeprecatedTagsAsContent = getArgValue(args, "treatdeprtagsascontent");
-        String omitComments = getArgValue(args, "omitcomments");
-        String omitXmlDeclaration = getArgValue(args, "omitxmldecl");
-        String omitDoctypeDeclaration = getArgValue(args, "omitdoctypedecl");
-        String omitHtmlEnvelope = getArgValue(args, "omithtmlenvelope");
-        String useEmptyElementTags = getArgValue(args, "useemptyelementtags");
-        String allowMultiWordAttributes = getArgValue(args, "allowmultiwordattributes");
-        String allowHtmlInsideAttributes = getArgValue(args, "allowhtmlinsideattributes");
-        String ignoreQuestAndExclam = getArgValue(args, "ignoreqe");
-        String namespacesAware= getArgValue(args, "namespacesaware");
-        String commentHyphen = getArgValue(args, "hyphenreplacement");
-        String pruneTags = getArgValue(args, "prunetags");
-        String booleanAtts = getArgValue(args, "booleanatts");
-        String nodeByXPath = getArgValue(args, "nodebyxpath");
+        String destination = getArgValue(args, "dest", "");
+        String outputType = getArgValue(args, "outputtype", "");
+        String advancedXmlEscape = getArgValue(args, "advancedxmlescape", "");
+        String useCData = getArgValue(args, "usecdata", "");
+        String translateSpecialEntities = getArgValue(args, "specialentities", "");
+        String unicodeChars = getArgValue(args, "unicodechars", "");
+        String omitUnknownTags = getArgValue(args, "omitunknowntags", "");
+        String treatUnknownTagsAsContent = getArgValue(args, "treatunknowntagsascontent", "");
+        String omitDeprecatedTags = getArgValue(args, "omitdeprtags", "");
+        String treatDeprecatedTagsAsContent = getArgValue(args, "treatdeprtagsascontent", "");
+        String omitComments = getArgValue(args, "omitcomments", "");
+        String omitXmlDeclaration = getArgValue(args, OMITXMLDECL, "");
+        String omitDoctypeDeclaration = getArgValue(args, "omitdoctypedecl", "");
+        String omitHtmlEnvelope = getArgValue(args, "omithtmlenvelope", "");
+        String useEmptyElementTags = getArgValue(args, "useemptyelementtags", "");
+        String allowMultiWordAttributes = getArgValue(args, "allowmultiwordattributes", "");
+        String allowHtmlInsideAttributes = getArgValue(args, "allowhtmlinsideattributes", "");
+        String ignoreQuestAndExclam = getArgValue(args, "ignoreqe", "");
+        String namespacesAware= getArgValue(args, "namespacesaware", "");
+        String commentHyphen = getArgValue(args, "hyphenreplacement", "");
+        String pruneTags = getArgValue(args, "prunetags", "");
+        String booleanAtts = getArgValue(args, "booleanatts", "");
+        String nodeByXPath = getArgValue(args, "nodebyxpath", "");
 
         HtmlCleaner cleaner;
 
-        String tagInfoFile = getArgValue(args, "taginfofile");
+        String tagInfoFile = getArgValue(args, "taginfofile", "");
         if ( !"".equals(tagInfoFile) ) {
             cleaner = new HtmlCleaner(new ConfigFileTagProvider(new File(tagInfoFile)));
         } else {
@@ -152,6 +156,8 @@ public class CommandLine {
         }
 
         final CleanerProperties props = cleaner.getProperties();
+
+        props.addHtmlModificationListener(new HtmlModificationListenerLogger(Logger.getLogger(Logger.GLOBAL_LOGGER_NAME)));
 
         if ( !"".equals(omitUnknownTags) ) {
             props.setOmitUnknownTags( toBoolean(omitUnknownTags) );
@@ -235,8 +241,8 @@ public class CommandLine {
 
         // collect transformation info
         Map transInfos = new TreeMap();
-        for (int i = 0; i < args.length; i++) {
-            String arg = args[i];
+        for (String arg2 : args) {
+            String arg = arg2;
             if (arg.startsWith("t:") && arg.length() > 2) {
                 arg = arg.substring(2);
                 int index = arg.indexOf('=');

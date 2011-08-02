@@ -60,6 +60,7 @@ public class ContentNode extends BaseTokenImpl {
         return content;
     }
 
+    @Override
     public String toString() {
         return getContent();
     }

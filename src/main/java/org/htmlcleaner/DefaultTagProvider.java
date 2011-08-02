@@ -53,6 +53,7 @@ import java.util.concurrent.ConcurrentMap;
 @SuppressWarnings("serial")
 public class DefaultTagProvider implements ITagInfoProvider {
 
+    private static final String STRONG = "strong";
     private ConcurrentMap<String, TagInfo> tagInfoMap = new ConcurrentHashMap<String, TagInfo>();
     // singleton instance, used if no other TagInfoProvider is specified
     public final static DefaultTagProvider INSTANCE= new DefaultTagProvider();
@@ -72,7 +73,7 @@ public class DefaultTagProvider implements ITagInfoProvider {
 //            "dir", "map", "applet", "dl", "del", "fieldset", "ul", "b", "acronym", "a", "blockquote",
 //            "caption", "i", "u", "s", "frameset", "tt", "address", "q", "pre", "legend", "em", "dfn")));
         tagInfo = new TagInfo("div", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("div", tagInfo);
 
@@ -95,43 +96,43 @@ public class DefaultTagProvider implements ITagInfoProvider {
         this.put("bgsound", tagInfo);
 
         tagInfo = new TagInfo("h1", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("h1,h2,h3,h4,h5,h6,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("h1", tagInfo);
 
         tagInfo = new TagInfo("h2", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("h1,h2,h3,h4,h5,h6,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("h2", tagInfo);
 
         tagInfo = new TagInfo("h3", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("h1,h2,h3,h4,h5,h6,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("h3", tagInfo);
 
         tagInfo = new TagInfo("h4", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("h1,h2,h3,h4,h5,h6,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("h4", tagInfo);
 
         tagInfo = new TagInfo("h5", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("h1,h2,h3,h4,h5,h6,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("h5", tagInfo);
 
         tagInfo = new TagInfo("h6", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("h1,h2,h3,h4,h5,h6,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("h6", tagInfo);
 
-        // jericho parser requires <p></p> 
+        // jericho parser requires <p></p>
         tagInfo = new TagInfo("p", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("p", tagInfo);
 
-        tagInfo = new TagInfo("strong", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.inline);
-        this.put("strong", tagInfo);
+        tagInfo = new TagInfo(STRONG, ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.inline);
+        this.put(STRONG, tagInfo);
 
         tagInfo = new TagInfo("em", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("em", tagInfo);
@@ -143,7 +144,7 @@ public class DefaultTagProvider implements ITagInfoProvider {
         this.put("acronym", tagInfo);
 
         tagInfo = new TagInfo("address", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("address", tagInfo);
 
@@ -151,7 +152,7 @@ public class DefaultTagProvider implements ITagInfoProvider {
         this.put("bdo", tagInfo);
 
         tagInfo = new TagInfo("blockquote", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("blockquote", tagInfo);
 
@@ -160,7 +161,7 @@ public class DefaultTagProvider implements ITagInfoProvider {
 
         tagInfo = new TagInfo("q", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("q", tagInfo);
- 
+
         tagInfo = new TagInfo("code", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.inline);
         this.put("code", tagInfo);
 
@@ -177,7 +178,7 @@ public class DefaultTagProvider implements ITagInfoProvider {
         this.put("kbd", tagInfo);
 
         tagInfo = new TagInfo("pre", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("pre", tagInfo);
 
@@ -185,7 +186,7 @@ public class DefaultTagProvider implements ITagInfoProvider {
         this.put("samp", tagInfo);
 
         tagInfo = new TagInfo("listing", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("listing", tagInfo);
 
@@ -228,7 +229,7 @@ public class DefaultTagProvider implements ITagInfoProvider {
         this.put("object", tagInfo);
 
         tagInfo = new TagInfo("param", ContentType.none, BelongsTo.BODY, false, false, false, CloseTag.forbidden, Display.none);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("param", tagInfo);
 
@@ -239,22 +240,22 @@ public class DefaultTagProvider implements ITagInfoProvider {
         this.put("xml", tagInfo);
 
         tagInfo = new TagInfo("ul", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("ul", tagInfo);
 
         tagInfo = new TagInfo("ol", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("ol", tagInfo);
 
         tagInfo = new TagInfo("li", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.optional, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("li,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("li", tagInfo);
 
         tagInfo = new TagInfo("dl", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("dl", tagInfo);
 
@@ -267,18 +268,18 @@ public class DefaultTagProvider implements ITagInfoProvider {
         this.put("dd", tagInfo);
 
         tagInfo = new TagInfo("menu", ContentType.all, BelongsTo.BODY, true, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("menu", tagInfo);
 
         tagInfo = new TagInfo("dir", ContentType.all, BelongsTo.BODY, true, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("dir", tagInfo);
 
         tagInfo = new TagInfo("table", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineAllowedChildrenTags("tr,tbody,thead,tfoot,colgroup,caption,tr");
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("tr,thead,tbody,tfoot,caption,colgroup,table,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("table", tagInfo);
 
@@ -290,7 +291,7 @@ public class DefaultTagProvider implements ITagInfoProvider {
         tagInfo.defineCloseBeforeTags("tr,td,th,caption,colgroup");
         this.put("tr", tagInfo);
 
-        // jericho parser requires <td></td> 
+        // jericho parser requires <td></td>
         tagInfo = new TagInfo("td", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
         tagInfo.defineFatalTags("table");
         tagInfo.defineRequiredEnclosingTags("tr");
@@ -338,7 +339,7 @@ public class DefaultTagProvider implements ITagInfoProvider {
 
         tagInfo = new TagInfo("form", ContentType.all, BelongsTo.BODY, false, false, true, CloseTag.required, Display.block);
         tagInfo.defineForbiddenTags("form");
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("option,optgroup,textarea,select,fieldset,p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("form", tagInfo);
 
@@ -374,12 +375,12 @@ public class DefaultTagProvider implements ITagInfoProvider {
         this.put("label", tagInfo);
 
         tagInfo = new TagInfo("fieldset", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("fieldset", tagInfo);
 
         tagInfo = new TagInfo("isindex", ContentType.none, BelongsTo.BODY, true, false, false, CloseTag.forbidden, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("isindex", tagInfo);
 
@@ -430,7 +431,7 @@ public class DefaultTagProvider implements ITagInfoProvider {
         this.put("blink", tagInfo);
 
         tagInfo = new TagInfo("marquee", ContentType.all, BelongsTo.BODY, false, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("marquee", tagInfo);
 
@@ -439,7 +440,7 @@ public class DefaultTagProvider implements ITagInfoProvider {
         this.put("s", tagInfo);
 
         tagInfo = new TagInfo("hr", ContentType.none, BelongsTo.BODY, false, false, false, CloseTag.forbidden, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("hr", tagInfo);
 
@@ -450,7 +451,7 @@ public class DefaultTagProvider implements ITagInfoProvider {
         this.put("basefont", tagInfo);
 
         tagInfo = new TagInfo("center", ContentType.all, BelongsTo.BODY, true, false, false, CloseTag.required, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("center", tagInfo);
 
@@ -464,7 +465,7 @@ public class DefaultTagProvider implements ITagInfoProvider {
         this.put("iframe", tagInfo);
 
         tagInfo = new TagInfo("embed", ContentType.none, BelongsTo.BODY, false, false, false, CloseTag.forbidden, Display.block);
-        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo,strong,em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
+        tagInfo.defineCloseBeforeCopyInsideTags("a,bdo"+STRONG+"em,q,b,i,u,tt,sub,sup,big,small,strike,s,font");
         tagInfo.defineCloseBeforeTags("p,address,label,abbr,acronym,dfn,kbd,samp,var,cite,code,param,xml");
         this.put("embed", tagInfo);
     }
