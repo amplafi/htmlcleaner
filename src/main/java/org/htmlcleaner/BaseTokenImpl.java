@@ -10,6 +10,10 @@ public abstract class BaseTokenImpl implements BaseToken {
 
     private int row;
     private int col;
+    
+    protected BaseTokenImpl(){
+    	
+    }
 
     protected BaseTokenImpl(int row, int col) {
         this.row = row;
