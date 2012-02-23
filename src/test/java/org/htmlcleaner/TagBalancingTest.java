@@ -24,6 +24,17 @@ public class TagBalancingTest extends TestCase {
     protected void setUp() throws Exception {
     }
     
+    public void testShouldReopenTagHavingItemsToMove() throws XPatherException, IOException  {
+    	HtmlCleaner cleaner = new HtmlCleaner();
+    	cleaner.getProperties().setOmitXmlDeclaration(true);
+    	cleaner.getProperties().setOmitComments(true);
+    	SimpleXmlSerializer serializer = new SimpleXmlSerializer(cleaner.getProperties());
+    	
+    	String expected = FileUtils.readFully(new FileReader((new File("src/test/resources/reopenTagHavingItemsToMove-cleaned.html"))));
+    	String actual = serializer.getXmlAsString(cleaner.clean(new File("src/test/resources/reopenTagHavingItemsToMove.html")));
+    	assertEquals(expected.trim(), actual.trim());
+    }
+    
     public void testShouldSupportBreakingSeveralOpenTags() throws XPatherException, IOException {
     	HtmlCleaner cleaner = new HtmlCleaner();
     	cleaner.getProperties().setOmitXmlDeclaration(true);
