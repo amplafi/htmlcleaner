@@ -1,12 +1,19 @@
 package org.htmlcleaner;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+
 import junit.framework.TestCase;
+
+import org.apache.tools.ant.util.FileUtils;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-
-import java.io.*;
 
 /**
  * Tests parsing and tag balancing.
@@ -16,7 +23,30 @@ public class TagBalancingTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
     }
-
+    
+    public void testShouldReopenTagHavingItemsToMove() throws XPatherException, IOException  {
+    	HtmlCleaner cleaner = new HtmlCleaner();
+    	cleaner.getProperties().setOmitXmlDeclaration(true);
+    	cleaner.getProperties().setOmitComments(true);
+    	SimpleXmlSerializer serializer = new SimpleXmlSerializer(cleaner.getProperties());
+    	
+    	String expected = FileUtils.readFully(new FileReader((new File("src/test/resources/reopenTagHavingItemsToMove-cleaned.html"))));
+    	String actual = serializer.getXmlAsString(cleaner.clean(new File("src/test/resources/reopenTagHavingItemsToMove.html")));
+    	assertEquals(expected.trim(), actual.trim());
+    }
+    
+    public void testShouldSupportBreakingSeveralOpenTags() throws XPatherException, IOException {
+    	HtmlCleaner cleaner = new HtmlCleaner();
+    	cleaner.getProperties().setOmitXmlDeclaration(true);
+    	cleaner.getProperties().setOmitComments(true);
+    	SimpleXmlSerializer serializer = new SimpleXmlSerializer(cleaner.getProperties());
+    	
+    	String expected = FileUtils.readFully(new FileReader((new File("src/test/resources/severalTagsClosedByChildBreak-cleaned.html"))));
+    	String actual = serializer.getXmlAsString(cleaner.clean(new File("src/test/resources/severalTagsClosedByChildBreak.html")));
+    	
+    	assertEquals(expected.trim(), actual.trim());
+    }
+    
     public void testBalancing() throws XPatherException, IOException {
         assertHtml(
                 "<u>aa<i>a<b>at</u> fi</i>rst</b> text",
