@@ -5,7 +5,7 @@
     <groupId>org.htmlcleaner</groupId>
     <artifactId>htmlcleaner</artifactId>
     <packaging>jar</packaging>
-    <version>2.2.3a</version>
+    <version>2.2.3.1</version>
     <name>HtmlCleaner</name>
     <description>
         HtmlCleaner is an HTML parser written in Java. It transforms dirty HTML to well-formed XML following
@@ -132,6 +132,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
@@ -142,6 +143,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.9</version>
                 <!-- eclipse:configure-workspace adds M2_REPO to eclipse -->
                 <!-- workspaceActiveCodeStyleProfileName Name of a profile in workspaceCodeStylesURL to activate. Default is the first profile name in the code style file in workspaceCodeStylesURL -->
                 <!-- workspaceCodeStylesURL String Point to a URL containing code styles content. -->
