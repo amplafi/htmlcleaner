@@ -206,11 +206,11 @@ public class Utils {
                             if ( !isValidXmlChar(unicodeChar) ) {
                                 i = charIndex;
                             } else if ( !isReservedXmlChar(unicodeChar) ) {
-                                result.append( recognizeUnicodeChars ? String.valueOf(unicodeChar) : "&#" + unicode + ";" );
+                                result.append( recognizeUnicodeChars ? String.valueOf(unicodeChar) : "&#" + (isHex ? "x" : "") + unicode + ";" );
                                 i = charIndex;
                             } else {
                                 i = charIndex;
-                                result.append("&#" + unicode + ";");
+                                result.append("&#" + (isHex ? "x" : "") + unicode + ";");
                             }
     					} else {
     						result.append("&amp;");
