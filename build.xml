@@ -43,7 +43,7 @@
     <target name="javadoc">
         <javadoc access="protected"
                  author="true"
-                 source="1.4"
+                 source="1.5"
                  destdir="doc"
                  nodeprecated="false"
                  nodeprecatedlist="false"

@@ -46,7 +46,17 @@
                 <role>Developer</role>
             </roles>
             <timezone>-8</timezone>
-            <email>patmoore@users.sourceforge.net</email>
+            <email>patmoore@farreach.es</email>
+        </developer>
+        <developer>
+            <name>Scott Wilson</name>
+            <id>scottbw</id>
+            <roles>
+                <role>Project Admin</role>
+                <role>Developer</role>
+            </roles>
+            <timezone>1</timezone>
+            <email>scottbw@apache.org</email>
         </developer>
     </developers>
     <!-- <scm> <url>http://htmlcleaner.svn.sourceforge.net/</url> </scm> -->
@@ -137,6 +147,7 @@
                     <source>1.5</source>
                     <target>1.5</target>
                     <encoding>UTF-8</encoding>
+                    <optimize>true</optimize>
                 </configuration>
             </plugin>
 
@@ -168,7 +179,6 @@
             </extension>
             <!-- sftp patmoore,amplafi-flow@web.sourceforge.net <extension> <groupId>org.apache.maven.wagon</groupId> <artifactId>wagon-sftp</artifactId> <version>${wagon-build}</version> </extension> -->
         </extensions>
-
     </build>
     <distributionManagement>
         <repository>
