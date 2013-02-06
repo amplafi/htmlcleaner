@@ -1,4 +1,4 @@
-Copyright (c) 2006-2010, Vladimir Nikic
+Copyright (c) 2006-2013, Vladimir Nikic
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
