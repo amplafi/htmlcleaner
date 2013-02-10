@@ -112,4 +112,24 @@ public class SpecialEntity{
     public char charValue() {
         return (char) intValue();
     }
+    /**
+     * @return Numeric Character Reference in decimal format
+     */
+    public String getDecimalNCR() {
+        return "&#" + intCode + ";";
+    }
+
+    /**
+     * @return Numeric Character Reference in hex format
+     */
+    public String getHexNCR() {
+        return "&#x" + Integer.toHexString(intCode) + ";";
+    }
+
+    /**
+     * @return Escaped value of the entity
+     */
+    public String getEscapedValue() {
+        return "&" + key + ";";
+    }
 }
