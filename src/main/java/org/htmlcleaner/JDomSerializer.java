@@ -7,10 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>DOM serializer - creates xml DOM.</p>
- * 
- * Created by: Vladimir Nikic, Benson Margulies <br/>
- * Date: April, 2007.
+ * <p>JDom serializer - creates xml JDom instance out of the TagNode.</p>
  */
 public class JDomSerializer {
 

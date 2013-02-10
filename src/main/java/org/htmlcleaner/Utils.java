@@ -290,7 +290,7 @@ public class Utils {
     }
 
     /**
-     * Chacks whether specified string can be valid tag name or attribute name in xml.
+     * Checks whether specified string can be valid tag name or attribute name in xml.
      * @param s String to be checked
      * @return True if string is valid xml identifier, false otherwise
      */

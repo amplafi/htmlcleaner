@@ -53,8 +53,7 @@ import org.htmlcleaner.audit.HtmlModificationListener;
  * Date: March, 2008.
  */
 public class CleanerProperties implements HtmlModificationListener{
-
-//    public static final String DEFAULT_CHARSET = System.getProperty("file.encoding");
+    // Force consistent cross-platform encoding ( mandatory for reliable server operation)
     public static final String DEFAULT_CHARSET = "UTF-8";
     public static final String BOOL_ATT_SELF = "self";
     public static final String BOOL_ATT_EMPTY = "empty";
