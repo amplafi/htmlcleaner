@@ -113,5 +113,19 @@ public class DoctypeToken extends BaseTokenImpl {
     public void serialize(XmlSerializer xmlSerializer, Writer writer) throws IOException {
     	writer.write(getContent() + "\n");
     }
+    public String getPart1() {
+        return part1;
+    }
 
+    public String getPart2() {
+        return part2;
+    }
+
+    public String getPart3() {
+        return part3;
+    }
+
+    public String getPart4() {
+        return part4;
+    }
 }
