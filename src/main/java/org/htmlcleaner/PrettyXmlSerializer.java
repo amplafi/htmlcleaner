@@ -46,10 +46,13 @@ import java.util.*;
  */
 public class PrettyXmlSerializer extends XmlSerializer {
 
-	private static final String INDENTATION_STRING = "\t";
-
+	private String indentString;
+    public PrettyXmlSerializer(CleanerProperties props, String indentString) {
+        super(props);
+        this.indentString = indentString;
+    }
 	public PrettyXmlSerializer(CleanerProperties props) {
-		super(props);
+	    this(props, "\t");
 	}
 
 	@Override
@@ -64,7 +67,7 @@ public class PrettyXmlSerializer extends XmlSerializer {
     private String indent(int level) {
         String result = "";
         while (level > 0) {
-            result += INDENTATION_STRING;
+            result += this.indentString;
             level--;
         }
 

@@ -284,10 +284,6 @@ public class HtmlCleaner {
 
     private CleanerProperties properties;
 
-    // Seems unnecessary since CleanerProperties also has the same value ( possible confusion ).
-    @Deprecated
-    private ITagInfoProvider tagInfoProvider;
-
     private CleanerTransformations transformations;
 
     private transient Stack<NestingState> nestingStates = new Stack<NestingState>();
@@ -336,9 +332,8 @@ public class HtmlCleaner {
 	 * @param properties Properties used during parsing and serializing
 	 */
 	public HtmlCleaner(ITagInfoProvider tagInfoProvider, CleanerProperties properties) {
-        this.tagInfoProvider = tagInfoProvider == null ? DefaultTagProvider.INSTANCE : tagInfoProvider;
         this.properties = properties == null ? new CleanerProperties() : properties;
-        this.properties.setTagInfoProvider(this.tagInfoProvider);
+        this.properties.setTagInfoProvider(tagInfoProvider == null ? DefaultTagProvider.INSTANCE : tagInfoProvider);
 	}
 
     public TagNode clean(String htmlContent) {
@@ -1049,7 +1044,7 @@ public class HtmlCleaner {
      * @return ITagInfoProvider instance for this HtmlCleaner
      */
     public ITagInfoProvider getTagInfoProvider() {
-        return tagInfoProvider;
+        return this.properties.getTagInfoProvider();
     }
 
     /**
