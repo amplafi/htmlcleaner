@@ -46,9 +46,6 @@ import java.util.concurrent.ConcurrentMap;
  * It is used as default tag info provider.
  * Class is created for performance purposes - parsing XML file requires some
  * processing time.
- *
- * Created by: Vladimir Nikic<br/>
- * Date: April, 2008.
  */
 @SuppressWarnings("serial")
 public class DefaultTagProvider implements ITagInfoProvider {

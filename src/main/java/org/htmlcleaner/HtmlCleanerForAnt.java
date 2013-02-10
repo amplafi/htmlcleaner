@@ -48,9 +48,6 @@ import java.util.*;
 
 /**
  * <p>Support for ANT.</p>
- *
- * Created by: Vladimir Nikic <br/>
- * Date: December, 2006.
  */
 public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
 
@@ -210,6 +207,7 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
      * Implementation of Ant task execution.
      * @throws BuildException
      */
+    @Override
     public void execute() throws BuildException {
         HtmlCleaner cleaner;
 
@@ -252,8 +250,7 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
         if ( !Utils.isEmptyString(transform) ) {
             String[] transItems = Utils.tokenize(transform, "|");
             Map transInfos = new TreeMap();
-            for (int i = 0; i < transItems.length; i++) {
-                String item = transItems[i];
+            for (String item : transItems) {
                 int index = item.indexOf('=');
                 String key = index <= 0 ? item : item.substring(0, index);
                 String value = index <= 0 ? null : item.substring(index + 1);
@@ -281,9 +278,9 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
             // try to evaluate XPath and look for first TagNode instance in the resulting array
             if ( nodebyxpath != null ) {
                 final Object[] xpathResult = node.evaluateXPath(nodebyxpath);
-                for (int i = 0; i < xpathResult.length; i++) {
-                    if ( xpathResult[i] instanceof TagNode ) {
-                        node = (TagNode) xpathResult[i];
+                for (Object element : xpathResult) {
+                    if ( element instanceof TagNode ) {
+                        node = (TagNode) element;
                         break;
                     }
                 }

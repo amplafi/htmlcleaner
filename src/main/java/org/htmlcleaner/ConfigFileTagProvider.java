@@ -52,9 +52,6 @@ import java.net.URL;
 
 /**
  * Default tag provider - reads XML file in specified format and creates tag infos
- * 
- * Created by: Vladimir Nikic<br/>
- * Date: April, 2008.
  */
 public class ConfigFileTagProvider extends HashMap implements ITagInfoProvider {
 
@@ -156,6 +153,7 @@ public class ConfigFileTagProvider extends HashMap implements ITagInfoProvider {
             parser.parse(in, this);
         }
 
+        @Override
         public void characters(char[] ch, int start, int length) throws SAXException {
             if (tagInfo != null) {
                 String value = new String(ch, start, length).trim();
@@ -203,6 +201,7 @@ public class ConfigFileTagProvider extends HashMap implements ITagInfoProvider {
             }
         }
 
+        @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
             if ( "tag".equals(qName) ) {
                 String name = attributes.getValue("name");
@@ -233,6 +232,7 @@ public class ConfigFileTagProvider extends HashMap implements ITagInfoProvider {
             }
         }
 
+        @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
             if ( "tag".equals(qName) ) {
                 if (tagInfo != null) {

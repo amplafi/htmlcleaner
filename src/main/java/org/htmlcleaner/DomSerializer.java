@@ -12,9 +12,6 @@ import java.util.Map;
 
 /**
  * <p>DOM serializer - creates xml DOM.</p>
- *
- * Created by: Vladimir Nikic<br/>
- * Date: April, 2007.
  */
 public class DomSerializer {
 

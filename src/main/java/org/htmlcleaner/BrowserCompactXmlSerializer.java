@@ -51,9 +51,6 @@ import java.util.StringTokenizer;
  *  for web-browsers, which usually treat multiple whitespaces as single one, but make difference
  *  between single whitespace and empty text.
  * </p>
- *
- * Created by: Vladimir Nikic<br/>
- * Date: November, 2006.
  */
 public class BrowserCompactXmlSerializer extends XmlSerializer {
 

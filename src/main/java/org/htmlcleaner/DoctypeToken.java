@@ -42,9 +42,6 @@ import java.io.Writer;
 
 /**
  * <p>HTML doctype token.</p>
- *
- * Created by: Vladimir Nikic<br/>
- * Date: November, 2006.
  */
 public class DoctypeToken extends BaseTokenImpl {
 
@@ -59,7 +56,7 @@ public class DoctypeToken extends BaseTokenImpl {
         this.part3 = clean(part3);
         this.part4 = clean(part4);
     }
-    
+
     private String clean(String s) {
     	if (s != null) {
 	    	s = s.replace('>', ' ');

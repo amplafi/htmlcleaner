@@ -128,7 +128,7 @@ public class Utils {
         return escapeXml(s, advanced, recognizeUnicodeChars, translateSpecialEntities, isDomCreation);
     }
     /**
-     * change notes: 
+     * change notes:
      * 1) convert ascii characters encoded using &#xx; format to the ascii characters -- may be an attempt to slip in malicious html
      * 2) convert &#xxx; format characters to &quot; style representation if available for the character.
      * 3) convert html special entities to xml &#xxx; when outputing in xml
@@ -185,7 +185,7 @@ public class Utils {
     private static final Pattern ASCII_CHAR = Pattern.compile("\\p{Print}");
     /**
      * @param s
-     * @param domCreation 
+     * @param domCreation
      * @param recognizeUnicodeChars
      * @param result
      * @param i
@@ -204,17 +204,17 @@ public class Utils {
                     // null character &#0Peanut for example
                     // just consume character &
                     result.append("&amp;");
-                } else if ( specialEntity != null && 
-                        // special characters that are always escaped. 
-                        (!specialEntity.isHtmlSpecialEntity() 
-                                // OR we are not outputting unicode characters as the characters ( they are staying escaped ) 
+                } else if ( specialEntity != null &&
+                        // special characters that are always escaped.
+                        (!specialEntity.isHtmlSpecialEntity()
+                                // OR we are not outputting unicode characters as the characters ( they are staying escaped )
                                 || !recognizeUnicodeChars)) {
                     result.append(domCreation?specialEntity.getHtmlString():specialEntity.getEscapedXmlString());
                 } else if ( recognizeUnicodeChars ) {
                     // output unicode characters as their actual byte code with the exception of characters that have special xml meaning.
                     result.append( String.valueOf(unicodeChar));
                 } else if ( ASCII_CHAR.matcher(new String(new char[] { unicodeChar } )).find()) {
-                    // ascii printable character. this fancy escaping might be an attempt to slip in dangerous characters (i.e. spelling out <script> ) 
+                    // ascii printable character. this fancy escaping might be an attempt to slip in dangerous characters (i.e. spelling out <script> )
                     // by converting to printable characters we can more easily detect such attacks.
                     result.append(String.valueOf(unicodeChar));
                 } else {

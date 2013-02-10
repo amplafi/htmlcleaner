@@ -43,9 +43,6 @@ import java.util.*;
 
 /**
  * <p>Compact XML serializer - creates resulting XML by stripping whitespaces.</p>
- *
- * Created by: Vladimir Nikic<br/>
- * Date: November, 2006.
  */
 public class CompactXmlSerializer extends XmlSerializer {
 
@@ -53,6 +50,7 @@ public class CompactXmlSerializer extends XmlSerializer {
 		super(props);
 	}
 
+    @Override
     protected void serialize(TagNode tagNode, Writer writer) throws IOException {
         serializeOpenTag(tagNode, writer, false);
 

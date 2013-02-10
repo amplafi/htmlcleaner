@@ -48,9 +48,6 @@ import org.htmlcleaner.audit.HtmlModificationListener;
 
 /**
  * Properties defining cleaner's behaviour
- *
- * Created by: Vladimir Nikic<br/>
- * Date: March, 2008.
  */
 public class CleanerProperties implements HtmlModificationListener{
     // Force consistent cross-platform encoding ( mandatory for reliable server operation)
@@ -396,26 +393,26 @@ public class CleanerProperties implements HtmlModificationListener{
      * advancedXmlEscape = true;
      * useCdataForScriptAndStyle = true;
      * translateSpecialEntities = true;
-     * recognizeUnicodeChars = true; 
-     * omitUnknownTags = false; 
+     * recognizeUnicodeChars = true;
+     * omitUnknownTags = false;
      * treatUnknownTagsAsContent = false;
      * omitDeprecatedTags = false;
-     * treatDeprecatedTagsAsContent = false; 
+     * treatDeprecatedTagsAsContent = false;
      * omitComments = false;
-     * omitXmlDeclaration = OptionalOutput.alwaysOutput; 
-     * omitDoctypeDeclaration = OptionalOutput.alwaysOutput; 
+     * omitXmlDeclaration = OptionalOutput.alwaysOutput;
+     * omitDoctypeDeclaration = OptionalOutput.alwaysOutput;
      * omitHtmlEnvelope = OptionalOutput.alwaysOutput;
-     * useEmptyElementTags = true; 
-     * allowMultiWordAttributes = true; 
-     * allowHtmlInsideAttributes = false; 
-     * ignoreQuestAndExclam = false; 
+     * useEmptyElementTags = true;
+     * allowMultiWordAttributes = true;
+     * allowHtmlInsideAttributes = false;
+     * ignoreQuestAndExclam = false;
      * namespacesAware = true;
      * keepHeadWhitespace = true;
-     * addNewlineToHeadAndBody = true; 
-     * hyphenReplacementInComment = "="; 
-     * pruneTags = null; 
+     * addNewlineToHeadAndBody = true;
+     * hyphenReplacementInComment = "=";
+     * pruneTags = null;
      * allowTags = null;
-     * booleanAttributeValues = BOOL_ATT_SELF; 
+     * booleanAttributeValues = BOOL_ATT_SELF;
      * collapseNullHtml = CollapseHtml.none
      * charset = "UTF-8";
      */

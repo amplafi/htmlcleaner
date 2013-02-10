@@ -61,8 +61,6 @@ import java.util.StringTokenizer;
  *      <li>data(//a['v' < @id])</li>
  * </ul>
  * </code>
- * Created by: Vladimir Nikic<br/>
- * Date: March, 2008.
  */
 public class XPather {
 

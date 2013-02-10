@@ -102,9 +102,6 @@ import org.htmlcleaner.audit.ErrorType;
  *   myJDom = new JDomSerializer(props, true).createJDom(aNode);
  *   myDom = new DomSerializer(props, true).createDOM(aNode);
  * </xmp>
- *
- * Created by: Vladimir Nikic <br/>
- * Date: November, 2006
  */
 public class HtmlCleaner {
 
@@ -367,7 +364,15 @@ public class HtmlCleaner {
         Reader reader = new StringReader( content.toString() );
         return clean(reader);
     }
-
+    /**
+     * Creates instance from the content downloaded from specified URL.
+     * HTML encoding is resolved following the attempts in the sequence:
+     * 1. reading Content-Type response header, 2. Analyzing META tags at the
+     * beginning of the html, 3. Using platform's default charset.
+     * @param url
+     * @return
+     * @throws IOException
+     */
     public TagNode clean(URL url) throws IOException {
         return clean(url, properties.getCharset());
     }
@@ -660,12 +665,12 @@ public class HtmlCleaner {
                         }
                         while( !getChildBreaks().isEmpty() && tagName.equals(getChildBreaks().getLastBreakingTag())
                         		&& matchingPosition.position == getChildBreaks().getLastBreakingTagPosition()){
-                        	
+
                         	if(nodeList.get(getChildBreaks().closedByChildBreak.peek().position) != null) {
                         		//this tag has broken it's parent, thus the parent tag should be reopened.
                         		int position = getChildBreaks().pop().position;
                         		Object toReopen = nodeList.get(position);
-                        		
+
                         		if(toReopen instanceof TagNode) {
                         			// normal case
                         			reopenBrokenNode(nodeIterator, (TagNode)toReopen);
@@ -675,29 +680,29 @@ public class HtmlCleaner {
                         		    //  <br/> -- added to table's itemsToMove
                         		    //   <table> -- will close first table and result in List[br, table]
                         			//   </table> -- will try to reopen table, but table is now  a List
-                        			
+
                         			List<TagNode> tagNodes = (List<TagNode>) toReopen;
-                        			
+
                         			for(TagNode n : tagNodes) {
                         				nodeIterator.add(n);
                         				makeTree(nodeList, nodeList.listIterator(nodeList.size()-1));
                         			}
-                        			// delete the elements from the previous position, we should not need them anymore 
+                        			// delete the elements from the previous position, we should not need them anymore
                         			nodeList.set(position, null);
-                        			
+
                         		}
-                                	
+
                         	} else {
-                        		// Example of when it happens : 
+                        		// Example of when it happens :
                         		// <li>Some incomplete li
                         		// <p><li>
                         		// When starting the second li tag, it will first close p, then the previous li.
                         		// li will then become the parent of p, and thus p will become null in the node list
-                        		// so we cannot do much about that. 
+                        		// so we cannot do much about that.
                         		// This means the HTML is messed up anyways, so we will not add a new p tag.
                         		getChildBreaks().pop();
                         	}
-                            
+
                         }
                     }
                 }

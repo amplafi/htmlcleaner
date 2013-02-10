@@ -100,9 +100,6 @@ import java.util.*;
  *      <li>if previous open tag is one of <code>tr</code>, <code>caption</code> or <code>colgroup</code>, it will be implicitly closed.</li>
  *   </ul>
  * </p>
- * <br>
- * Created by Vladimir Nikic.<br/>
- * Date: November, 2006
  */
 public class TagInfo {
 
@@ -202,11 +199,11 @@ public class TagInfo {
     }
 
     // getters and setters
-    
+
     public Display getDisplay() {
     	return display;
     }
-    
+
     public void setDisplay(Display display) {
     	this.display = display;
     }
@@ -367,7 +364,7 @@ public class TagInfo {
     }
 
     /**
-     * 
+     *
      * @param token
      * @return true if the passed token is allowed to be nested in a Tag with this TagInfo.
      */
