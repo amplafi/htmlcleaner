@@ -57,6 +57,7 @@ import java.util.Stack;
 import java.util.TreeSet;
 
 import org.htmlcleaner.audit.ErrorType;
+import org.htmlcleaner.conditional.ITagNodeCondition;
 
 /**
  * Main HtmlCleaner class.

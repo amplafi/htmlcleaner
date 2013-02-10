@@ -34,8 +34,8 @@
 */
 package org.htmlcleaner.audit;
 
-import org.htmlcleaner.ITagNodeCondition;
 import org.htmlcleaner.TagNode;
+import org.htmlcleaner.conditional.ITagNodeCondition;
 
 /**
  * Implementors can be registered on {@link org.htmlcleaner.CleanerProperties} to receive notifications about

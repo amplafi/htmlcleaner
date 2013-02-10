@@ -40,7 +40,12 @@ package org.htmlcleaner;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
-import java.util.regex.Pattern;
+
+import org.htmlcleaner.conditional.ITagNodeCondition;
+import org.htmlcleaner.conditional.TagAllCondition;
+import org.htmlcleaner.conditional.TagNodeAttExistsCondition;
+import org.htmlcleaner.conditional.TagNodeAttValueCondition;
+import org.htmlcleaner.conditional.TagNodeNameCondition;
 
 /**
  * <p>
@@ -51,96 +56,6 @@ import java.util.regex.Pattern;
  * </p>
  */
 public class TagNode extends TagToken {
-
-
-    /**
-     * All nodes.
-     */
-    public static class TagAllCondition implements ITagNodeCondition {
-        public boolean satisfy(TagNode tagNode) {
-            return true;
-        }
-    }
-
-    /**
-     * Checks if node has specified name.
-     */
-    public static class TagNodeNameCondition implements ITagNodeCondition {
-        private String name;
-
-        public TagNodeNameCondition(String name) {
-            this.name = name;
-        }
-
-        public boolean satisfy(TagNode tagNode) {
-            return tagNode == null ? false : tagNode.name.equalsIgnoreCase(this.name);
-        }
-    }
-
-    /**
-     * Checks if node contains specified attribute.
-     */
-    public static class TagNodeAttExistsCondition implements ITagNodeCondition {
-        private String attName;
-
-        public TagNodeAttExistsCondition(String attName) {
-            this.attName = attName;
-        }
-
-        public boolean satisfy(TagNode tagNode) {
-            return tagNode == null ? false : tagNode.attributes.containsKey( attName.toLowerCase() );
-        }
-    }
-
-    /**
-     * Checks if node has specified attribute with specified value.
-     */
-    public static class TagNodeAttValueCondition implements ITagNodeCondition {
-        private String attName;
-        private String attValue;
-        private boolean isCaseSensitive;
-
-        public TagNodeAttValueCondition(String attName, String attValue, boolean isCaseSensitive) {
-            this.attName = attName;
-            this.attValue = attValue;
-            this.isCaseSensitive = isCaseSensitive;
-        }
-
-        public boolean satisfy(TagNode tagNode) {
-            if (tagNode == null || attName == null || attValue == null) {
-                return false;
-            } else {
-                return isCaseSensitive ?
-                        attValue.equals( tagNode.getAttributeByName(attName) ) :
-                        attValue.equalsIgnoreCase( tagNode.getAttributeByName(attName) );
-            }
-        }
-    }
-
-    /**
-     * Checks if node has specified attribute with specified value.
-     */
-    public static class TagNodeAttNameValueRegexCondition implements ITagNodeCondition {
-        private Pattern attNameRegex;
-        private Pattern attValueRegex;
-
-        public TagNodeAttNameValueRegexCondition(Pattern attNameRegex, Pattern attValueRegex) {
-            this.attNameRegex = attNameRegex;
-            this.attValueRegex = attValueRegex;
-        }
-
-        public boolean satisfy(TagNode tagNode) {
-            if (tagNode != null ) {
-                for(Map.Entry<String, String>entry: tagNode.getAttributes().entrySet()) {
-                    if ( (attNameRegex == null || attNameRegex.matcher(entry.getKey()).find()) && (attValueRegex == null || attValueRegex.matcher( entry.getValue() ).find())) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-    }
-
     private TagNode parent;
     private Map<String, String> attributes = new LinkedHashMap<String, String>();
     private List children = new ArrayList();

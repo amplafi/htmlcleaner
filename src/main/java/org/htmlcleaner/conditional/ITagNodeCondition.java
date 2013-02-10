@@ -1,4 +1,6 @@
-package org.htmlcleaner;
+package org.htmlcleaner.conditional;
+
+import org.htmlcleaner.TagNode;
 
 /**
  * Used as base for different node checkers.

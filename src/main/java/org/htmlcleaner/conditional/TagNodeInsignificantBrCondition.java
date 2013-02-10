@@ -1,6 +1,8 @@
-package org.htmlcleaner;
+package org.htmlcleaner.conditional;
 
 import java.util.List;
+
+import org.htmlcleaner.TagNode;
 
 /**
  * Checks if node is an insignificant br tag -- is placed at the end or at the

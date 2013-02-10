@@ -1,8 +1,13 @@
-package org.htmlcleaner;
+package org.htmlcleaner.conditional;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.htmlcleaner.ContentNode;
+import org.htmlcleaner.ITagInfoProvider;
+import org.htmlcleaner.TagInfo;
+import org.htmlcleaner.TagNode;
 
 import static org.htmlcleaner.Utils.isEmptyString;
 import static org.htmlcleaner.Display.*;

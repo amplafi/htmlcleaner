@@ -1,5 +1,8 @@
 package org.htmlcleaner;
 
+import org.htmlcleaner.conditional.TagNodeEmptyContentCondition;
+import org.htmlcleaner.conditional.TagNodeInsignificantBrCondition;
+
 import junit.framework.TestCase;
 
 /**

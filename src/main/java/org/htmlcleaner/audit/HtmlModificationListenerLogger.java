@@ -2,8 +2,8 @@ package org.htmlcleaner.audit;
 
 import java.util.logging.Logger;
 
-import org.htmlcleaner.ITagNodeCondition;
 import org.htmlcleaner.TagNode;
+import org.htmlcleaner.conditional.ITagNodeCondition;
 
 public class HtmlModificationListenerLogger implements HtmlModificationListener {
 
