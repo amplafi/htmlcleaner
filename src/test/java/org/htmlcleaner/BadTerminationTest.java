@@ -13,15 +13,15 @@ public class BadTerminationTest extends TestCase{
         cleanerProperties.setOmitHtmlEnvelope(true);
         cleanerProperties.setOmitXmlDeclaration(true);
         cleanerProperties.setUseEmptyElementTags(false);
-        String output = new SimpleXmlSerializer().getXmlAsString(cleanerProperties, "<div></div id=\"foo\">", "UTF-8");
+        String output = new SimpleXmlSerializer(cleanerProperties).getXmlAsString(cleanerProperties, "<div></div id=\"foo\">", "UTF-8");
         assertEquals("<div></div>", output);
     }
-    
+
 //    public void testWhiteSpaceInTag() throws Exception {
-//        String s = "<html><body><table width=\"838\" cellpadding=\"5\" cellspacing=\"0\">\n" + 
-//        		"                <tbody>\n" + 
-//        		"                <td width=\"704\"> </td>\n" + 
-//        		"                </tr\n" + 
+//        String s = "<html><body><table width=\"838\" cellpadding=\"5\" cellspacing=\"0\">\n" +
+//        		"                <tbody>\n" +
+//        		"                <td width=\"704\"> </td>\n" +
+//        		"                </tr\n" +
 //        		"                ></tbody>< /table></bo dy>";
 //        CleanerProperties cleanerProperties = new CleanerProperties();
 //        cleanerProperties.setOmitHtmlEnvelope(false);

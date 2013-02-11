@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
  */
 public class PropertiesTest extends TestCase {
 
-    public void testProperties() throws Exception {
+    public void testPropertiesAdvancedXmlEscape() throws Exception {
         HtmlCleaner cleaner = new HtmlCleaner();
         CleanerProperties properties = cleaner.getProperties();
         properties.setNamespacesAware(false);
@@ -23,25 +23,44 @@ public class PropertiesTest extends TestCase {
         properties.setAdvancedXmlEscape(false);
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString, xmlString.indexOf("<div>&amp;amp;&amp;quot;&amp;apos;&amp;lt;&amp;gt;</div>") >= 0);
-
+    }
+    public void testUseCdataForScriptAndStyle() throws Exception {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        String xmlString;
+        properties.setNamespacesAware(false);
+        properties.setAdvancedXmlEscape(false);
         properties.setUseCdataForScriptAndStyle(true);
         xmlString = getXmlString(cleaner, properties);
         String expected = "<script>"+XmlSerializer.SAFE_BEGIN_CDATA+"var x=y&&z;"+XmlSerializer.SAFE_END_CDATA+"</script>";
         assertTrue("looking for :\""+expected+"\" in :\n"+ xmlString,  xmlString.indexOf(expected) >= 0 );
         expected = "<style>"+XmlSerializer.SAFE_BEGIN_CDATA+".test{font-size:10;}"+XmlSerializer.SAFE_END_CDATA+"</style>";
         assertTrue("looking for :\""+expected+"\" in :\n"+ xmlString, xmlString.indexOf(expected) >= 0);
-        assertTrue( xmlString.indexOf("<script></script>") >= 0 );
-        assertTrue( xmlString.indexOf("<style></style>") >= 0 );
         properties.setUseCdataForScriptAndStyle(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<script>var x=y&amp;&amp;z;</script>") >= 0 );
-        assertTrue( getXmlString(cleaner, properties).indexOf("<style>.test{font-size:10;}</style>") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<script>var x=y&amp;&amp;z;</script>") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<style>.test{font-size:10;}</style>") >= 0 );
+    }
+    public void testTranslateSpecialEntities() throws Exception {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        String xmlString;
+        properties.setAdvancedXmlEscape(false);
 
         properties.setTranslateSpecialEntities(true);
         String specialHtmlEntities = "<div>"+ new String(new char[] {244,8240, 215,376, 8364})+"</div>";
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf(specialHtmlEntities) >= 0 );
         properties.setTranslateSpecialEntities(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf(specialHtmlEntities) < 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf(specialHtmlEntities) < 0 );
+    }
+    public void testRecognizeUnicodeChars() throws Exception {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        String xmlString;
+        properties.setAdvancedXmlEscape(false);
 
         String unicodeCharString = "<div>"+ new String(new char[] {352, 8224,8249})+"</div>";
         properties.setRecognizeUnicodeChars(true);
@@ -49,72 +68,175 @@ public class PropertiesTest extends TestCase {
         properties.setRecognizeUnicodeChars(false);
         assertTrue( getXmlString(cleaner, properties).indexOf(unicodeCharString) < 0 );
         assertTrue( getXmlString(cleaner, properties).indexOf("<div>&amp;#352;&amp;#8224;&amp;#8249;</div>") >= 0 );
+    }
+    public void testOmitUnknownTags() throws Exception {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        String xmlString;
+        properties.setAdvancedXmlEscape(false);
 
         properties.setOmitUnknownTags(true);
         assertTrue( getXmlString(cleaner, properties).indexOf("<mytag>content of unknown tag</mytag>") < 0 );
         assertTrue( getXmlString(cleaner, properties).indexOf("content of unknown tag") >= 0 );
         properties.setOmitUnknownTags(false);
         assertTrue( getXmlString(cleaner, properties).indexOf("<mytag>content of unknown tag</mytag>") >= 0 );
+    }
+    public void testTreatUnknownTagsAsContent() throws Exception {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        String xmlString;
+        properties.setAdvancedXmlEscape(false);
 
         properties.setOmitUnknownTags(false);
         properties.setTreatUnknownTagsAsContent(true);
-        assertTrue( getXmlString(cleaner, properties).indexOf("&lt;mytag&gt;content of unknown tag&lt;/mytag&gt;") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("&lt;mytag&gt;content of unknown tag&lt;/mytag&gt;") >= 0 );
         properties.setTreatUnknownTagsAsContent(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<mytag>content of unknown tag</mytag>") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<mytag>content of unknown tag</mytag>") >= 0 );
+    }
+    public void testOmitDeprecatedTags() throws Exception {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        String xmlString;
+        properties.setAdvancedXmlEscape(false);
 
         properties.setOmitDeprecatedTags(true);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<u>content of deprecated tag</u>") < 0 );
-        assertTrue( getXmlString(cleaner, properties).indexOf("content of deprecated tag") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<u>content of deprecated tag</u>") < 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("content of deprecated tag") >= 0 );
         properties.setOmitDeprecatedTags(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<u>content of deprecated tag</u>") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<u>content of deprecated tag</u>") >= 0 );
+    }
+    public void testTreatDeprecatedTagsAsContent() throws Exception {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        String xmlString;
+        properties.setAdvancedXmlEscape(false);
 
         properties.setOmitDeprecatedTags(false);
         properties.setTreatDeprecatedTagsAsContent(true);
-        assertTrue( getXmlString(cleaner, properties).indexOf("&lt;u&gt;content of deprecated tag&lt;/u&gt;") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("&lt;u&gt;content of deprecated tag&lt;/u&gt;") >= 0 );
         properties.setTreatDeprecatedTagsAsContent(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<u>content of deprecated tag</u>") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<u>content of deprecated tag</u>") >= 0 );
+    }
+    /**
+     * @throws IOException
+     */
+    public void testOmitComments() throws Exception {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        properties.setNamespacesAware(false);
+        properties.setOmitComments(false);
+        assertTrue( getXmlString(cleaner, properties).indexOf("<!--my comment-->") >= 0 );
+        properties.setOmitComments(true);
+        assertTrue( getXmlString(cleaner, properties).indexOf("<!--my comment-->") < 0 );
+    }
+    public void testUseEmptyElementTags() throws Exception {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        String xmlString;
+        properties.setAdvancedXmlEscape(false);
 
-        properties.setOmitDoctypeDeclaration(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">") >= 0 );
-        properties.setOmitDoctypeDeclaration(true);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">") < 0 );
-
+//        properties.setUseEmptyElementTags(false);
+//        xmlString = getXmlString(cleaner, properties);
+//        assertTrue( xmlString.indexOf("<a href=\"index.php\" />") >= 0 );
         properties.setUseEmptyElementTags(true);
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf("<a href=\"index.php\"></a>") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<br />") >= 0 );
+
+        xmlString = getXmlString(cleaner, properties);
         // jericho reports that td can not be empty. so we test on <tr/> collapsing
         assertTrue(xmlString, xmlString.indexOf("<tr><td></td></tr><tr />") >= 0);
         properties.setUseEmptyElementTags(false);
         xmlString = getXmlString(cleaner, properties);
         assertTrue(xmlString.indexOf("<table><tbody><tr><td></td></tr><tr></tr></tbody></table>") >= 0);
-        assertTrue( xmlString.indexOf("<a href=\"index.php\"></a>") >= 0 );
-        assertTrue( xmlString.indexOf("<br />") >= 0 );
-
+    }
+    public void testAllowMultiWordAttributes() throws Exception {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        String xmlString;
+        properties.setAdvancedXmlEscape(false);
+        properties.setUseEmptyElementTags(false);
         properties.setAllowMultiWordAttributes(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<div att=\"a b c\">") < 0 );
-        assertTrue( getXmlString(cleaner, properties).indexOf("<div att=\"a\" b=\"b\" c=\"c\">") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<div att=\"a b c\">") < 0 );
+        assertTrue( xmlString.indexOf("<div att=\"a\" b=\"b\" c=\"c\">") >= 0 );
         properties.setAllowMultiWordAttributes(true);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<div att=\"a b c\">") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<div att=\"a b c\">") >= 0 );
 
         properties.setAllowHtmlInsideAttributes(true);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<a title=\"&lt;b&gt;Title&lt;b&gt; is here\">LINK 1</a>") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<a title=\"&lt;b&gt;Title&lt;b&gt; is here\">LINK 1</a>") >= 0 );
         properties.setAllowHtmlInsideAttributes(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<a title=\"&lt;b&gt;Title&lt;b&gt; is here\">LINK 1</a>") < 0 );
-        assertTrue( getXmlString(cleaner, properties).indexOf("<a title=\"\"><b>Title<b> is here&quot;&gt;LINK 1</b></b></a>") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<a title=\"&lt;b&gt;Title&lt;b&gt; is here\">LINK 1</a>") < 0 );
+        assertTrue( xmlString.indexOf("<a title=\"\"><b>Title<b> is here&quot;&gt;LINK 1</b></b></a>") >= 0 );
 
         properties.setIgnoreQuestAndExclam(true);
-        assertTrue( getXmlString(cleaner, properties).indexOf("&lt;!INSTRUCTION1 id=&quot;aaa&quot;&gt;") < 0 );
-        assertTrue( getXmlString(cleaner, properties).indexOf("&lt;?INSTRUCTION2 id=&quot;bbb&quot;&gt;") < 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("&lt;!INSTRUCTION1 id=&quot;aaa&quot;&gt;") < 0 );
+        assertTrue( xmlString.indexOf("&lt;?INSTRUCTION2 id=&quot;bbb&quot;&gt;") < 0 );
         properties.setIgnoreQuestAndExclam(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf("&lt;!INSTRUCTION1 id=&quot;aaa&quot;&gt;") >= 0 );
-        assertTrue( getXmlString(cleaner, properties).indexOf("&lt;?INSTRUCTION2 id=&quot;bbb&quot;&gt;") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("&lt;!INSTRUCTION1 id=&quot;aaa&quot;&gt;") >= 0 );
+        assertTrue( xmlString.indexOf("&lt;?INSTRUCTION2 id=&quot;bbb&quot;&gt;") >= 0 );
 
         properties.setNamespacesAware(true);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<html xmlns:my=\"my\">") >= 0 );
-        assertTrue( getXmlString(cleaner, properties).indexOf("<my:tag id=\"xxx\">aaa</my:tag>") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<html xmlns:my=\"my\">") >= 0 );
+        assertTrue( xmlString.indexOf("<my:tag id=\"xxx\">aaa</my:tag>") >= 0 );
         properties.setNamespacesAware(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<html") >= 0 );
-        assertTrue( getXmlString(cleaner, properties).indexOf("<tag id=\"xxx\">aaa</tag>") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<html") >= 0 );
+        assertTrue( xmlString.indexOf("<tag id=\"xxx\">aaa</tag>") >= 0 );
+    }
+    /**
+     * @throws IOException
+     */
+    public void testComments() throws IOException {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        properties.setNamespacesAware(false);
+        properties.setOmitComments(false);
+        assertTrue( getXmlString(cleaner, properties).indexOf("<!--my comment-->") >= 0 );
+        properties.setOmitComments(true);
+        assertTrue( getXmlString(cleaner, properties).indexOf("<!--my comment-->") < 0 );
+
+        properties.setOmitComments(false);
+        assertTrue( getXmlString(cleaner, properties).indexOf("<!-- comment with == - hyphen -->") >= 0 );
+        properties.setHyphenReplacementInComment("*");
+        assertTrue( getXmlString(cleaner, properties).indexOf("<!-- comment with ** - hyphen -->") >= 0 );
+    }
+    /**
+     * @throws IOException
+     */
+    public void testOmitXmlDeclaration() throws IOException {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        properties.setNamespacesAware(false);
+        properties.setOmitXmlDeclaration(false);
+        assertTrue( getXmlString(cleaner, properties).indexOf("<?xml version=\"1.0\"") >= 0 );
+        properties.setOmitXmlDeclaration(true);
+        assertTrue( getXmlString(cleaner, properties).indexOf("<?xml version=\"1.0\"") < 0 );
+    }
+    public void testOmitDoctypeDeclaration() throws Exception {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        String xmlString;
+        properties.setAdvancedXmlEscape(false);
+
+        properties.setOmitDoctypeDeclaration(false);
+        assertTrue( getXmlString(cleaner, properties).indexOf("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">") >= 0 );
+        properties.setOmitDoctypeDeclaration(true);
+        assertTrue( getXmlString(cleaner, properties).indexOf("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">") < 0 );
     }
     /**
      * @throws IOException
@@ -135,35 +257,6 @@ public class PropertiesTest extends TestCase {
         assertTrue(xmlString,  xmlString.indexOf("<html><head>") >= 0);
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString, xmlString.indexOf("</body></html>") >= 0 );
-    }
-    /**
-     * @throws IOException
-     */
-    public void testComments() throws IOException {
-        HtmlCleaner cleaner = new HtmlCleaner();
-        CleanerProperties properties = cleaner.getProperties();
-        properties.setNamespacesAware(false);
-        properties.setOmitComments(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<!--my comment-->") >= 0 );
-        properties.setOmitComments(true);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<!--my comment-->") < 0 );
-        
-        properties.setOmitComments(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<!-- comment with == - hyphen -->") >= 0 );
-        properties.setHyphenReplacementInComment("*");
-        assertTrue( getXmlString(cleaner, properties).indexOf("<!-- comment with ** - hyphen -->") >= 0 );
-    }
-    /**
-     * @throws IOException
-     */
-    public void testOmitXmlDeclaration() throws IOException {
-        HtmlCleaner cleaner = new HtmlCleaner();
-        CleanerProperties properties = cleaner.getProperties();
-        properties.setNamespacesAware(false);
-        properties.setOmitXmlDeclaration(false);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<?xml version=\"1.0\"") >= 0 );
-        properties.setOmitXmlDeclaration(true);
-        assertTrue( getXmlString(cleaner, properties).indexOf("<?xml version=\"1.0\"") < 0 );
     }
     public void testPruneProperties() throws Exception {
         HtmlCleaner cleaner = new HtmlCleaner();
@@ -222,8 +315,8 @@ public class PropertiesTest extends TestCase {
         // then test when generating html
         String domString = simpleXmlSerializer.getXmlAsString(node, "UTF-8" );
         assertEquals("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n" +
-//            "<html><head /><body><div> &amp;&quot;&#39;&#39;&lt;&gt;&nbsp;&amp;garbage;&amp;</div></body></html>", 
-            "<html><head /><body><div> &amp;&quot;''&lt;&gt;&nbsp;&amp;garbage;&amp;</div></body></html>", 
+//            "<html><head /><body><div> &amp;&quot;&#39;&#39;&lt;&gt;&nbsp;&amp;garbage;&amp;</div></body></html>",
+            "<html><head /><body><div> &amp;&quot;''&lt;&gt;&nbsp;&amp;garbage;&amp;</div></body></html>",
                 domString.trim());
     }
 
@@ -318,7 +411,7 @@ public class PropertiesTest extends TestCase {
             }
         }
     }
-    
+
     public void testConvertUnicode() throws Exception {
         CleanerProperties cleanerProperties = new CleanerProperties();
         cleanerProperties.setOmitHtmlEnvelope(true);
@@ -328,13 +421,13 @@ public class PropertiesTest extends TestCase {
         String output = new SimpleXmlSerializer().getXmlAsString(cleanerProperties, "<h3><u><strong>President’s Message</strong></u><div> </h3>", "UTF-8");
         assertEquals("<h3><u><strong>President’s Message</strong></u><div> </div></h3>", output);
     }
-    
+
     private static final String HTML_COMMENT_OUT_BEGIN = "<html><head><script>";
     private static final String HTML_COMMENT_OUT_END = "</script></head><body></body></html>";
     private static final String SAMPLE_JS = "var x = ['foo','bar'];";
     private static final String COMMENT_START = "<!--";
     private static final String COMMENT_END = "-->";
-    
+
     /**
      * Test conversion of former ( now bad practice ) of:
      * <pre>
@@ -342,7 +435,7 @@ public class PropertiesTest extends TestCase {
      * </pre>
      * into
      * &lt;style>/(star)&lt;![CDATA[(star)/ style info /(star)]]>(star)/&lt;/style>
-     * 
+     *
      * Note: disabled because it doesn't test actual behavior
      */
     public void disabledTestConvertOldStyleComments() {
@@ -363,11 +456,11 @@ public class PropertiesTest extends TestCase {
                 // don't let random whitespace confuse things
             new String[] { HTML_COMMENT_OUT_BEGIN+"\n\n\n\n"+"//"+"   \t"+COMMENT_START+"\n"+SAMPLE_JS+"\n\n\n"+"//"+COMMENT_END+"\n\n\t\n"+HTML_COMMENT_OUT_END,
                 HTML_COMMENT_OUT_BEGIN+"\n\n\n\n"+XmlSerializer.SAFE_BEGIN_CDATA+"\n"+SAMPLE_JS+"\n\n\n"+"//"+XmlSerializer.SAFE_END_CDATA +"\n\n\t\n"+HTML_COMMENT_OUT_END},
-                
+
             }) {
             doTestConvertOldStyleComments(cleaner, properties, testData);
         }
-        
+
         // test for false positives
         for(String[] testData: new String[][] {
             // make sure not to remove real comments
@@ -394,14 +487,14 @@ public class PropertiesTest extends TestCase {
         xmlString = new SimpleXmlSerializer(properties).getXmlAsString(node);
         assertEquals(testData[1], xmlString);
     }
-    
+
     public void testIgnoreClosingCData() {
-        String html = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" + 
+        String html = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +
         		"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta http-equiv=\"content-type\" content=\"application/xhtml+xml; charset=utf-8\" /><link href=\"aswa.css\" type=\"text/css\" rel=\"stylesheet\" /><title>ASWA - Events</title>" +
-        		"<style type=\"text/css\">/*<![CDATA[*/\r\n" + 
-        		"#ampmep_188 { }\r\n" + 
+        		"<style type=\"text/css\">/*<![CDATA[*/\r\n" +
+        		"#ampmep_188 { }\r\n" +
         		"/*]]>*/</style></head><body></body></html>";
-        
+
         CleanerProperties properties = new CleanerProperties();
         properties.setOmitXmlDeclaration(true);
         properties.setUseCdataForScriptAndStyle(true);
