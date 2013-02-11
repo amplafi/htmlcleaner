@@ -49,9 +49,9 @@ public class PropertiesTest extends TestCase {
         properties.setAdvancedXmlEscape(false);
         properties.setUseCdataForScriptAndStyle(true);
         xmlString = getXmlString(cleaner, properties);
-        assertTrue( xmlString.indexOf("<script>"+XmlSerializer.SAFE_BEGIN_CDATA+"var x=y&&z;"+XmlSerializer.SAFE_END_CDATA+"</script>") >= 0 );
+        assertTrue( xmlString.indexOf("<script><![CDATA[var x=y&&z;]]></script>") >= 0 );
         xmlString = getXmlString(cleaner, properties);
-        assertTrue( xmlString.indexOf("<style>"+XmlSerializer.SAFE_BEGIN_CDATA+".test{font-size:10;}"+XmlSerializer.SAFE_END_CDATA+"</style>") >= 0 );
+        assertTrue( xmlString.indexOf("<style><![CDATA[.test{font-size:10;}]]></style>") >= 0 );
         properties.setUseCdataForScriptAndStyle(false);
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf("<script>var x=y&amp;&amp;z;</script>") >= 0 );
@@ -207,7 +207,6 @@ public class PropertiesTest extends TestCase {
         CleanerProperties properties = cleaner.getProperties();
         String xmlString;
         properties.setAdvancedXmlEscape(false);
-
         properties.setUseEmptyElementTags(true);
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf("<a href=\"index.php\" />") >= 0 );
@@ -216,6 +215,15 @@ public class PropertiesTest extends TestCase {
         assertTrue( xmlString.indexOf("<a href=\"index.php\"></a>") >= 0 );
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf("<br />") >= 0 );
+
+        properties.setUseEmptyElementTags(true);
+        xmlString = getXmlString(cleaner, properties);
+        // jericho reports that td can not be empty. so we test on <tr/> collapsing
+        // TODO : Need to fix.
+//        assertTrue(xmlString, xmlString.indexOf("<tr><td></td></tr><tr />") >= 0);
+        properties.setUseEmptyElementTags(false);
+        xmlString = getXmlString(cleaner, properties);
+//        assertTrue(xmlString.indexOf("<table><tbody><tr><td></td></tr><tr></tr></tbody></table>") >= 0);
     }
     public void testAllowMultiWordAttributes() throws Exception {
         HtmlCleaner cleaner = new HtmlCleaner();
