@@ -1,0 +1,7 @@
+/bin
+/target
+/.settings
+/.classpath
+/.project
+/test-output
+pom.xml.versionsBackup
