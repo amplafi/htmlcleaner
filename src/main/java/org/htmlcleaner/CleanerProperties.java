@@ -46,10 +46,10 @@ public class CleanerProperties {
     public static final String BOOL_ATT_EMPTY = "empty";
     public static final String BOOL_ATT_TRUE = "true";
 
-    ITagInfoProvider tagInfoProvider = null;
+    private ITagInfoProvider tagInfoProvider;
 
     boolean advancedXmlEscape = true;
-    boolean transResCharsToNCR = false;
+    boolean transResCharsToNCR;
     boolean useCdataForScriptAndStyle = true;
     boolean translateSpecialEntities = true;
     boolean transSpecialEntitiesToNCR = false;
@@ -70,6 +70,13 @@ public class CleanerProperties {
     String hyphenReplacementInComment = "=";
     String pruneTags = null;
     String booleanAttributeValues = BOOL_ATT_SELF;
+
+    /**
+     * @param tagInfoProvider the tagInfoProvider to set
+     */
+    void setTagInfoProvider(ITagInfoProvider tagInfoProvider) {
+        this.tagInfoProvider = tagInfoProvider;
+    }
 
     public ITagInfoProvider getTagInfoProvider() {
         return tagInfoProvider;
@@ -253,8 +260,8 @@ public class CleanerProperties {
              BOOL_ATT_TRUE.equalsIgnoreCase(booleanAttributeValues) ) {
             this.booleanAttributeValues = booleanAttributeValues.toLowerCase();
         } else {
-            this.booleanAttributeValues = BOOL_ATT_SELF;    
+            this.booleanAttributeValues = BOOL_ATT_SELF;
         }
     }
-    
+
 }

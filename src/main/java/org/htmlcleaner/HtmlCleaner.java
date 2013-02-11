@@ -102,7 +102,7 @@ public class HtmlCleaner {
 		TagPos(int position, String name) {
 			this.position = position;
 			this.name = name;
-            this.info = tagInfoProvider.getTagInfo(name);
+            this.info = getTagInfoProvider().getTagInfo(name);
         }
 	}
 
@@ -150,7 +150,7 @@ public class HtmlCleaner {
             if (tagName != null) {
                 ListIterator<TagPos> it = list.listIterator(list.size());
                 String fatalTag = null;
-                TagInfo fatalInfo = tagInfoProvider.getTagInfo(tagName);
+                TagInfo fatalInfo = getTagInfoProvider().getTagInfo(tagName);
                 if (fatalInfo != null) {
                     fatalTag = fatalInfo.getFatalTag();
                 }
@@ -233,8 +233,6 @@ public class HtmlCleaner {
 
     private CleanerProperties properties;
 
-    private ITagInfoProvider tagInfoProvider;
-
     private CleanerTransformations transformations = null;
 
     /**
@@ -266,9 +264,8 @@ public class HtmlCleaner {
 	 * @param properties Properties used during parsing and serializing
 	 */
 	public HtmlCleaner(ITagInfoProvider tagInfoProvider, CleanerProperties properties) {
-        this.tagInfoProvider = tagInfoProvider == null ? DefaultTagProvider.getInstance() : tagInfoProvider;
         this.properties = properties == null ? new CleanerProperties() : properties;
-        this.properties.tagInfoProvider = this.tagInfoProvider;
+        this.properties.setTagInfoProvider(tagInfoProvider == null ? DefaultTagProvider.getInstance() : tagInfoProvider);
     }
 
     public TagNode clean(String htmlContent) {
@@ -350,7 +347,7 @@ public class HtmlCleaner {
         cleanTimeValues.htmlNode.addChild(cleanTimeValues.headNode);
         cleanTimeValues.htmlNode.addChild(cleanTimeValues.bodyNode);
 
-        HtmlTokenizer htmlTokenizer = new HtmlTokenizer(reader, properties, transformations, tagInfoProvider) {
+        HtmlTokenizer htmlTokenizer = new HtmlTokenizer(reader, properties, transformations, getTagInfoProvider()) {
             @Override
             void makeTree(List<BaseToken> tokenList) {
                 HtmlCleaner.this.makeTree( tokenList, tokenList.listIterator(tokenList.size() - 1), cleanTimeValues );
@@ -358,7 +355,7 @@ public class HtmlCleaner {
 
             @Override
             TagNode createTagNode(String name) {
-                return HtmlCleaner.this.createTagNode(name, cleanTimeValues); 
+                return HtmlCleaner.this.createTagNode(name, cleanTimeValues);
             }
         };
 
@@ -536,7 +533,7 @@ public class HtmlCleaner {
             if (token instanceof EndTagToken) {
 				EndTagToken endTagToken = (EndTagToken) token;
 				String tagName = endTagToken.getName();
-				TagInfo tag = tagInfoProvider.getTagInfo(tagName);
+				TagInfo tag = getTagInfoProvider().getTagInfo(tagName);
 
 				if ( (tag == null && properties.omitUnknownTags) || (tag != null && tag.isDeprecated() && properties.omitDeprecatedTags) ) {
 					nodeIterator.set(null);
@@ -563,10 +560,10 @@ public class HtmlCleaner {
 			} else if ( isStartToken(token) ) {
                 TagNode startTagToken = (TagNode) token;
 				String tagName = startTagToken.getName();
-				TagInfo tag = tagInfoProvider.getTagInfo(tagName);
+				TagInfo tag = getTagInfoProvider().getTagInfo(tagName);
 
                 TagPos lastTagPos = cleanTimeValues._openTags.isEmpty() ? null : cleanTimeValues._openTags.getLastTagPos();
-                TagInfo lastTagInfo = lastTagPos == null ? null : tagInfoProvider.getTagInfo(lastTagPos.name);
+                TagInfo lastTagInfo = lastTagPos == null ? null : getTagInfoProvider().getTagInfo(lastTagPos.name);
 
                 // add tag to set of all tags
 				cleanTimeValues.allTags.add(tagName);
@@ -677,7 +674,7 @@ public class HtmlCleaner {
 
             if (child instanceof TagNode) {
                 TagNode node = (TagNode) child;
-                TagInfo tag = tagInfoProvider.getTagInfo( node.getName() );
+                TagInfo tag = getTagInfoProvider().getTagInfo( node.getName() );
                 addPossibleHeadCandidate(tag, node, cleanTimeValues);
 			} else {
 				if (child instanceof ContentNode) {
@@ -736,7 +733,7 @@ public class HtmlCleaner {
                 }
 
                 TagNode newTagNode = createTagNode(startTagToken);
-                TagInfo tag = tagInfoProvider.getTagInfo( newTagNode.getName() );
+                TagInfo tag = getTagInfoProvider().getTagInfo( newTagNode.getName() );
                 addPossibleHeadCandidate(tag, newTagNode, cleanTimeValues);
                 if (tagNode != null) {
 					tagNode.addChildren(itemsToMove);
@@ -814,7 +811,7 @@ public class HtmlCleaner {
      * @return ITagInfoProvider instance for this HtmlCleaner
      */
     public ITagInfoProvider getTagInfoProvider() {
-        return tagInfoProvider;
+        return this.properties.getTagInfoProvider();
     }
 
     /**
