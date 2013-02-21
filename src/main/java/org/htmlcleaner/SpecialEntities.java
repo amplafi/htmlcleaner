@@ -66,7 +66,7 @@ public class SpecialEntities {
 	private Map<Integer, SpecialEntity> entitiesByUnicodeCharcode = new HashMap<Integer, SpecialEntity>();
 	private boolean greek;
 	private boolean math;
-
+	private int maxEntityLength;
 	public static final char NON_BREAKABLE_SPACE = 160;
 
 	public SpecialEntities(boolean greek, boolean math) {
@@ -444,21 +444,23 @@ public class SpecialEntities {
         // this is xml only -- apos appearing in html needs to be converted to ' or maybe &#39; to be universally safe
         // may need to special case for html attributes that use ' as surrounding delimeter on attribute value (instead of " ) : <a href='javascript:foo("bar'")' >wierd link</a>
         _put(new SpecialEntity("apos",  '\'', "'", false));
-}
+	}
 
 	/**
 	 *
-	 * @param seq expected to have a ';'
+	 * @param seq may have a leading & and/or trailing ; ( those will be removed prior to comparision)
 	 * @return {@link SpecialEntity} if found.
 	 */
 	public SpecialEntity getSpecialEntity(String seq) {
 	    int startIndex = seq.charAt(0) == '&'?1:0;
         int semiIndex = seq.indexOf(';');
-        SpecialEntity specialEntity = null;
-        if (semiIndex > 0) {
-            String entity = seq.substring(startIndex, semiIndex);
-            specialEntity  = entities.get(entity);
+        String entity;
+        if (semiIndex < 0) {
+            entity = seq.substring(startIndex);
+        } else {
+            entity = seq.substring(startIndex, semiIndex);
         }
+        SpecialEntity specialEntity = entities.get(entity);
 	    return specialEntity;
 	}
 
@@ -483,5 +485,9 @@ public class SpecialEntities {
         if ( old != null ) {
             throw new HtmlCleanerException("replaced "+old+" with "+specialEntity);
         }
+        this.maxEntityLength = Math.max(this.maxEntityLength,specialEntity.getKey().length());
+    }
+    public int getMaxEntityLength() {
+        return maxEntityLength;
     }
 }
