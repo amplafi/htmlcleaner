@@ -74,6 +74,9 @@ public class CommandLine {
     private static boolean toBoolean(String s) {
         return s != null && ( "on".equalsIgnoreCase(s) || "true".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s) );
     }
+    
+    private final static String className = CommandLine.class.getName();
+    private final static Logger logger = Logger.getLogger(className);
 
     public static void main(String[] args) throws IOException, XPatherException {
         String source = getArgValue(args, "src", "");
@@ -154,7 +157,7 @@ public class CommandLine {
 
         final CleanerProperties props = cleaner.getProperties();
 
-        props.addHtmlModificationListener(new HtmlModificationListenerLogger(Logger.getLogger(Logger.GLOBAL_LOGGER_NAME)));
+        props.addHtmlModificationListener(new HtmlModificationListenerLogger(logger));
 
         if ( !"".equals(omitUnknownTags) ) {
             props.setOmitUnknownTags( toBoolean(omitUnknownTags) );

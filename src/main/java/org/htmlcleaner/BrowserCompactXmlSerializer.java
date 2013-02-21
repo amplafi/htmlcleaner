@@ -82,7 +82,7 @@ public class BrowserCompactXmlSerializer extends XmlSerializer {
                         boolean writeLeadingSpace = content.length() > 0 && (Character.isWhitespace(content.charAt(0))) && whitespaceAllowed;
                         boolean writeEndingSpace = content.length() > 1 && Character.isWhitespace(content.charAt(content.length() - 1)) && whitespaceAllowed;
                         content = content.trim();
-                        if (!content.isEmpty()) {
+                        if (content != "") {
                             boolean hasPrevContent = false;
                             int order = tagChildren.indexOf(item);
                             if (order >= 2 && childrenIt.hasNext()) {
