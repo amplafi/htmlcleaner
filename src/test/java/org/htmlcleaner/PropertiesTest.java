@@ -65,8 +65,10 @@ public class PropertiesTest extends TestCase {
         properties.setAdvancedXmlEscape(false);
 
         properties.setTranslateSpecialEntities(true);
+        String inputString = "<div>&ocirc;&permil;&times;&Yuml;&euro;</div>";
         String specialHtmlEntities = "<div>"+ new String(new char[] {244,8240, 215,376, 8364})+"</div>";
-        xmlString = getXmlString(cleaner, properties);
+        TagNode node = cleaner.clean(inputString);
+        xmlString = new SimpleXmlSerializer(properties).getAsString(node);
         assertTrue( xmlString.indexOf(specialHtmlEntities) >= 0 );
         properties.setTranslateSpecialEntities(false);
         xmlString = getXmlString(cleaner, properties);
