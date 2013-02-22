@@ -164,6 +164,13 @@ public class TagNode extends TagToken {
 
         return childTagList;
     }
+    
+    /**
+     * @return Whether this node has child elements or not.
+     */
+    public boolean hasChildren() {
+        return children.size() > 0;
+    }
 
     /**
      * @return An array of child TagNode instances.
