@@ -527,4 +527,23 @@ public class PropertiesTest extends TestCase {
         assertEquals(html, xmlString);
     }
 
+    public void testTransResCharsToNCR() throws Exception {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        String xmlString;
+
+        properties.setNamespacesAware(false);
+        properties.setAdvancedXmlEscape(true);
+        properties.setTransResCharsToNCR(true);
+        xmlString = getXmlString(cleaner, properties);
+        System.out.println("xmlString = "+xmlString);
+        assertTrue( xmlString.indexOf("<div>1.&#38;&#34;&#39;&#60;&#62;</div>") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<div>2.&#38;&#34;&#39;&#60;&#62;</div>") >= 0 );
+        properties.setTransResCharsToNCR(false);
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<div>1.&amp;&quot;&apos;&lt;&gt;</div>") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<div>2.&amp;&quot;&apos;&lt;&gt;</div>") >= 0 );
+    }
 }
