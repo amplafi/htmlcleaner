@@ -66,7 +66,7 @@ public class SpecialEntities {
 	private Map<Integer, SpecialEntity> entitiesByUnicodeCharcode = new HashMap<Integer, SpecialEntity>();
 	private boolean greek;
 	private boolean math;
-
+	private int maxEntityLength;
 	public static final char NON_BREAKABLE_SPACE = 160;
 
 	public SpecialEntities(boolean greek, boolean math) {
@@ -470,7 +470,7 @@ public class SpecialEntities {
 	    _put(specialEntity);
 	}
 
-    /**
+	/**
      * @param specialEntity
      */
     private void _put(SpecialEntity specialEntity) {
@@ -483,5 +483,9 @@ public class SpecialEntities {
         if ( old != null ) {
             throw new HtmlCleanerException("replaced "+old+" with "+specialEntity);
         }
+        this.maxEntityLength = Math.max(this.maxEntityLength,specialEntity.getKey().length());
+    }
+    public int getMaxEntityLength() {
+        return maxEntityLength;
     }
 }
