@@ -157,12 +157,15 @@ public class PropertiesTest extends TestCase {
         String xmlString;
         properties.setAdvancedXmlEscape(false);
 
-//        properties.setUseEmptyElementTags(false);
-//        xmlString = getXmlString(cleaner, properties);
-//        assertTrue( xmlString.indexOf("<a href=\"index.php\" />") >= 0 );
+        //This is fixed in SF branch, so we need it fixed too.
+        properties.setUseEmptyElementTags(false);
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<a href=\"index.php\" />") >= 0 );
+        
         properties.setUseEmptyElementTags(true);
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf("<a href=\"index.php\"></a>") >= 0 );
+        
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf("<br />") >= 0 );
 
