@@ -158,11 +158,11 @@ public class PropertiesTest extends TestCase {
         properties.setAdvancedXmlEscape(false);
 
         //This is fixed in SF branch, so we need it fixed too.
-        properties.setUseEmptyElementTags(false);
+        properties.setUseEmptyElementTags(true);
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf("<a href=\"index.php\" />") >= 0 );
         
-        properties.setUseEmptyElementTags(true);
+        properties.setUseEmptyElementTags(false);
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf("<a href=\"index.php\"></a>") >= 0 );
         
