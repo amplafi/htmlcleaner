@@ -162,10 +162,12 @@ public class PropertiesTest extends TestCase {
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf("<a href=\"index.php\" />") >= 0 );
         
+        //This part was not correct in the before-branch 'merge_sf' age. Hence, it needs to be fixed also.
         properties.setUseEmptyElementTags(false);
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf("<a href=\"index.php\"></a>") >= 0 );
         
+        properties.setUseEmptyElementTags(true);
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf("<br />") >= 0 );
 
