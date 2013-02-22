@@ -61,6 +61,7 @@ public class TagNode extends TagToken {
     private List children = new ArrayList();
     private DoctypeToken docType;
     private List itemsToMove;
+    private Map<String, String> nsDeclarations = null;
 
     private transient boolean isFormed;
 
@@ -480,6 +481,57 @@ public class TagNode extends TagToken {
             }
         }
         return true;
+    }
+    
+    /**
+     * Adds namespace declaration to the node
+     * @param nsPrefix Namespace prefix
+     * @param nsURI Namespace URI
+     */
+    public void addNamespaceDeclaration(String nsPrefix, String nsURI) {
+        if (nsDeclarations == null) {
+            nsDeclarations = new TreeMap<String, String>();
+        }
+        nsDeclarations.put(nsPrefix, nsURI);
+    }
+    
+    /**
+     * Collect all prefixes in namespace declarations up the path to the document root from the specified node
+     * @param prefixes Set of prefixes to be collected
+     */
+    void collectNamespacePrefixesOnPath(Set<String> prefixes) {
+        Map<String, String> nsDeclarations = getNamespaceDeclarations();
+        if (nsDeclarations != null) {
+            for (String prefix: nsDeclarations.keySet()) {
+                prefixes.add(prefix);
+            }
+        }
+        if (parent != null) {
+            parent.collectNamespacePrefixesOnPath(prefixes);
+        }
+    }
+
+    String getNamespaceURIOnPath(String nsPrefix) {
+        if (nsDeclarations != null) {
+            for (Map.Entry<String, String> nsEntry: nsDeclarations.entrySet()) {
+                String currName = nsEntry.getKey();
+                if ( currName.equals(nsPrefix) || ("".equals(currName) && nsPrefix == null) ) {
+                    return nsEntry.getValue();
+                }
+            }
+        }
+        if (parent != null) {
+            return parent.getNamespaceURIOnPath(nsPrefix);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return Map of namespace declarations for this node
+     */
+    public Map<String, String> getNamespaceDeclarations() {
+        return nsDeclarations;
     }
 
     public void serialize(XmlSerializer xmlSerializer, Writer writer) throws IOException {
