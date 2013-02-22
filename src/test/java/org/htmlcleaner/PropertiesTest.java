@@ -95,6 +95,21 @@ public class PropertiesTest extends TestCase {
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf("<mytag>content of unknown tag</mytag>") >= 0 );
     }
+    public void testNamespacesAware() throws Exception {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        String xmlString;
+        properties.setAdvancedXmlEscape(false);
+
+        properties.setNamespacesAware(true);
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<my:tag id=\"xxx\" xmlns:my=\"my\">aaa</my:tag>") >= 0 );
+        properties.setNamespacesAware(false);
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<html") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<tag id=\"xxx\">aaa</tag>") >= 0 );
+    }
     public void testOmitDeprecatedTags() throws Exception {
         HtmlCleaner cleaner = new HtmlCleaner();
         CleanerProperties properties = cleaner.getProperties();
