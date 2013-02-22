@@ -157,12 +157,12 @@ public class PropertiesTest extends TestCase {
         String xmlString;
         properties.setAdvancedXmlEscape(false);
 
-        //This is fixed in SF branch, so we need it fixed too.
+        //Tag <a> connot be collapsed according to DefaultTagProvider
         properties.setUseEmptyElementTags(true);
         xmlString = getXmlString(cleaner, properties);
-        assertTrue( xmlString.indexOf("<a href=\"index.php\" />") >= 0 );
+        assertTrue( xmlString.indexOf("<a href=\"index.php\" />") < 0 );
+        assertTrue( xmlString.indexOf("<a href=\"index.php\"></a>") >= 0 );
         
-        //This part was not correct in the before-branch 'merge_sf' age. Hence, it needs to be fixed also.
         properties.setUseEmptyElementTags(false);
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf("<a href=\"index.php\"></a>") >= 0 );
