@@ -342,5 +342,18 @@ public class Utils {
 
         return result;
     }
+    
+    /**
+     * @param name
+     * @return For xml element name or attribute name returns name after prefix (part after :)
+     */
+    public static String getXmlName(String name) {
+        int colIndex = name.indexOf(':');
+        if (colIndex > 0 && colIndex < name.length() - 1) {
+            return name.substring(colIndex + 1);
+        }
+
+        return name;
+    }
 
 }
