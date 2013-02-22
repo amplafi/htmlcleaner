@@ -345,6 +345,19 @@ public class Utils {
     
     /**
      * @param name
+     * @return For xml element name or attribute name returns prefix (part before :) or null if there is no prefix
+     */
+    public static String getXmlNSPrefix(String name) {
+        int colIndex = name.indexOf(':');
+        if (colIndex > 0) {
+            return name.substring(0, colIndex);
+        }
+
+        return null;
+    }
+    
+    /**
+     * @param name
      * @return For xml element name or attribute name returns name after prefix (part after :)
      */
     public static String getXmlName(String name) {
