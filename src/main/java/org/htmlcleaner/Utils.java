@@ -39,6 +39,8 @@ package org.htmlcleaner;
 
 import java.io.*;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,6 +53,16 @@ import java.util.regex.Pattern;
  */
 public class Utils {
 
+    public static final Map<Character, String> RESERVED_XML_CHARS = new HashMap<Character, String>();
+
+    static {
+        RESERVED_XML_CHARS.put('&', "&amp;");
+        RESERVED_XML_CHARS.put('<', "&lt;");
+        RESERVED_XML_CHARS.put('>', "&gt;");
+        RESERVED_XML_CHARS.put('\"', "&quot;");
+        RESERVED_XML_CHARS.put('\'', "&apos;");
+    }
+    
     /**
      * Trims specified string from left.
      * @param s
@@ -368,5 +380,28 @@ public class Utils {
 
         return name;
     }
+    
+    public static boolean isValidInt(String s, int radix) {
+        try {
+            Integer.parseInt(s, radix);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+    
+    public static boolean isValidXmlChar(char ch) {
+        return ((ch >= 0x20) && (ch <= 0xD7FF)) ||
+               (ch == 0x9) ||
+               (ch == 0xA) ||
+               (ch == 0xD) ||
+               ((ch >= 0xE000) && (ch <= 0xFFFD)) ||
+               ((ch >= 0x10000) && (ch <= 0x10FFFF));
+    }
+    
+    public static boolean isReservedXmlChar(char ch) {
+        return RESERVED_XML_CHARS.containsKey(ch);
+    }
+
 
 }
