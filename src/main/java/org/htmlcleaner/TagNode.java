@@ -605,4 +605,40 @@ public class TagNode extends TagToken implements HtmlNode {
         copy.attributes.putAll(attributes);
     	return copy;
     }
+    
+    /**
+     * Traverses the tree and performs visitor's action on each node. It stops when it
+     * finishes all the tree or when visitor returns false.
+     * @param visitor TagNodeVisitor implementation
+     */
+    public void traverse(TagNodeVisitor visitor) {
+        traverseInternally(visitor);
+    }
+
+
+    private boolean traverseInternally(TagNodeVisitor visitor) {
+        if (visitor != null) {
+            boolean hasParent = parent != null;
+            boolean toContinue = visitor.visit(parent, this);
+
+            if (!toContinue) {
+                return false; // if visitor stops traversal
+            } else if (hasParent && parent == null) {
+                return true; // if this node is pruned from the tree during the visit, then don't go deeper
+            }
+            for (Object child: children.toArray()) {  // make an array to avoid ConcurrentModificationException when some node is cut 
+                if (child instanceof TagNode) {
+                    toContinue = ((TagNode)child).traverseInternally(visitor);
+                } else if (child instanceof ContentNode) {
+                    toContinue = visitor.visit(this, (ContentNode)child);
+                } else if (child instanceof CommentNode) {
+                    toContinue = visitor.visit(this, (CommentNode)child);
+                }
+                if (!toContinue) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }

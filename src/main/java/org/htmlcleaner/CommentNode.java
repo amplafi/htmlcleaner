@@ -43,7 +43,7 @@ import java.io.Writer;
 /**
  * <p>HTML comment token.</p>
  */
-public class CommentNode extends BaseTokenImpl {
+public class CommentNode extends BaseTokenImpl implements HtmlNode {
 
     private String content;
 
