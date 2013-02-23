@@ -170,7 +170,7 @@ public class Utils {
                             if (recognizeUnicodeChars) {
                                 result.append( (char)code.intValue() );
                             } else {
-                                result.append( "&#" + code + ";" );
+                                result.append( code.getDecimalNCR() );
                             }
 							i += code.getKey().length() + 1;
 						} else if (advanced ) {
