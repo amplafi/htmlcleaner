@@ -137,7 +137,8 @@ public class Utils {
         boolean advanced = props.isAdvancedXmlEscape();
         boolean recognizeUnicodeChars = props.isRecognizeUnicodeChars();
         boolean translateSpecialEntities = props.isTranslateSpecialEntities();
-        return escapeXml(s, advanced, recognizeUnicodeChars, translateSpecialEntities, isDomCreation);
+        boolean transResCharsToNCR = props.isTransResCharsToNCR();
+        return escapeXml(s, advanced, recognizeUnicodeChars, translateSpecialEntities, isDomCreation, transResCharsToNCR);
     }
     /**
      * change notes:
@@ -151,7 +152,7 @@ public class Utils {
      * @param isDomCreation
      * @return
      */
-    public static String escapeXml(String s, boolean advanced, boolean recognizeUnicodeChars, boolean translateSpecialEntities, boolean isDomCreation) {
+    public static String escapeXml(String s, boolean advanced, boolean recognizeUnicodeChars, boolean translateSpecialEntities, boolean isDomCreation, boolean transResCharsToNCR) {
         if (s != null) {
     		int len = s.length();
     		StringBuffer result = new StringBuffer(len);
@@ -334,7 +335,7 @@ public class Utils {
             return true;
         }
         String s = o.toString();
-        String text = escapeXml(s, true, false, false, false);
+        String text = escapeXml(s, true, false, false, false, false);
         // TODO: doesn't escapeXml handle this?
         String last = text.replace(SpecialEntities.NON_BREAKABLE_SPACE, ' ').trim();
         return last.length() == 0;
@@ -402,6 +403,4 @@ public class Utils {
     public static boolean isReservedXmlChar(char ch) {
         return RESERVED_XML_CHARS.containsKey(ch);
     }
-
-
 }
