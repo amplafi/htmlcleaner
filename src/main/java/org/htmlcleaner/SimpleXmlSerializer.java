@@ -58,9 +58,9 @@ public class SimpleXmlSerializer extends XmlSerializer {
         if (trimmed.endsWith(SAFE_END_CDATA)) {
             int pos = content.lastIndexOf(SAFE_END_CDATA);
             String ending = content.substring(pos);
-            if (dontEscape)
+            if (dontEscape) {
                 writer.write( content.substring(0, pos).replaceAll("]]>", "]]&gt;") );
-            else {
+            } else {
                 if (trimmed.startsWith(BEGIN_CDATA)) {
                     int actualStart = content.indexOf(BEGIN_CDATA) + BEGIN_CDATA.length();
                     writer.write(content.substring(0, actualStart));
