@@ -248,6 +248,23 @@ public class PropertiesTest extends TestCase {
         xmlString = getXmlString(cleaner, properties);
         assertTrue( xmlString.indexOf("<a title=\"\"><b>Title<b> is here&quot;&gt;LINK 1</b></b></a>") >= 0 );
     }
+    public void testIgnoreQuestAndExclam() throws Exception {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        String xmlString;
+        properties.setAdvancedXmlEscape(false);
+
+        properties.setIgnoreQuestAndExclam(true);
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("&lt;!INSTRUCTION1 id=&quot;aaa&quot;&gt;") < 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("&lt;?INSTRUCTION2 id=&quot;bbb&quot;&gt;") < 0 );
+        properties.setIgnoreQuestAndExclam(false);
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("&lt;!INSTRUCTION1 id=&quot;aaa&quot;&gt;") >= 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("&lt;?INSTRUCTION2 id=&quot;bbb&quot;&gt;") >= 0 );
+    }
     /**
      * @throws IOException
      */
