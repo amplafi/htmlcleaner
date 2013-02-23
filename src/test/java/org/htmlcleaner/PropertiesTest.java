@@ -382,14 +382,10 @@ public class PropertiesTest extends TestCase {
         SimpleXmlSerializer simpleXmlSerializer = new SimpleXmlSerializer(properties);
         simpleXmlSerializer.setCreatingHtmlDom(false);
 
-        String xmlString = simpleXmlSerializer.getAsString(
-                TestTagNodeUtils.getTagNode(properties, "<div>&#138A;</div>"), "UTF-8");
-        assertEquals(
-                TestTagNodeUtils.getTagNode(properties, "<div>" + new String(new char[] { 138, 'A', ';' }) + "</div>"),
-                xmlString);
-        xmlString = simpleXmlSerializer.getAsString(TestTagNodeUtils.getTagNode(properties, "<div>&#x138A;</div>"),
-                "UTF-8");
-        assertEquals("<div>" + new String(new char[] { 0x138A }) + "</div>", xmlString);
+        String xmlString = simpleXmlSerializer.getAsString(TestTagNodeUtils.getTagNode(properties, "<div>&#138A;</div>"), "UTF-8");
+        assertEquals("<div>"+new String(new char[] {138, 'A',';'})+"</div>", xmlString);
+        xmlString = simpleXmlSerializer.getAsString(TestTagNodeUtils.getTagNode(properties,  "<div>&#x138A;</div>"), "UTF-8");
+        assertEquals("<div>"+new String(new char[] {0x138A})+"</div>", xmlString);
         properties.reset();
 
     }
