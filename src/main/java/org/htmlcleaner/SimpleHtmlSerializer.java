@@ -37,63 +37,27 @@
 
 package org.htmlcleaner;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Iterator;
-import java.util.List;
+import java.io.*;
 
 /**
- * <p>Simple XML serializer - creates resulting XML without indenting lines.</p>
+ * <p>Simple HTML serializer - creates resulting HTML without indenting and/or compacting.</p>
  */
-public class SimpleXmlSerializer extends XmlSerializer {
+public class SimpleHtmlSerializer extends HtmlSerializer {
 
-	public SimpleXmlSerializer(CleanerProperties props) {
+	public SimpleHtmlSerializer(CleanerProperties props) {
 		super(props);
 	}
 
-	protected void serializeContentToken(ContentNode item, TagNode tagNode, Writer writer) throws IOException {
-        String content = item.getContent();
-        String trimmed = content.trim();
-        boolean dontEscape = dontEscape(tagNode);                        
-        if (trimmed.endsWith(SAFE_END_CDATA)) {
-            int pos = content.lastIndexOf(SAFE_END_CDATA);
-            String ending = content.substring(pos);
-            if (dontEscape) {
-                writer.write( content.substring(0, pos).replaceAll("]]>", "]]&gt;") );
-            } else {
-                if (trimmed.startsWith(BEGIN_CDATA)) {
-                    int actualStart = content.indexOf(BEGIN_CDATA) + BEGIN_CDATA.length();
-                    writer.write(content.substring(0, actualStart));
-                    writer.write( escapeXml(content.substring(actualStart, pos)));
-                } else {
-                    writer.write( escapeXml(content.substring(0, pos)));
-                }
-            }
-            writer.write(ending);
-        } else {
-            if (dontEscape)
-                writer.write( content.replaceAll("]]>", "]]&gt;") );
-            else {
-                writer.write( escapeXml(content) );
-            }
-        }       
-    }
-
-    @Override
     protected void serialize(TagNode tagNode, Writer writer) throws IOException {
         serializeOpenTag(tagNode, writer, false);
 
-        List tagChildren = tagNode.getChildren();
         if ( !isMinimizedTagSyntax(tagNode) ) {
-            Iterator childrenIt = tagChildren.iterator();
-            while ( childrenIt.hasNext() ) {
-                Object item = childrenIt.next();
-                if (item != null) {
-                    if ( item instanceof ContentNode ) {
-                        serializeContentToken((ContentNode)item, tagNode, writer);
-                    } else {
-                        ((BaseToken)item).serialize(this, writer);
-                    }
+            for (Object item: tagNode.getChildren()) {
+                if ( item instanceof ContentNode) {
+                    String content = item.toString();
+                    writer.write( dontEscape(tagNode) ? content : escapeText(content) );
+                } else if (item instanceof BaseToken) {
+                    ((BaseToken)item).serialize(this, writer);
                 }
             }
 

@@ -18,7 +18,7 @@ public class TransformationTest extends TestCase {
         cleaner = new HtmlCleaner();
     }
 
-    public void test1() {
+    public void test1() throws IOException {
         CleanerTransformations transformations = new CleanerTransformations();
         TagTransformation tagTransformation = new TagTransformation("strong", "span", false);
         tagTransformation.addAttributeTransformation("style", "font-weight:bold");
@@ -30,7 +30,7 @@ public class TransformationTest extends TestCase {
         TagNode node = cleaner.clean("<div><strong>Mama</strong></div>");
         assertEquals(
                 "<html><head /><body><div><span style=\"font-weight:bold\">Mama</span></div></body></html>",
-                new CompactXmlSerializer(props).getXmlAsString(node)
+                new CompactXmlSerializer(props).getAsString(node)
         );
     }
 
@@ -60,7 +60,7 @@ public class TransformationTest extends TestCase {
 
         TagNode node = cleaner.clean( new File("src/test/resources/test8.html"), "UTF-8" );
 
-        String xml = new PrettyXmlSerializer(props).getXmlAsString(node);
+        String xml = new PrettyXmlSerializer(props).getAsString(node);
 
         assertTrue("Shouldn't have blockquote in it "+xml, xml.indexOf("blockquote") < 0 );
         assertTrue( xml.indexOf("&quot;Hi there!&quot;") >= 0 );
@@ -98,7 +98,7 @@ public class TransformationTest extends TestCase {
         TagNode node = cleaner.clean("<div onfoo=\"bar\" ONNot=\"\"><p bad=\" javascript:  \" class=\"javascript\" unknown=\"good\">Mama</p></div>");
         assertEquals(
                 "<html><head /><body><div><p class=\"javascript\" unknown=\"good\">Mama</p></div></body></html>",
-                new CompactXmlSerializer(props).getXmlAsString(node)
+                new CompactXmlSerializer(props).getAsString(node)
         );
     }
 

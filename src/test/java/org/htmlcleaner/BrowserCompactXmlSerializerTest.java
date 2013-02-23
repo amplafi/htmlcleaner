@@ -1,5 +1,7 @@
 package org.htmlcleaner;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
 
 /**
@@ -23,46 +25,50 @@ public class BrowserCompactXmlSerializerTest extends TestCase {
     
     /**
      * Tests that serializer removes white spaces properly.
+     * @throws IOException 
      */
-    public void testRemoveInsignificantWhitespaces(){
-        String cleaned = compactXmlSerializer.getXmlAsString(properties, "        <u>text here, </u><b>some text</b>      ", "UTF-8");
+    public void testRemoveInsignificantWhitespaces() throws IOException{
+        String cleaned = compactXmlSerializer.getAsString(
+                TestTagNodeUtils.getTagNode(properties, "        <u>text here, </u><b>some text</b>      "), "UTF-8");
         assertEquals("<u>text here, </u><b>some text</b>", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString(properties, "    <div class=\"foo\">2 roots < here >  </div>", "UTF-8");
+        cleaned = compactXmlSerializer.getAsString(TestTagNodeUtils.getTagNode(properties, "    <div class=\"foo\">2 roots < here >  </div>"), "UTF-8");
         assertEquals("<div class=\"foo\">2 roots &lt; here &gt;</div>\n", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString(properties, "    <div class=\"foo\">2 roots \n    < here >  </div>", "UTF-8");
+        cleaned = compactXmlSerializer.getAsString(TestTagNodeUtils.getTagNode(properties, "    <div class=\"foo\">2 roots \n    < here >  </div>"), "UTF-8");
         assertEquals("<div class=\"foo\">2 roots &lt; here &gt;</div>\n", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString(properties, "    <div class=\"foo\">2 roots \n\n    < here >  </div>", "UTF-8");
+        cleaned = compactXmlSerializer.getAsString(TestTagNodeUtils.getTagNode(properties, "    <div class=\"foo\">2 roots \n\n    < here >  </div>"), "UTF-8");
         assertEquals("<div class=\"foo\">2 roots <br />&lt; here &gt;</div>\n", cleaned);
     }
     
     /**
      * Non-breakable spaces also must be removed from start and end.
+     * @throws IOException 
      */
-    public void testRemoveLeadingAndEndingNbsp() {
-        String cleaned = compactXmlSerializer.getXmlAsString(properties,
-                "&nbsp;&nbsp;We have just released Jericho Road. Listen to Still Waters the lead-off track.", "UTF-8");
+    public void testRemoveLeadingAndEndingNbsp() throws IOException {
+        String cleaned = compactXmlSerializer.getAsString(TestTagNodeUtils.getTagNode(properties, 
+                "&nbsp;&nbsp;We have just released Jericho Road. Listen to Still Waters the lead-off track."), "UTF-8");
         assertEquals("We have just released Jericho Road. Listen to Still Waters the lead-off track.", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString(properties,
-                "&#160;We have just released Jericho Road. Listen to Still Waters the lead-off track.&#160;", "UTF-8");
+        cleaned = compactXmlSerializer.getAsString(TestTagNodeUtils.getTagNode(properties, 
+                "&#160;We have just released Jericho Road. Listen to Still Waters the lead-off track.&#160;"), "UTF-8");
         assertEquals("We have just released Jericho Road. Listen to Still Waters the lead-off track.", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString(properties,
-                "&#xA0;We have just released Jericho Road. Listen to Still Waters the lead-off track.&#xA0;", "UTF-8");
+        cleaned = compactXmlSerializer.getAsString(TestTagNodeUtils.getTagNode(properties, 
+                "&#xA0;We have just released Jericho Road. Listen to Still Waters the lead-off track.&#xA0;"), "UTF-8");
         assertEquals("We have just released Jericho Road. Listen to Still Waters the lead-off track.", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString(properties, SpecialEntities.NON_BREAKABLE_SPACE
+        cleaned = compactXmlSerializer.getAsString(TestTagNodeUtils.getTagNode(properties, SpecialEntities.NON_BREAKABLE_SPACE
                 + "We have just released Jericho Road. Listen to Still Waters the lead-off track.&#xA0;"
-                + SpecialEntities.NON_BREAKABLE_SPACE, "UTF-8");
+                + SpecialEntities.NON_BREAKABLE_SPACE), "UTF-8");
         assertEquals("We have just released Jericho Road. Listen to Still Waters the lead-off track.", cleaned);
     }
     
     /**
      * Tests that contents of 'pre' tag are untouched.
+     * @throws IOException 
      */
-    public void testPreTagIsUntouched(){
-        String cleaned = compactXmlSerializer.getXmlAsString(properties, "   <pre>some text</pre>", "UTF-8");
+    public void testPreTagIsUntouched() throws IOException{
+        String cleaned = compactXmlSerializer.getAsString(TestTagNodeUtils.getTagNode(properties, "   <pre>some text</pre>"), "UTF-8");
         assertEquals("<pre>some text</pre>\n", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString(properties, "<pre>     some text</pre>", "UTF-8");
+        cleaned = compactXmlSerializer.getAsString(TestTagNodeUtils.getTagNode(properties, "<pre>     some text</pre>"), "UTF-8");
         assertEquals("<pre>     some text</pre>\n", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString(properties, "<pre>some /n/n text</pre>", "UTF-8");
+        cleaned = compactXmlSerializer.getAsString(TestTagNodeUtils.getTagNode(properties, "<pre>some /n/n text</pre>"), "UTF-8");
         assertEquals("<pre>some /n/n text</pre>\n", cleaned);
     }
 }

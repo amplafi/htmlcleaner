@@ -43,7 +43,7 @@ import java.io.Writer;
 /**
  * <p>HTML comment token.</p>
  */
-public class CommentNode extends BaseTokenImpl {
+public class CommentNode extends BaseTokenImpl implements HtmlNode {
 
     private String content;
 
@@ -64,7 +64,7 @@ public class CommentNode extends BaseTokenImpl {
         return getCommentedContent();
     }
 
-    public void serialize(XmlSerializer xmlSerializer, Writer writer) throws IOException {
+    public void serialize(Serializer serializer, Writer writer) throws IOException {
     	writer.write( getCommentedContent() );
     }
 

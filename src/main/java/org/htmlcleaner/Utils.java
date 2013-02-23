@@ -39,6 +39,8 @@ package org.htmlcleaner;
 
 import java.io.*;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,6 +53,16 @@ import java.util.regex.Pattern;
  */
 public class Utils {
 
+    public static final Map<Character, String> RESERVED_XML_CHARS = new HashMap<Character, String>();
+
+    static {
+        RESERVED_XML_CHARS.put('&', "&amp;");
+        RESERVED_XML_CHARS.put('<', "&lt;");
+        RESERVED_XML_CHARS.put('>', "&gt;");
+        RESERVED_XML_CHARS.put('\"', "&quot;");
+        RESERVED_XML_CHARS.put('\'', "&apos;");
+    }
+    
     /**
      * Trims specified string from left.
      * @param s
@@ -125,7 +137,8 @@ public class Utils {
         boolean advanced = props.isAdvancedXmlEscape();
         boolean recognizeUnicodeChars = props.isRecognizeUnicodeChars();
         boolean translateSpecialEntities = props.isTranslateSpecialEntities();
-        return escapeXml(s, advanced, recognizeUnicodeChars, translateSpecialEntities, isDomCreation);
+        boolean transResCharsToNCR = props.isTransResCharsToNCR();
+        return escapeXml(s, advanced, recognizeUnicodeChars, translateSpecialEntities, isDomCreation, transResCharsToNCR);
     }
     /**
      * change notes:
@@ -139,7 +152,7 @@ public class Utils {
      * @param isDomCreation
      * @return
      */
-    public static String escapeXml(String s, boolean advanced, boolean recognizeUnicodeChars, boolean translateSpecialEntities, boolean isDomCreation) {
+    public static String escapeXml(String s, boolean advanced, boolean recognizeUnicodeChars, boolean translateSpecialEntities, boolean isDomCreation, boolean transResCharsToNCR) {
         if (s != null) {
     		int len = s.length();
     		StringBuffer result = new StringBuffer(len);
@@ -161,16 +174,16 @@ public class Utils {
                             }
 							i += code.getKey().length() + 1;
 						} else if (advanced ) {
-					        result.append(code.getEscaped(isDomCreation));
+					        result.append(transResCharsToNCR ? code.getDecimalNCR() : code.getEscaped(isDomCreation));
 		                    i += code.getKey().length()+1;
 			            } else {
-			                result.append("&amp;");
+			                result.append(transResCharsToNCR ? getAmpNcr() : "&amp;");
 			            }
     				} else {
-    					result.append("&amp;");
+    				    result.append(transResCharsToNCR ? getAmpNcr() : "&amp;");
     				}
     			} else if ((code = SpecialEntities.INSTANCE.getSpecialEntityByUnicode(ch)) != null ) {
-    				result.append(code.getEscaped(isDomCreation));
+    			    result.append(transResCharsToNCR ? code.getDecimalNCR() : code.getEscaped(isDomCreation));
     			} else {
     				result.append(ch);
     			}
@@ -180,6 +193,16 @@ public class Utils {
     	}
 
     	return null;
+    }
+
+    private static String ampNcr;
+
+    private static String getAmpNcr() {
+        if (ampNcr == null) {
+            ampNcr = SpecialEntities.INSTANCE.getSpecialEntityByUnicode('&').getDecimalNCR();
+        }
+
+        return ampNcr;
     }
 
     private static final Pattern ASCII_CHAR = Pattern.compile("\\p{Print}");
@@ -322,7 +345,7 @@ public class Utils {
             return true;
         }
         String s = o.toString();
-        String text = escapeXml(s, true, false, false, false);
+        String text = escapeXml(s, true, false, false, false, false);
         // TODO: doesn't escapeXml handle this?
         String last = text.replace(SpecialEntities.NON_BREAKABLE_SPACE, ' ').trim();
         return last.length() == 0;
@@ -342,5 +365,52 @@ public class Utils {
 
         return result;
     }
+    
+    /**
+     * @param name
+     * @return For xml element name or attribute name returns prefix (part before :) or null if there is no prefix
+     */
+    public static String getXmlNSPrefix(String name) {
+        int colIndex = name.indexOf(':');
+        if (colIndex > 0) {
+            return name.substring(0, colIndex);
+        }
 
+        return null;
+    }
+    
+    /**
+     * @param name
+     * @return For xml element name or attribute name returns name after prefix (part after :)
+     */
+    public static String getXmlName(String name) {
+        int colIndex = name.indexOf(':');
+        if (colIndex > 0 && colIndex < name.length() - 1) {
+            return name.substring(colIndex + 1);
+        }
+
+        return name;
+    }
+    
+    public static boolean isValidInt(String s, int radix) {
+        try {
+            Integer.parseInt(s, radix);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+    
+    public static boolean isValidXmlChar(char ch) {
+        return ((ch >= 0x20) && (ch <= 0xD7FF)) ||
+               (ch == 0x9) ||
+               (ch == 0xA) ||
+               (ch == 0xD) ||
+               ((ch >= 0xE000) && (ch <= 0xFFFD)) ||
+               ((ch >= 0x10000) && (ch <= 0x10FFFF));
+    }
+    
+    public static boolean isReservedXmlChar(char ch) {
+        return RESERVED_XML_CHARS.containsKey(ch);
+    }
 }

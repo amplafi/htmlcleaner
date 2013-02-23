@@ -110,7 +110,7 @@ public class DoctypeToken extends BaseTokenImpl {
     	return "";
     }
 
-    public void serialize(XmlSerializer xmlSerializer, Writer writer) throws IOException {
+    public void serialize(Serializer serializer, Writer writer) throws IOException {
     	writer.write(getContent() + "\n");
     }
     public String getPart1() {

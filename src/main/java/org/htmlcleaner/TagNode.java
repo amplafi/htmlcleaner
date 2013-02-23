@@ -55,12 +55,13 @@ import org.htmlcleaner.conditional.TagNodeNameCondition;
  *      and optionally doctype node (DoctypeToken).
  * </p>
  */
-public class TagNode extends TagToken {
+public class TagNode extends TagToken implements HtmlNode {
     private TagNode parent;
     private Map<String, String> attributes = new LinkedHashMap<String, String>();
     private List children = new ArrayList();
     private DoctypeToken docType;
     private List itemsToMove;
+    private Map<String, String> nsDeclarations = null;
 
     private transient boolean isFormed;
 
@@ -163,6 +164,13 @@ public class TagNode extends TagToken {
 
         return childTagList;
     }
+    
+    /**
+     * @return Whether this node has child elements or not.
+     */
+    public boolean hasChildren() {
+        return children.size() > 0;
+    }
 
     /**
      * @return An array of child TagNode instances.
@@ -193,6 +201,54 @@ public class TagNode extends TagToken {
         }
 
         return text;
+    }
+    
+    /**
+     * @param child Child to find index of
+     * @return Index of the specified child node inside this node's children, -1 if node is not the child 
+     */
+    public int getChildIndex(HtmlNode child) {
+        int index = 0;
+        for (Object curr: children) {
+            if (curr == child) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+    
+    /**
+     * Inserts specified node at specified position in array of children  
+     * @param index
+     * @param childToAdd
+     */
+    public void insertChild(int index, HtmlNode childToAdd) {
+        children.add(index, childToAdd);
+    }
+
+    /**
+     * Inserts specified node in the list of children before specified child
+     * @param node Child before which to insert new node
+     * @param nodeToInsert Node to be inserted at specified position
+     */
+    public void insertChildBefore(HtmlNode node, HtmlNode nodeToInsert) {
+        int index = getChildIndex(node);
+        if (index >= 0) {
+            insertChild(index, nodeToInsert);
+        }
+    }
+
+    /**
+     * Inserts specified node in the list of children after specified child
+     * @param node Child after which to insert new node
+     * @param nodeToInsert Node to be inserted at specified position
+     */
+    public void insertChildAfter(HtmlNode node, HtmlNode nodeToInsert) {
+        int index = getChildIndex(node);
+        if (index >= 0) {
+            insertChild(index + 1, nodeToInsert);
+        }
     }
 
     /**
@@ -406,6 +462,13 @@ public class TagNode extends TagToken {
     public boolean removeChild(Object child) {
         return this.children.remove(child);
     }
+    
+    /**
+     * Removes all children (subelements and text content).
+     */
+    public void removeAllChildren() {
+        this.children.clear();
+    }
 
     void addItemForMoving(Object item) {
     	if (itemsToMove == null) {
@@ -481,14 +544,101 @@ public class TagNode extends TagToken {
         }
         return true;
     }
+    
+    /**
+     * Adds namespace declaration to the node
+     * @param nsPrefix Namespace prefix
+     * @param nsURI Namespace URI
+     */
+    public void addNamespaceDeclaration(String nsPrefix, String nsURI) {
+        if (nsDeclarations == null) {
+            nsDeclarations = new TreeMap<String, String>();
+        }
+        nsDeclarations.put(nsPrefix, nsURI);
+    }
+    
+    /**
+     * Collect all prefixes in namespace declarations up the path to the document root from the specified node
+     * @param prefixes Set of prefixes to be collected
+     */
+    void collectNamespacePrefixesOnPath(Set<String> prefixes) {
+        Map<String, String> nsDeclarations = getNamespaceDeclarations();
+        if (nsDeclarations != null) {
+            for (String prefix: nsDeclarations.keySet()) {
+                prefixes.add(prefix);
+            }
+        }
+        if (parent != null) {
+            parent.collectNamespacePrefixesOnPath(prefixes);
+        }
+    }
 
-    public void serialize(XmlSerializer xmlSerializer, Writer writer) throws IOException {
-    	xmlSerializer.serialize(this, writer);
+    String getNamespaceURIOnPath(String nsPrefix) {
+        if (nsDeclarations != null) {
+            for (Map.Entry<String, String> nsEntry: nsDeclarations.entrySet()) {
+                String currName = nsEntry.getKey();
+                if ( currName.equals(nsPrefix) || ("".equals(currName) && nsPrefix == null) ) {
+                    return nsEntry.getValue();
+                }
+            }
+        }
+        if (parent != null) {
+            return parent.getNamespaceURIOnPath(nsPrefix);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return Map of namespace declarations for this node
+     */
+    public Map<String, String> getNamespaceDeclarations() {
+        return nsDeclarations;
+    }
+
+    public void serialize(Serializer serializer, Writer writer) throws IOException {
+        serializer.serialize(this, writer);
     }
 
     public TagNode makeCopy() {
     	TagNode copy = new TagNode(name);
         copy.attributes.putAll(attributes);
     	return copy;
+    }
+    
+    /**
+     * Traverses the tree and performs visitor's action on each node. It stops when it
+     * finishes all the tree or when visitor returns false.
+     * @param visitor TagNodeVisitor implementation
+     */
+    public void traverse(TagNodeVisitor visitor) {
+        traverseInternally(visitor);
+    }
+
+
+    private boolean traverseInternally(TagNodeVisitor visitor) {
+        if (visitor != null) {
+            boolean hasParent = parent != null;
+            boolean toContinue = visitor.visit(parent, this);
+
+            if (!toContinue) {
+                return false; // if visitor stops traversal
+            } else if (hasParent && parent == null) {
+                return true; // if this node is pruned from the tree during the visit, then don't go deeper
+            }
+            for (Object child: children.toArray()) {  // make an array to avoid ConcurrentModificationException when some node is cut 
+                if (child instanceof TagNode) {
+                    toContinue = ((TagNode)child).traverseInternally(visitor);
+                } else if (child instanceof ContentNode) {
+                    toContinue = visitor.visit(this, (ContentNode)child);
+                } else if (child instanceof CommentNode) {
+                    toContinue = visitor.visit(this, (CommentNode)child);
+                }
+                if (!toContinue) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
