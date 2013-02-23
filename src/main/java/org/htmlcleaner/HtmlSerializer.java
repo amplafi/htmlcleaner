@@ -112,7 +112,7 @@ public abstract class HtmlSerializer extends Serializer {
                             SpecialEntity entity = SpecialEntities.INSTANCE.getSpecialEntity(entityKey);
                             if (entity != null) {
                                 if (translateSpecialEntities) {
-                                    result.append(props.isTransSpecialEntitiesToNCR() ? entity.getDecimalNCR() : entity.charValue());
+                                    result.append(recognizeUnicodeChars ? entity.charValue() : entity.getDecimalNCR() );
                                 } else {
                                     result.append(entity.getEscapedValue());
                                 }
