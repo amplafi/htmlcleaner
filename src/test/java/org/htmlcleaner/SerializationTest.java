@@ -41,10 +41,11 @@ public class SerializationTest extends TestCase {
     public void testPrettyXmlSerializer() throws IOException {
         TagNode node = getTestTagNode();
         String xml1 = new PrettyXmlSerializer(properties, "----").getAsString(node);
+        System.out.println(xml1);
         assertTrue(xml1.indexOf("--------<mama:div xmlns:mama=\"http://www.helloworld.com\">") > 0);
         assertTrue(xml1.indexOf("----------------<sub>a</sub>") > 0);
         assertTrue(xml1.indexOf("--------<!-- ZANZIBAR '\"&<>' -->") > 0);
-        assertTrue(xml1.indexOf("------------<x:button onclick=\"micko()\" xmlns:x=\"x\">PRITISNI</x:button>") > 0);
+        assertTrue(xml1.indexOf("------------<x:button onclick=\"micko()\">PRITISNI</x:button>") > 0);
 
         String xml2 = new PrettyXmlSerializer(properties, "").getAsString(node);
         assertTrue(xml2.indexOf("\n<mama:div xmlns:mama=\"http://www.helloworld.com\">\n") > 0);
