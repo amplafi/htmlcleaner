@@ -233,7 +233,21 @@ public class PropertiesTest extends TestCase {
         assertTrue(xmlString.indexOf("<html") >= 0);
         assertTrue(xmlString.indexOf("<tag id=\"xxx\">aaa</tag>") >= 0);
     }
+    public void testAllowHtmlInsideAttributes() throws Exception {
+        HtmlCleaner cleaner = new HtmlCleaner();
+        CleanerProperties properties = cleaner.getProperties();
+        String xmlString;
+        properties.setAdvancedXmlEscape(false);
 
+        properties.setAllowHtmlInsideAttributes(true);
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<a title=\"&lt;b&gt;Title&lt;b&gt; is here\">LINK 1</a>") >= 0 );
+        properties.setAllowHtmlInsideAttributes(false);
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<a title=\"&lt;b&gt;Title&lt;b&gt; is here\">LINK 1</a>") < 0 );
+        xmlString = getXmlString(cleaner, properties);
+        assertTrue( xmlString.indexOf("<a title=\"\"><b>Title<b> is here&quot;&gt;LINK 1</b></b></a>") >= 0 );
+    }
     /**
      * @throws IOException
      */
