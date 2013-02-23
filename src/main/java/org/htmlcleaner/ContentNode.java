@@ -43,7 +43,7 @@ import java.io.Writer;
 /**
  * <p>HTML text token.</p>
  */
-public class ContentNode extends BaseTokenImpl {
+public class ContentNode extends BaseTokenImpl implements HtmlNode {
 
     private final String content;
     private final boolean blank;
