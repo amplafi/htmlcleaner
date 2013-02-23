@@ -113,7 +113,6 @@ public class CleanerProperties implements HtmlModificationListener{
     private Set<ITagNodeCondition> allowTagSet = new HashSet<ITagNodeCondition>();
     private String charset;
     private boolean transResCharsToNCR;
-    private boolean transSpecialEntitiesToNCR;
 
     public CleanerProperties() {
         reset();
@@ -172,14 +171,6 @@ public class CleanerProperties implements HtmlModificationListener{
      */
     public void setTranslateSpecialEntities(boolean translateSpecialEntities) {
         this.translateSpecialEntities = translateSpecialEntities;
-    }
-
-    public boolean isTransSpecialEntitiesToNCR() {
-        return transSpecialEntitiesToNCR;
-    }
-
-    public void setTransSpecialEntitiesToNCR(boolean transSpecialEntitiesToNCR) {
-        this.transSpecialEntitiesToNCR = transSpecialEntitiesToNCR;
     }
 
     public boolean isRecognizeUnicodeChars() {
