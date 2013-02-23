@@ -140,8 +140,6 @@ public abstract class XmlSerializer extends Serializer {
         return tagNode.isEmpty() && (tagInfo == null || tagInfo.isMinimizedTagPermitted()) &&
                ( props.isUseEmptyElementTags() || (tagInfo != null && tagInfo.isEmptyTag()) );
     }
-    
-    private static String XMLNS_PREFIX = "xmlns";
 
     protected void serializeOpenTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
         if ( !isForbiddenTag(tagNode)) {
