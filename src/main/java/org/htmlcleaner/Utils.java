@@ -174,16 +174,16 @@ public class Utils {
                             }
 							i += code.getKey().length() + 1;
 						} else if (advanced ) {
-					        result.append(code.getEscaped(isDomCreation));
+					        result.append(transResCharsToNCR ? code.getDecimalNCR() : code.getEscaped(isDomCreation));
 		                    i += code.getKey().length()+1;
 			            } else {
-			                result.append("&amp;");
+			                result.append(transResCharsToNCR ? getAmpNcr() : "&amp;");
 			            }
     				} else {
-    					result.append("&amp;");
+    				    result.append(transResCharsToNCR ? getAmpNcr() : "&amp;");
     				}
     			} else if ((code = SpecialEntities.INSTANCE.getSpecialEntityByUnicode(ch)) != null ) {
-    				result.append(code.getEscaped(isDomCreation));
+    			    result.append(transResCharsToNCR ? code.getDecimalNCR() : code.getEscaped(isDomCreation));
     			} else {
     				result.append(ch);
     			}
@@ -193,6 +193,16 @@ public class Utils {
     	}
 
     	return null;
+    }
+
+    private static String ampNcr;
+
+    private static String getAmpNcr() {
+        if (ampNcr == null) {
+            ampNcr = SpecialEntities.INSTANCE.getSpecialEntityByUnicode('&').getDecimalNCR();
+        }
+
+        return ampNcr;
     }
 
     private static final Pattern ASCII_CHAR = Pattern.compile("\\p{Print}");
