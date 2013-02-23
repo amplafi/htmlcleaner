@@ -38,13 +38,12 @@
 package org.htmlcleaner;
 
 import java.io.*;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>Abstract XML serializer - contains common logic for descendants.</p>
  */
-public abstract class XmlSerializer {
+public abstract class XmlSerializer extends Serializer {
 
     public static final String XMLNS_NAMESPACE = "xmlns";
     public static final String BEGIN_CDATA = "<![CDATA[";
@@ -52,17 +51,13 @@ public abstract class XmlSerializer {
     public static final String SAFE_BEGIN_CDATA = "/*" + BEGIN_CDATA + "*/";
     public static final String SAFE_END_CDATA = "/*" + END_CDATA + "*/";
 
-    protected CleanerProperties props;
-	private boolean creatingHtmlDom;
-
-    protected XmlSerializer() {
-
-    }
 	protected XmlSerializer(CleanerProperties props) {
-		this.props = props;
+		super(props);
     }
-
-    /**
+	
+	private boolean creatingHtmlDom;
+	
+	 /**
      * @param creatingHtmlDom the creatingHtmlDom to set
      */
     public void setCreatingHtmlDom(boolean creatingHtmlDom) {
@@ -76,90 +71,70 @@ public abstract class XmlSerializer {
         return creatingHtmlDom;
     }
 
+    /**
+     * @deprecated Use writeToStream() instead.
+     */
+    @Deprecated
     public void writeXmlToStream(TagNode tagNode, OutputStream out, String charset) throws IOException {
-         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, charset));
-         writeXml( tagNode, writer, charset );
-         writer.flush();
-         writer.close();
+         super.writeToStream(tagNode, out, charset);
     }
 
+    /**
+     * @deprecated Use writeToStream() instead.
+     */
+    @Deprecated
     public void writeXmlToStream(TagNode tagNode, OutputStream out) throws IOException {
-         writeXmlToStream( tagNode, out, props.getCharset() );
+         super.writeToStream(tagNode, out);
     }
 
+    /**
+     * @deprecated Use writeToFile() instead.
+     */
+    @Deprecated
     public void writeXmlToFile(TagNode tagNode, String fileName, String charset) throws IOException {
-        writeXmlToStream(tagNode, new FileOutputStream(fileName), charset );
+        super.writeToFile(tagNode, fileName, charset);
     }
 
+    /**
+     * @deprecated Use writeToFile() instead.
+     */
+    @Deprecated
     public void writeXmlToFile(TagNode tagNode, String fileName) throws IOException {
-        writeXmlToFile(tagNode,fileName, props.getCharset());
+        super.writeToFile(tagNode, fileName);
     }
 
-    public String getXmlAsString(CleanerProperties cleanerProperties, String htmlContent, String charset) {
-        this.props = cleanerProperties;
-        HtmlCleaner htmlCleaner = new HtmlCleaner(cleanerProperties);
-        TagNode tagNode = htmlCleaner.clean(htmlContent);
-        return getXmlAsString(tagNode, charset==null||charset.length()==0?props.getCharset():charset);
+    /**
+     * @deprecated Use getAsString() instead.
+     */
+    @Deprecated
+    public String getXmlAsString(TagNode tagNode, String charset) throws IOException {
+        return super.getAsString(tagNode, charset);
     }
 
-    public String getXmlAsString(TagNode tagNode, String charset) {
-        StringWriter writer = new StringWriter();
-        try {
-            writeXml(tagNode, writer, charset);
-        } catch (IOException e) {
-            throw new HtmlCleanerException(e);
-        }
-        return writer.getBuffer().toString();
+    /**
+     * @deprecated Use getAsString() instead.
+     */
+    @Deprecated
+    public String getXmlAsString(TagNode tagNode) throws IOException {
+        return super.getAsString(tagNode);
     }
 
-    public String getXmlAsString(TagNode tagNode) {
-        return getXmlAsString(tagNode, props.getCharset());
-    }
-
+    /**
+     * @deprecated Use write() instead.
+     */
+    @Deprecated
     public void writeXml(TagNode tagNode, Writer writer, String charset) throws IOException {
-        if ( !props.isOmitXmlDeclaration() ) {
-            String declaration = "<?xml version=\"1.0\"";
-            if (charset != null) {
-                declaration += " encoding=\"" + charset + "\"";
-            }
-            declaration += "?>";
-            writer.write(declaration + "\n");
-		}
-
-		if ( !props.isOmitDoctypeDeclaration() ) {
-			DoctypeToken doctypeToken = tagNode.getDocType();
-			if ( doctypeToken != null ) {
-				doctypeToken.serialize(this, writer);
-			}
-		}
-
-		serialize(tagNode, writer);
+        super.write(tagNode, writer, charset);
     }
 
-	protected String escapeXml(String xmlContent) {
-		return Utils.escapeXml(xmlContent, props, isCreatingHtmlDom());
-	}
+    protected String escapeXml(String xmlContent) {
+        return Utils.escapeXml(xmlContent, props, isCreatingHtmlDom());
+    }
 
-	/**
-	 * encapsulate content with <[CDATA[ ]]> for things like script and style elements
-	 * @param tagNode
-	 * @return true if <[CDATA[ ]]> should be used.
-	 */
-	protected boolean dontEscape(TagNode tagNode) {
-	    // make sure <script src=..></script> doesn't get turned into <script src=..><[CDATA[]]></script>
-	    // TODO check for blank content as well.
-		return props.isUseCdataForScriptAndStyle() && isScriptOrStyle(tagNode) && !tagNode.isEmpty();
-	}
-
-	protected boolean isScriptOrStyle(TagNode tagNode) {
-		String tagName = tagNode.getName();
-		return "script".equalsIgnoreCase(tagName) || "style".equalsIgnoreCase(tagName);
-	}
-
-	protected boolean isHeadOrBody(String tagName) {
-		return "head".equalsIgnoreCase(tagName) || "body".equalsIgnoreCase(tagName);
-	}
-
+    protected boolean dontEscape(TagNode tagNode) {
+        return props.isUseCdataForScriptAndStyle() && isScriptOrStyle(tagNode);
+    }
+    
     protected boolean isMinimizedTagSyntax(TagNode tagNode) {
         final TagInfo tagInfo = props.getTagInfoProvider().getTagInfo(tagNode.getName());
         return tagNode.isEmpty() && (tagInfo == null || tagInfo.isMinimizedTagPermitted()) &&
@@ -167,101 +142,111 @@ public abstract class XmlSerializer {
     }
 
     protected void serializeOpenTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
-        if ( !isForbiddenTag(tagNode)) {
-            String tagName = tagNode.getName();
-            Map tagAtttributes = tagNode.getAttributes();
+        String tagName = tagNode.getName();
 
-            // always have head and body in newline
-            if (props.isAddNewlineToHeadAndBody() && isHeadOrBody(tagName)) {
-            	writer.write("\n");
-            }
+        if (Utils.isEmptyString(tagName)) {
+            return;
+        }
 
-            writer.write("<" + tagName);
-            Iterator it = tagAtttributes.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry entry = (Map.Entry) it.next();
-                String attName = (String) entry.getKey();
-                String attValue = (String) entry.getValue();
-                serializeAttribute(tagNode, writer, attName, attValue);
-            }
+        boolean nsAware = props.isNamespacesAware();
 
-            if ( isMinimizedTagSyntax(tagNode) ) {
-            	writer.write(" />");
-            	if (newLine) {
-            		writer.write("\n");
-            	}
-            } else if (dontEscape(tagNode)) {
-                // because we are not considering if the file is xhtml or html,
-                // we need to put a javascript comment in front of the CDATA in case this is NOT xhtml
-                writer.write(">");
-                if (!tagNode.getText().toString().startsWith(SAFE_BEGIN_CDATA)) {
-                	writer.write(SAFE_BEGIN_CDATA);
+        Set<String> definedNSPrefixes = null;
+        Set<String> additionalNSDeclNeeded = null;
+
+        String tagPrefix = Utils.getXmlNSPrefix(tagName);
+        if (tagPrefix != null) {
+            if (nsAware) {
+                definedNSPrefixes = new HashSet<String>();
+                tagNode.collectNamespacePrefixesOnPath(definedNSPrefixes);
+                if ( !definedNSPrefixes.contains(tagPrefix) ) {
+                    additionalNSDeclNeeded = new TreeSet<String>();
+                    additionalNSDeclNeeded.add(tagPrefix);
                 }
             } else {
-            	writer.write(">");
+                tagName = Utils.getXmlName(tagName);
             }
         }
-    }
-    protected void serializeOpenTag(TagNode tagNode, Writer writer) throws IOException {
-        serializeOpenTag(tagNode, writer, true);
-    }
-    /**
-     * @param tagNode
-     * @return
-     */
-    protected boolean isForbiddenTag(TagNode tagNode) {
-        // null tagName when rootNode is a dummy node.
-        // this happens when omitting the html envelope elements ( <html>, <head>, <body> elements )
-        String tagName = tagNode.getName();
-        return tagName == null;
-    }
-    /**
-     * This allows overriding to eliminate forbidden attributes (for example javascript attributes onclick, onblur, etc. )
-     * @param writer
-     * @param attName
-     * @param attValue
-     * @throws IOException
-     */
-    protected void serializeAttribute(TagNode tagNode, Writer writer, String attName, String attValue) throws IOException {
-        if (!isForbiddenAttribute(tagNode, attName, attValue)) {
-            writer.write(" " + attName + "=\"" + escapeXml(attValue) + "\"");
+
+        writer.write("<" + tagName);
+
+        // write attributes
+        for (Map.Entry<String, String> entry: tagNode.getAttributes().entrySet()) {
+            String attName = entry.getKey();
+            String attPrefix = Utils.getXmlNSPrefix(attName);
+            if (attPrefix != null) {
+                if (nsAware) {
+                    // collect used namespace prefixes in attributes in order to explicitly define
+                    // ns declaration if needed; otherwise it would be ill-formed xml
+                    if (definedNSPrefixes == null) {
+                        definedNSPrefixes = new HashSet<String>();
+                        tagNode.collectNamespacePrefixesOnPath(definedNSPrefixes);
+                    }
+                    if ( !definedNSPrefixes.contains(attPrefix) ) {
+                        if (additionalNSDeclNeeded == null) {
+                            additionalNSDeclNeeded = new TreeSet<String>();
+                        }
+                        additionalNSDeclNeeded.add(attPrefix);
+                    }
+                } else {
+                    attName = Utils.getXmlName(attName);
+                }
+            }
+            writer.write(" " + attName + "=\"" + escapeXml(entry.getValue()) + "\"");
         }
-    }
-    /**
-     * Override to add additional conditions.
-     * @param tagNode
-     * @param attName
-     * @param value
-     * @return true if the attribute should not be outputed.
-     */
-    protected boolean isForbiddenAttribute(TagNode tagNode, String attName, String value) {
-        return !props.isNamespacesAware() && (XMLNS_NAMESPACE.equals(attName) || attName.startsWith(XMLNS_NAMESPACE +":"));
+
+        // write namespace declarations
+        if (nsAware) {
+            Map<String, String> nsDeclarations = tagNode.getNamespaceDeclarations();
+            if (nsDeclarations != null) {
+                for (Map.Entry<String, String> entry: nsDeclarations.entrySet()) {
+                    String prefix = entry.getKey();
+                    String att = "xmlns";
+                    if (prefix.length() > 0) {
+                         att += ":" + prefix;
+                    }
+                    writer.write(" " + att + "=\"" + escapeXml(entry.getValue()) + "\"");
+                }
+            }
+        }
+
+        // write additional namespace declarations needed for this tag in order xml to be well-formed
+        if (additionalNSDeclNeeded != null) {
+            for (String prefix: additionalNSDeclNeeded) {
+                writer.write(" xmlns:" + prefix + "=\"" + prefix + "\"");
+            }
+        }
+
+        if ( isMinimizedTagSyntax(tagNode) ) {
+            writer.write(" />");
+            if (newLine) {
+                writer.write("\n");
+            }
+        } else if (dontEscape(tagNode)) {
+            writer.write("><![CDATA[");
+        } else {
+            writer.write(">");
+        }
     }
 
     protected void serializeEndTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
-    	if ( !isForbiddenTag(tagNode)) {
-    	    String tagName = tagNode.getName();
-        	if (dontEscape(tagNode)) {
-                // because we are not considering if the file is xhtml or html,
-                // we need to put a javascript comment in front of the CDATA in case this is NOT xhtml
+        String tagName = tagNode.getName();
 
-        		if (!tagNode.getText().toString().trim().endsWith(SAFE_END_CDATA)) {
-                    writer.write(SAFE_END_CDATA);
-                }
-        	}
+        if (Utils.isEmptyString(tagName)) {
+            return;
+        }
 
-        	writer.write( "</" + tagName + ">" );
+        if (dontEscape(tagNode)) {
+            writer.write("]]>");
+        }
 
-            if (newLine) {
-        		writer.write("\n");
-        	}
-    	}
+        if (Utils.getXmlNSPrefix(tagName) != null && !props.isNamespacesAware()) {
+            tagName = Utils.getXmlName(tagName);
+        }
+        writer.write( "</" + tagName + ">" );
+
+        if (newLine) {
+            writer.write("\n");
+        }
     }
-
-    protected void serializeEndTag(TagNode tagNode, Writer writer) throws IOException {
-    	serializeEndTag(tagNode, writer, true);
-    }
-
-    protected abstract void serialize(TagNode tagNode, Writer writer) throws IOException;
 
 }

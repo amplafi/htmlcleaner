@@ -37,15 +37,14 @@
 
 package org.htmlcleaner;
 
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 
 /**
- * <p>Simple XML serializer - creates resulting XML without indenting lines.</p>
+ * <p>Simple HTML serializer - creates resulting HTML without indenting and/or compacting.</p>
  */
-public class SimpleXmlSerializer extends XmlSerializer {
+public class SimpleHtmlSerializer extends HtmlSerializer {
 
-	public SimpleXmlSerializer(CleanerProperties props) {
+	public SimpleHtmlSerializer(CleanerProperties props) {
 		super(props);
 	}
 
@@ -56,7 +55,7 @@ public class SimpleXmlSerializer extends XmlSerializer {
             for (Object item: tagNode.getChildren()) {
                 if ( item instanceof ContentNode) {
                     String content = item.toString();
-                    writer.write( dontEscape(tagNode) ? content.replaceAll("]]>", "]]&gt;") : escapeXml(content) );
+                    writer.write( dontEscape(tagNode) ? content : escapeText(content) );
                 } else if (item instanceof BaseToken) {
                     ((BaseToken)item).serialize(this, writer);
                 }

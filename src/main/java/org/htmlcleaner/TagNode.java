@@ -541,8 +541,8 @@ public class TagNode extends TagToken {
         return nsDeclarations;
     }
 
-    public void serialize(XmlSerializer xmlSerializer, Writer writer) throws IOException {
-    	xmlSerializer.serialize(this, writer);
+    public void serialize(Serializer serializer, Writer writer) throws IOException {
+        serializer.serialize(this, writer);
     }
 
     public TagNode makeCopy() {
