@@ -36,3 +36,9 @@ XmlSerializer/HtmlCleaner -- remove IOException being thrown when reading from s
   
 * added audit code - now it is possible to hook in code that will be notified about changes that htmlcleaner does.
   See CleanerProperties#addHtmlModificationListener.
+  
+* Added unit tests for escapeXml function from Utils
+
+* JDom generation updated not to fail on starting with 'xml' attributes. 
+
+* Unit tests TODOs added  
