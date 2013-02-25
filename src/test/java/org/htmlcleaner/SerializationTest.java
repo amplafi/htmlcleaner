@@ -61,18 +61,4 @@ public class SerializationTest extends TestCase {
 
     }
 
-    public void testCompactXmlSerializerNCR() throws IOException, ParserConfigurationException {
-        TagNode node = getTestTagNode();
-
-        node = cleaner.clean(new File("src/test/resources/test6.html"));
-        properties.setRecognizeUnicodeChars(true);
-        CompactXmlSerializer compactXmlSerializer = new CompactXmlSerializer(properties);
-        String xml = compactXmlSerializer.getAsString(node);
-        //System.out.println(xml);
-        assertTrue(xml.indexOf("<div>[&#945;][&#233;][&#8254;]</div>") >= 0);
-        properties.setRecognizeUnicodeChars(false);
-        xml = compactXmlSerializer.getAsString(node);
-        assertTrue(xml.indexOf("<div>[&#945;][&#233;][&#8254;]</div>") < 0);
-    }
-
 }
