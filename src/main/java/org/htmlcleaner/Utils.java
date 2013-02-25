@@ -152,6 +152,7 @@ public class Utils {
      * @param translateSpecialEntities
      * @param isDomCreation
      * @return
+     * TODO Consider moving to CleanerProperties since a long list of params is misleading.
      */
     public static String escapeXml(String s, boolean advanced, boolean recognizeUnicodeChars, boolean translateSpecialEntities, 
                                    boolean isDomCreation, boolean transResCharsToNCR, boolean translateSpecialEntitiesToNCR) {
