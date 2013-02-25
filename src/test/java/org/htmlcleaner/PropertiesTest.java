@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 
 /**
  * Testing node manipulation after cleaning.
- * TODO String escaping tests should be re-created at UtilsTest class.
+ * TODO String escaping tests should be moved to UtilsTest class.
  */
 public class PropertiesTest extends TestCase {
 
