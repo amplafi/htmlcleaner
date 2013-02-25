@@ -209,6 +209,13 @@ public abstract class Serializer {
         return getAsString(tagNode, false);
     }
 
+    public String getXmlAsString(String htmlContent, String charset) {
+        HtmlCleaner htmlCleaner = new HtmlCleaner(this.props);
+        TagNode tagNode = htmlCleaner.clean(htmlContent);
+        return getAsString(tagNode, charset==null||charset.length()==0?props.getCharset():charset);
+    }
+
+
     /**
      * Writes specified node using specified writer.
      * @param tagNode Node to serialize.

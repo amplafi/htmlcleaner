@@ -134,11 +134,14 @@ public abstract class XmlSerializer extends Serializer {
     protected boolean dontEscape(TagNode tagNode) {
         return props.isUseCdataForScriptAndStyle() && isScriptOrStyle(tagNode);
     }
-    
+
     protected boolean isMinimizedTagSyntax(TagNode tagNode) {
         final TagInfo tagInfo = props.getTagInfoProvider().getTagInfo(tagNode.getName());
         return tagNode.isEmpty() && (tagInfo == null || tagInfo.isMinimizedTagPermitted()) &&
                ( props.isUseEmptyElementTags() || (tagInfo != null && tagInfo.isEmptyTag()) );
+    }
+    protected void serializeOpenTag(TagNode tagNode, Writer writer) throws IOException {
+        serializeOpenTag(tagNode, writer, true);
     }
 
     protected void serializeOpenTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
@@ -217,6 +220,9 @@ public abstract class XmlSerializer extends Serializer {
         return !props.isNamespacesAware() && (XMLNS_NAMESPACE.equals(attName) || attName.startsWith(XMLNS_NAMESPACE +":"));
     }
 
+    protected void serializeEndTag(TagNode tagNode, Writer writer) throws IOException {
+       serializeEndTag(tagNode, writer, true);
+    }
 
     protected void serializeEndTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
         if ( !isForbiddenTag(tagNode)) {

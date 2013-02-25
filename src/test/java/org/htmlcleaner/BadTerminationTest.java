@@ -14,8 +14,7 @@ public class BadTerminationTest extends TestCase {
         cleanerProperties.setOmitXmlDeclaration(true);
         cleanerProperties.setUseEmptyElementTags(false);
 
-        String output = new SimpleXmlSerializer(cleanerProperties).getAsString(
-                TestTagNodeUtils.getTagNode(cleanerProperties, "<div></div id=\"foo\">"), "UTF-8");
+        String output = new SimpleXmlSerializer(cleanerProperties).getXmlAsString( "<div></div id=\"foo\">", "UTF-8");
         assertEquals("<div></div>", output);
     }
 
