@@ -107,7 +107,7 @@ public abstract class XmlSerializer extends Serializer {
      * @deprecated Use getAsString() instead.
      */
     @Deprecated
-    public String getXmlAsString(TagNode tagNode, String charset) throws IOException {
+    public String getXmlAsString(TagNode tagNode, String charset) {
         return super.getAsString(tagNode, charset);
     }
 
@@ -115,7 +115,7 @@ public abstract class XmlSerializer extends Serializer {
      * @deprecated Use getAsString() instead.
      */
     @Deprecated
-    public String getXmlAsString(TagNode tagNode) throws IOException {
+    public String getXmlAsString(TagNode tagNode) {
         return super.getAsString(tagNode);
     }
 

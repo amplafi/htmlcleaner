@@ -1060,18 +1060,14 @@ public class HtmlCleaner {
      * @return node's content as string
      */
     public String getInnerHtml(TagNode node) {
-        try{
-            if (node != null) {
-                String content = new SimpleXmlSerializer(properties).getAsString(node);
-                int index1 = content.indexOf("<" + node.getName());
-                index1 = content.indexOf('>', index1 + 1);
-                int index2 = content.lastIndexOf('<');
-                return index1 >= 0 && index1 <= index2 ? content.substring(index1 + 1, index2) : null;
-            } else {
-                throw new HtmlCleanerException("Cannot return inner html of the null node!");
-            }
-        }catch (IOException e) {
-            throw new HtmlCleanerException("IO exception occured.", e);
+        if (node != null) {
+            String content = new SimpleXmlSerializer(properties).getAsString(node);
+            int index1 = content.indexOf("<" + node.getName());
+            index1 = content.indexOf('>', index1 + 1);
+            int index2 = content.lastIndexOf('<');
+            return index1 >= 0 && index1 <= index2 ? content.substring(index1 + 1, index2) : null;
+        } else {
+            throw new HtmlCleanerException("Cannot return inner html of the null node!");
         }
     }
 

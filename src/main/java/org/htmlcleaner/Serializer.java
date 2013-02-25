@@ -169,11 +169,15 @@ public abstract class Serializer {
      * @param charset Charset of the output - stands in xml declaration part
      * @param omitEnvelope Tells whether to skip open and close tag of the node.
      * @return Output as string
-     * @throws IOException
      */
-    public String getAsString(TagNode tagNode, String charset, boolean omitEnvelope) throws IOException {
+    public String getAsString(TagNode tagNode, String charset, boolean omitEnvelope) {
         StringWriter writer = new StringWriter();
-        write(tagNode, writer, charset, omitEnvelope);
+        try {
+            write(tagNode, writer, charset, omitEnvelope);
+        } catch (IOException e) {
+            // not writing to the file system so any io errors should be really rare ( and bad)
+            throw new HtmlCleanerException(e);
+        }
         return writer.getBuffer().toString();
     }
 
@@ -181,9 +185,8 @@ public abstract class Serializer {
      * @param tagNode Node to serialize to string
      * @param charset Charset of the output - stands in xml declaration part
      * @return Output as string
-     * @throws IOException
      */
-    public String getAsString(TagNode tagNode, String charset) throws IOException {
+    public String getAsString(TagNode tagNode, String charset) {
         return getAsString(tagNode, charset, false);
     }
 
@@ -193,7 +196,7 @@ public abstract class Serializer {
      * @return Output as string
      * @throws IOException
      */
-    public String getAsString(TagNode tagNode, boolean omitEnvelope) throws IOException {
+    public String getAsString(TagNode tagNode, boolean omitEnvelope) {
         return getAsString(tagNode, CleanerProperties.DEFAULT_CHARSET, omitEnvelope);
     }
 
@@ -202,7 +205,7 @@ public abstract class Serializer {
      * @return Output as string
      * @throws IOException
      */
-    public String getAsString(TagNode tagNode) throws IOException {
+    public String getAsString(TagNode tagNode) {
         return getAsString(tagNode, false);
     }
 

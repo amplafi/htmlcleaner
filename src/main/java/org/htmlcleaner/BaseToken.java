@@ -47,7 +47,7 @@ import java.io.Writer;
  */
 public interface BaseToken {
 
-	public void serialize(Serializer xmlSerializer, Writer writer) throws IOException;
+	public void serialize(Serializer serializer, Writer writer) throws IOException;
 
 	/**
 	 * @return row in source html where the token was found
