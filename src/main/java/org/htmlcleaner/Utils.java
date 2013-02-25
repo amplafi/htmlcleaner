@@ -219,7 +219,8 @@ public class Utils {
         int charIndex = extractCharCode(s, i, true, unicode);
         if (unicode.length() > 0) {
         	try {
-        		char unicodeChar = unicode.substring(0,1).equals("x") ?
+        	    boolean isHex = unicode.substring(0,1).equals("x");
+        		char unicodeChar = isHex ?
                                         (char)Integer.parseInt(unicode.substring(1), 16) :
                                         (char)Integer.parseInt(unicode.toString());
                 SpecialEntity specialEntity = SpecialEntities.INSTANCE.getSpecialEntityByUnicode(unicodeChar);
