@@ -238,7 +238,8 @@ public class Utils {
                                 // OR we are not outputting unicode characters as the characters ( they are staying escaped )
                                 || !recognizeUnicodeChars)) {
                     result.append(domCreation? specialEntity.getHtmlString():
-                        (translateSpecialEntitiesToNCR? specialEntity.getDecimalNCR() : specialEntity.getEscapedXmlString()));
+                        (translateSpecialEntitiesToNCR? (isHex? specialEntity.getHexNCR(): specialEntity.getDecimalNCR()) : 
+                            specialEntity.getEscapedXmlString()));
                 } else if ( recognizeUnicodeChars ) {
                     // output unicode characters as their actual byte code with the exception of characters that have special xml meaning.
                     result.append( String.valueOf(unicodeChar));

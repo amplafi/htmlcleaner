@@ -25,8 +25,11 @@ public class UtilsTest extends TestCase {
         assertEquals("[α][é][‾][Σ]", res);
     }
     
-    public void testEscapeXml_transSpecialEntitiesToNCR() {
+    public void testEscapeXml_transSpecialEntitiesToNCR_withHex() {
         String res = Utils.escapeXml("&#x27;&#xa1;", true, false, true, false, false, true);
+        assertEquals("&#x27;&#xa1;", res);   
+        
+        res = Utils.escapeXml("&#39;&#161;", true, false, true, false, false, true);
         assertEquals("&#39;&#161;", res);   
         
         res = Utils.escapeXml("&#x27;&#xa1;", true, false, true, false, false, false);
