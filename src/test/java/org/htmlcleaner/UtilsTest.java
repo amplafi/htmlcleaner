@@ -2,6 +2,11 @@ package org.htmlcleaner;
 
 import junit.framework.TestCase;
 
+/**
+ * 
+ * @author Eugene Sapozhnikov (blackorangebox@gmail.com)
+ *
+ */
 public class UtilsTest extends TestCase {
     public void testEscapeXml_transResCharsToNCR() {
         String res = Utils.escapeXml("1.&\"'<>", true, true, true, false, true, false);
