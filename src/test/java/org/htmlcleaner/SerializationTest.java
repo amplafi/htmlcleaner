@@ -41,7 +41,6 @@ public class SerializationTest extends TestCase {
     public void testPrettyXmlSerializer() throws IOException {
         TagNode node = getTestTagNode();
         String xml1 = new PrettyXmlSerializer(properties, "----").getAsString(node);
-        System.out.println(xml1);
         assertTrue(xml1.indexOf("--------<mama:div xmlns:mama=\"http://www.helloworld.com\">") > 0);
         assertTrue(xml1.indexOf("----------------<sub>a</sub>") > 0);
         assertTrue(xml1.indexOf("--------<!-- ZANZIBAR '\"&<>' -->") > 0);
