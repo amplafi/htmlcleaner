@@ -1,13 +1,20 @@
 package org.htmlcleaner;
 
-import org.jdom.*;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.jdom.Comment;
+import org.jdom.DefaultJDOMFactory;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.jdom.Text;
+
 /**
- * <p>JDom serializer - creates xml JDom instance out of the TagNode.</p>
+ * <p>
+ * JDom serializer - creates xml JDom instance out of the TagNode.
+ * </p>
  */
 public class JDomSerializer {
 
@@ -27,11 +34,100 @@ public class JDomSerializer {
 
     public Document createJDom(TagNode rootNode) {
         this.factory = new DefaultJDOMFactory();
-        Element rootElement = this.factory.element(rootNode.getName());
+        Element rootElement = createElement(rootNode);
         Document document = this.factory.document(rootElement);
+
+        setAttributes(rootNode, rootElement);
+
         createSubnodes(rootElement, rootNode.getChildren());
 
         return document;
+    }
+
+    private Element createElement(TagNode node) {
+        String name = node.getName();
+        boolean nsAware = props.isNamespacesAware();
+        String prefix = Utils.getXmlNSPrefix(name);
+        Map<String, String> nsDeclarations = node.getNamespaceDeclarations();
+        String nsURI = null;
+        if (prefix != null) {
+            name = Utils.getXmlName(name);
+            if (nsAware) {
+                if (nsDeclarations != null) {
+                    nsURI = nsDeclarations.get(prefix);
+                }
+                if (nsURI == null) {
+                    nsURI = node.getNamespaceURIOnPath(prefix);
+                }
+                if (nsURI == null) {
+                    nsURI = prefix;
+                }
+            }
+        } else {
+            if (nsAware) {
+                if (nsDeclarations != null) {
+                    nsURI = nsDeclarations.get("");
+                }
+                if (nsURI == null) {
+                    nsURI = node.getNamespaceURIOnPath(prefix);
+                }
+            }
+        }
+
+        Element element;
+        if (nsAware && nsURI != null) {
+            Namespace ns = prefix == null ? Namespace.getNamespace(nsURI) : Namespace.getNamespace(prefix, nsURI);
+            element = factory.element(name, ns);
+        } else {
+            element = factory.element(name);
+        }
+
+        if (nsAware) {
+            defineNamespaceDeclarations(node, element);
+        }
+        return element;
+    }
+
+    private void defineNamespaceDeclarations(TagNode node, Element element) {
+        Map<String, String> nsDeclarations = node.getNamespaceDeclarations();
+        if (nsDeclarations != null) {
+            for (Map.Entry<String, String> nsEntry : nsDeclarations.entrySet()) {
+                String nsPrefix = nsEntry.getKey();
+                String nsURI = nsEntry.getValue();
+                Namespace ns = nsPrefix == null || "".equals(nsPrefix) ? Namespace.getNamespace(nsURI) : Namespace
+                        .getNamespace(nsPrefix, nsURI);
+                element.addNamespaceDeclaration(ns);
+            }
+        }
+    }
+
+    private void setAttributes(TagNode node, Element element) {
+        for (Map.Entry<String, String> entry : node.getAttributes().entrySet()) {
+            String attrName = entry.getKey();
+            String attrValue = entry.getValue();
+            if (escapeXml) {
+                attrValue = Utils.escapeXml(attrValue, props, true);
+            }
+            String attPrefix = Utils.getXmlNSPrefix(attrName);
+            Namespace ns = null;
+            if (attPrefix != null) {
+                attrName = Utils.getXmlName(attrName);
+                if (props.isNamespacesAware()) {
+                    String nsURI = node.getNamespaceURIOnPath(attPrefix);
+                    if (nsURI == null) {
+                        nsURI = attPrefix;
+                    }
+                    if (!attPrefix.startsWith("xml")) {
+                        ns = Namespace.getNamespace(attPrefix, nsURI);
+                    }
+                }
+            }
+            if (ns == null) {
+                element.setAttribute(attrName, attrValue);
+            } else {
+                element.setAttribute(attrName, attrValue, ns);
+            }
+        }
     }
 
     private void createSubnodes(Element element, List tagChildren) {
@@ -41,14 +137,13 @@ public class JDomSerializer {
                 Object item = it.next();
                 if (item instanceof CommentNode) {
                     CommentNode commentNode = (CommentNode) item;
-                    Comment comment = factory.comment( commentNode.getContent() );
+                    Comment comment = factory.comment(commentNode.getContent().toString());
                     element.addContent(comment);
                 } else if (item instanceof ContentNode) {
                     String nodeName = element.getName();
-                    ContentNode contentNode = (ContentNode) item;
-                    String content = contentNode.getContent();
-                    boolean specialCase = props.isUseCdataForScriptAndStyle() &&
-                                          ("script".equalsIgnoreCase(nodeName) || "style".equalsIgnoreCase(nodeName));
+                    String content = item.toString();
+                    boolean specialCase = props.isUseCdataForScriptAndStyle()
+                            && ("script".equalsIgnoreCase(nodeName) || "style".equalsIgnoreCase(nodeName));
                     if (escapeXml && !specialCase) {
                         content = Utils.escapeXml(content, props, true);
                     }
@@ -56,15 +151,9 @@ public class JDomSerializer {
                     element.addContent(text);
                 } else if (item instanceof TagNode) {
                     TagNode subTagNode = (TagNode) item;
-                    Element subelement = factory.element( subTagNode.getName() );
-                    Map attributes = subTagNode.getAttributes();
-                    Iterator entryIterator = attributes.entrySet().iterator();
-                    while (entryIterator.hasNext()) {
-                        Map.Entry entry = (Map.Entry) entryIterator.next();
-                        String attrName = (String) entry.getKey();
-                        String attrValue = (String) entry.getValue();
-                        subelement.setAttribute(attrName, attrValue);
-                    }
+                    Element subelement = createElement(subTagNode);
+
+                    setAttributes(subTagNode, subelement);
 
                     // recursively create subnodes
                     createSubnodes(subelement, subTagNode.getChildren());
