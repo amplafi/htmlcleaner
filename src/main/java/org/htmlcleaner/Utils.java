@@ -138,7 +138,8 @@ public class Utils {
         boolean recognizeUnicodeChars = props.isRecognizeUnicodeChars();
         boolean translateSpecialEntities = props.isTranslateSpecialEntities();
         boolean transResCharsToNCR = props.isTransResCharsToNCR();
-        return escapeXml(s, advanced, recognizeUnicodeChars, translateSpecialEntities, isDomCreation, transResCharsToNCR);
+        boolean transSpecialEntitiesToNCR = props.isTransSpecialEntitiesToNCR();
+        return escapeXml(s, advanced, recognizeUnicodeChars, translateSpecialEntities, isDomCreation, transResCharsToNCR, transSpecialEntitiesToNCR);
     }
     /**
      * change notes:
@@ -152,7 +153,8 @@ public class Utils {
      * @param isDomCreation
      * @return
      */
-    public static String escapeXml(String s, boolean advanced, boolean recognizeUnicodeChars, boolean translateSpecialEntities, boolean isDomCreation, boolean transResCharsToNCR) {
+    public static String escapeXml(String s, boolean advanced, boolean recognizeUnicodeChars, boolean translateSpecialEntities, 
+                                   boolean isDomCreation, boolean transResCharsToNCR, boolean translateSpecialEntitiesToNCR) {
         if (s != null) {
     		int len = s.length();
     		StringBuffer result = new StringBuffer(len);
@@ -163,7 +165,7 @@ public class Utils {
     			SpecialEntity code;
     			if (ch == '&') {
     				if ( (advanced || recognizeUnicodeChars) && (i < len-1) && (s.charAt(i+1) == '#') ) {
-    					i = convertToUnicode(s, isDomCreation, recognizeUnicodeChars, result, i+2);
+    					i = convertToUnicode(s, isDomCreation, recognizeUnicodeChars, translateSpecialEntitiesToNCR, result, i+2);
     				} else if ((translateSpecialEntities || advanced) &&
 				        (code = SpecialEntities.INSTANCE.getSpecialEntity(s.substring(i, i+Math.min(10, len-i)))) != null) {
 			            if (translateSpecialEntities && code.isHtmlSpecialEntity()) {
@@ -210,11 +212,12 @@ public class Utils {
      * @param s
      * @param domCreation
      * @param recognizeUnicodeChars
+     * @param translateSpecialEntitiesToNCR 
      * @param result
      * @param i
      * @return
      */
-    public static int convertToUnicode(String s, boolean domCreation, boolean recognizeUnicodeChars, StringBuffer result, int i) {
+    public static int convertToUnicode(String s, boolean domCreation, boolean recognizeUnicodeChars, boolean translateSpecialEntitiesToNCR, StringBuffer result, int i) {
         StringBuilder unicode = new StringBuilder();
         int charIndex = extractCharCode(s, i, true, unicode);
         if (unicode.length() > 0) {
@@ -224,7 +227,7 @@ public class Utils {
                                         (char)Integer.parseInt(unicode.substring(1), 16) :
                                         (char)Integer.parseInt(unicode.toString());
                 SpecialEntity specialEntity = SpecialEntities.INSTANCE.getSpecialEntityByUnicode(unicodeChar);
-                if ( unicodeChar ==0) {
+                if (unicodeChar == 0) {
                     // null character &#0Peanut for example
                     // just consume character &
                     result.append("&amp;");
@@ -233,7 +236,8 @@ public class Utils {
                         (!specialEntity.isHtmlSpecialEntity()
                                 // OR we are not outputting unicode characters as the characters ( they are staying escaped )
                                 || !recognizeUnicodeChars)) {
-                    result.append(domCreation?specialEntity.getHtmlString():specialEntity.getEscapedXmlString());
+                    result.append(domCreation? specialEntity.getHtmlString():
+                        (translateSpecialEntitiesToNCR? specialEntity.getDecimalNCR() : specialEntity.getEscapedXmlString()));
                 } else if ( recognizeUnicodeChars ) {
                     // output unicode characters as their actual byte code with the exception of characters that have special xml meaning.
                     result.append( String.valueOf(unicodeChar));
@@ -346,7 +350,7 @@ public class Utils {
             return true;
         }
         String s = o.toString();
-        String text = escapeXml(s, true, false, false, false, false);
+        String text = escapeXml(s, true, false, false, false, false, false);
         // TODO: doesn't escapeXml handle this?
         String last = text.replace(SpecialEntities.NON_BREAKABLE_SPACE, ' ').trim();
         return last.length() == 0;

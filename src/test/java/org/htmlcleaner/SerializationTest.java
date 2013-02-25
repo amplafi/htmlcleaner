@@ -75,14 +75,4 @@ public class SerializationTest extends TestCase {
         assertTrue(xml.indexOf("<div>[&#945;][&#233;][&#8254;]</div>") < 0);
     }
 
-    public void testHexEntity() throws IOException {
-        final CleanerProperties props = new CleanerProperties();
-        props.setRecognizeUnicodeChars(false);
-        props.setOmitXmlDeclaration(true);
-
-        final TagNode tagNode = new HtmlCleaner(props).clean("<html><body>&#x27;&#xa1;</body></html>");
-        assertEquals("<html><head /><body>&#x27;&#xa1;</body></html>",
-                new SimpleXmlSerializer(props).getAsString(tagNode, "utf-8"));
-    }
-
 }
