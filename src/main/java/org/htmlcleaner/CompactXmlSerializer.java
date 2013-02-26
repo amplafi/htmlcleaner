@@ -50,6 +50,7 @@ public class CompactXmlSerializer extends XmlSerializer {
 		super(props);
 	}
 
+    @Override
     protected void serialize(TagNode tagNode, Writer writer) throws IOException {
         serializeOpenTag(tagNode, writer, false);
 
@@ -58,21 +59,23 @@ public class CompactXmlSerializer extends XmlSerializer {
             ListIterator childrenIt = tagChildren.listIterator();
             while ( childrenIt.hasNext() ) {
                 Object item = childrenIt.next();
-                if (item instanceof ContentNode) {
-                    String content = item.toString().trim();
-                    writer.write( dontEscape(tagNode) ? content.replaceAll("]]>", "]]&gt;") : escapeXml(content) );
+                if (item != null) {
+                    if ( item instanceof ContentNode ) {
+                    	String content = ((ContentNode) item).getContent().trim();
+                        writer.write( dontEscape(tagNode) ? content.replaceAll("]]>", "]]&gt;") : escapeXml(content) );
 
-                    if (childrenIt.hasNext()) {
-                        if ( !Utils.isWhitespaceString(childrenIt.next()) ) {
-                            writer.write("\n");
+                        if (childrenIt.hasNext()) {
+                            if ( !Utils.isWhitespaceString(childrenIt.next()) ) {
+                                writer.write("\n");
+                            }
+                            childrenIt.previous();
                         }
-                        childrenIt.previous();
+                    } else if (item instanceof CommentNode) {
+                    	String content = ((CommentNode) item).getCommentedContent().trim();
+                    	writer.write(content);
+                    } else {
+                    	((BaseToken)item).serialize(this, writer);
                     }
-                } else if (item instanceof CommentNode) {
-                    String content = ((CommentNode) item).getCommentedContent().trim();
-                    writer.write(content);
-                } else if (item instanceof BaseToken) {
-                    ((BaseToken)item).serialize(this, writer);
                 }
             }
 

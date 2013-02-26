@@ -105,7 +105,7 @@ public abstract class Serializer {
      * @throws IOException
      */
     public void writeToStream(TagNode tagNode, OutputStream out, boolean omitEnvelope) throws IOException {
-         writeToStream( tagNode, out, HtmlCleaner.DEFAULT_CHARSET, omitEnvelope );
+         writeToStream( tagNode, out, CleanerProperties.DEFAULT_CHARSET, omitEnvelope );
     }
 
     /**
@@ -151,7 +151,7 @@ public abstract class Serializer {
      * @throws IOException
      */
     public void writeToFile(TagNode tagNode, String fileName, boolean omitEnvelope) throws IOException {
-        writeToFile(tagNode,fileName, HtmlCleaner.DEFAULT_CHARSET, omitEnvelope);
+        writeToFile(tagNode,fileName, CleanerProperties.DEFAULT_CHARSET, omitEnvelope);
     }
 
     /**
@@ -169,11 +169,15 @@ public abstract class Serializer {
      * @param charset Charset of the output - stands in xml declaration part
      * @param omitEnvelope Tells whether to skip open and close tag of the node.
      * @return Output as string
-     * @throws IOException
      */
-    public String getAsString(TagNode tagNode, String charset, boolean omitEnvelope) throws IOException {
+    public String getAsString(TagNode tagNode, String charset, boolean omitEnvelope) {
         StringWriter writer = new StringWriter();
-        write(tagNode, writer, charset, omitEnvelope);
+        try {
+            write(tagNode, writer, charset, omitEnvelope);
+        } catch (IOException e) {
+            // not writing to the file system so any io errors should be really rare ( and bad)
+            throw new HtmlCleanerException(e);
+        }
         return writer.getBuffer().toString();
     }
 
@@ -181,9 +185,8 @@ public abstract class Serializer {
      * @param tagNode Node to serialize to string
      * @param charset Charset of the output - stands in xml declaration part
      * @return Output as string
-     * @throws IOException
      */
-    public String getAsString(TagNode tagNode, String charset) throws IOException {
+    public String getAsString(TagNode tagNode, String charset) {
         return getAsString(tagNode, charset, false);
     }
 
@@ -193,8 +196,8 @@ public abstract class Serializer {
      * @return Output as string
      * @throws IOException
      */
-    public String getAsString(TagNode tagNode, boolean omitEnvelope) throws IOException {
-        return getAsString(tagNode, HtmlCleaner.DEFAULT_CHARSET, omitEnvelope);
+    public String getAsString(TagNode tagNode, boolean omitEnvelope) {
+        return getAsString(tagNode, CleanerProperties.DEFAULT_CHARSET, omitEnvelope);
     }
 
     /**
@@ -202,9 +205,16 @@ public abstract class Serializer {
      * @return Output as string
      * @throws IOException
      */
-    public String getAsString(TagNode tagNode) throws IOException {
+    public String getAsString(TagNode tagNode) {
         return getAsString(tagNode, false);
     }
+
+    public String getXmlAsString(String htmlContent, String charset) {
+        HtmlCleaner htmlCleaner = new HtmlCleaner(this.props);
+        TagNode tagNode = htmlCleaner.clean(htmlContent);
+        return getAsString(tagNode, charset==null||charset.length()==0?props.getCharset():charset);
+    }
+
 
     /**
      * Writes specified node using specified writer.

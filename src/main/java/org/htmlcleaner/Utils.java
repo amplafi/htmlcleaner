@@ -1,35 +1,35 @@
 /*  Copyright (c) 2006-2007, Vladimir Nikic
     All rights reserved.
-	
-    Redistribution and use of this software in source and binary forms, 
-    with or without modification, are permitted provided that the following 
+
+    Redistribution and use of this software in source and binary forms,
+    with or without modification, are permitted provided that the following
     conditions are met:
-	
+
     * Redistributions of source code must retain the above
       copyright notice, this list of conditions and the
       following disclaimer.
-	
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the
       following disclaimer in the documentation and/or other
       materials provided with the distribution.
-	
-    * The name of HtmlCleaner may not be used to endorse or promote 
+
+    * The name of HtmlCleaner may not be used to endorse or promote
       products derived from this software without specific prior
       written permission.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
-	
+
     You can contact Vladimir Nikic by sending e-mail to
     nikic_vladimir@yahoo.com. Please include the word "HtmlCleaner" in the
     subject line.
@@ -39,7 +39,6 @@ package org.htmlcleaner;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -48,11 +47,11 @@ import java.util.regex.Pattern;
 
 /**
  * <p>Common utilities.</p>
+ *
+ * Created by: Vladimir Nikic<br/>
+ * Date: November, 2006.
  */
 public class Utils {
-
-    public static String VAR_START = "${";
-    public static String VAR_END = "}";
 
     public static final Map<Character, String> RESERVED_XML_CHARS = new HashMap<Character, String>();
 
@@ -102,166 +101,199 @@ public class Utils {
         return (index <= 0) ? "" : s.substring(0, index);
     }
 
-    public static String getCharsetFromContentTypeString(String contentType) {
-        if (contentType != null) {
-            String pattern = "charset=([a-z\\d\\-]*)";
-            Matcher matcher = Pattern.compile(pattern,  Pattern.CASE_INSENSITIVE).matcher(contentType);
-            if (matcher.find()) {
-                String charset = matcher.group(1);
-                if (Charset.isSupported(charset)) {
-                    return charset;
+    /**
+     * Reads content from the specified URL with specified charset into string
+     * @param url
+     * @param charset
+     * @throws IOException
+     */
+    public static StringBuffer readUrl(URL url, String charset) throws IOException {
+        StringBuffer buffer = new StringBuffer(1024);
+
+        Object content = url.getContent();
+        if (content instanceof InputStream) {
+            InputStreamReader reader = new InputStreamReader((InputStream)content, charset);
+            char[] charArray = new char[1024];
+
+            int charsRead = 0;
+            do {
+                charsRead = reader.read(charArray);
+                if (charsRead >= 0) {
+                    buffer.append(charArray, 0, charsRead);
                 }
-            }
-        }
-        
-        return null;
-    }
-
-    public static String getCharsetFromContent(URL url) throws IOException {
-        InputStream stream = url.openStream();
-        byte chunk[] = new byte[2048];
-        int bytesRead = stream.read(chunk);
-        if (bytesRead > 0) {
-            String startContent = new String(chunk);
-            String pattern = "\\<meta\\s*http-equiv=[\\\"\\']content-type[\\\"\\']\\s*content\\s*=\\s*[\"']text/html\\s*;\\s*charset=([a-z\\d\\-]*)[\\\"\\'\\>]";
-            Matcher matcher = Pattern.compile(pattern,  Pattern.CASE_INSENSITIVE).matcher(startContent);
-            if (matcher.find()) {
-                String charset = matcher.group(1);
-                if (Charset.isSupported(charset)) {
-                    return charset;
-                }
-            }
+            } while (charsRead > 0);
         }
 
-        return null;
+        return buffer;
     }
 
-    public static boolean isHexadecimalDigit(char ch) {
-        return Character.isDigit(ch) ||
-               ch == 'A' || ch == 'a' || ch == 'B' || ch == 'b' || ch == 'C' || ch == 'c' ||
-               ch == 'D' || ch == 'd' || ch == 'E' || ch == 'e' || ch == 'F' || ch == 'f';
-    }
-
-    public static boolean isValidXmlChar(char ch) {
-        return ((ch >= 0x20) && (ch <= 0xD7FF)) ||
-               (ch == 0x9) ||
-               (ch == 0xA) ||
-               (ch == 0xD) ||
-               ((ch >= 0xE000) && (ch <= 0xFFFD)) ||
-               ((ch >= 0x10000) && (ch <= 0x10FFFF));
-    }
-
-    public static boolean isReservedXmlChar(char ch) {
-        return RESERVED_XML_CHARS.containsKey(ch);
-    }
-
-    public static boolean isValidInt(String s, int radix) {
-        try {
-            Integer.parseInt(s, radix);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-    
     /**
      * Escapes XML string.
      * @param s String to be escaped
-     * @param props Cleaner properties gover affect escaping behaviour
+     * @param props Cleaner properties affects escaping behaviour
      * @param isDomCreation Tells if escaped content will be part of the DOM
      */
     public static String escapeXml(String s, CleanerProperties props, boolean isDomCreation) {
         boolean advanced = props.isAdvancedXmlEscape();
         boolean recognizeUnicodeChars = props.isRecognizeUnicodeChars();
         boolean translateSpecialEntities = props.isTranslateSpecialEntities();
-
+        boolean transResCharsToNCR = props.isTransResCharsToNCR();
+        boolean transSpecialEntitiesToNCR = props.isTransSpecialEntitiesToNCR();
+        return escapeXml(s, advanced, recognizeUnicodeChars, translateSpecialEntities, isDomCreation, transResCharsToNCR, transSpecialEntitiesToNCR);
+    }
+    /**
+     * change notes:
+     * 1) convert ascii characters encoded using &#xx; format to the ascii characters -- may be an attempt to slip in malicious html
+     * 2) convert &#xxx; format characters to &quot; style representation if available for the character.
+     * 3) convert html special entities to xml &#xxx; when outputing in xml
+     * @param s
+     * @param advanced
+     * @param recognizeUnicodeChars
+     * @param translateSpecialEntities
+     * @param isDomCreation
+     * @return
+     * TODO Consider moving to CleanerProperties since a long list of params is misleading.
+     */
+    public static String escapeXml(String s, boolean advanced, boolean recognizeUnicodeChars, boolean translateSpecialEntities, 
+                                   boolean isDomCreation, boolean transResCharsToNCR, boolean translateSpecialEntitiesToNCR) {
         if (s != null) {
     		int len = s.length();
-    		StringBuilder result = new StringBuilder(len);
-    		
+    		StringBuffer result = new StringBuffer(len);
+
     		for (int i = 0; i < len; i++) {
     			char ch = s.charAt(i);
-    			
+
+    			SpecialEntity code;
     			if (ch == '&') {
-    				if ( (advanced || recognizeUnicodeChars) && (i < len-2) && (s.charAt(i+1) == '#') ) {
-                        boolean isHex = Character.toLowerCase(s.charAt(i+2)) == 'x';
-                        int charIndex = i + (isHex ? 3 : 2);
-                        int radix = isHex ? 16 : 10;
-                        String unicode = "";
-                        while (charIndex < len) {
-                            char currCh = s.charAt(charIndex);
-                            if (currCh == ';') {
-                                break;
-                            } else if (isValidInt(unicode + currCh, radix)) {
-                                unicode += currCh;
-                                charIndex++;
+    				if ( (advanced || recognizeUnicodeChars) && (i < len-1) && (s.charAt(i+1) == '#') ) {
+    					i = convertToUnicode(s, isDomCreation, recognizeUnicodeChars, translateSpecialEntitiesToNCR, result, i+2);
+    				} else if ((translateSpecialEntities || advanced) &&
+				        (code = SpecialEntities.INSTANCE.getSpecialEntity(s.substring(i, i+Math.min(10, len-i)))) != null) {
+			            if (translateSpecialEntities && code.isHtmlSpecialEntity()) {
+                            if (recognizeUnicodeChars) {
+                                result.append( (char)code.intValue() );
                             } else {
-                                charIndex--;
-                                break;
+                                result.append( code.getDecimalNCR() );
                             }
-                        }
-
-    					if (isValidInt(unicode, radix)) {
-                            char unicodeChar = (char)Integer.parseInt(unicode, radix);
-                            if ( !isValidXmlChar(unicodeChar) ) {
-                                i = charIndex;
-                            } else if ( !isReservedXmlChar(unicodeChar) ) {
-                                result.append( recognizeUnicodeChars ? String.valueOf(unicodeChar) : "&#" + (isHex ? "x" : "") + unicode + ";" );
-                                i = charIndex;
-                            } else {
-                                i = charIndex;
-                                result.append("&#" + (isHex ? "x" : "") + unicode + ";");
-                            }
-    					} else {
-    						result.append("&amp;");
-    					}
+							i += code.getKey().length() + 1;
+						} else if (advanced ) {
+					        result.append(transResCharsToNCR ? code.getDecimalNCR() : code.getEscaped(isDomCreation));
+		                    i += code.getKey().length()+1;
+			            } else {
+			                result.append(transResCharsToNCR ? getAmpNcr() : "&amp;");
+			            }
     				} else {
-    					if (translateSpecialEntities) {
-                            // get minimal following sequence required to recognize some special entitiy
-                            String seq = s.substring(i, i + Math.min(SpecialEntities.INSTANCE.getMaxEntityLength() + 2, len - i));
-    						int semiIndex = seq.indexOf(';');
-    						if (semiIndex > 0) {
-    							String entityKey = seq.substring(1, semiIndex);
-    							SpecialEntity entity = SpecialEntities.INSTANCE.getSpecialEntity(entityKey);
-    							if (entity != null) {
-                                    result.append(props.isTransSpecialEntitiesToNCR() ? entity.getDecimalNCR() : entity.charValue());
-    								i += entityKey.length() + 1;
-    								continue;
-    							}
-    						}
-    					}
-
-    					if (advanced) {
-                            String sub = s.substring(i);
-                            boolean isReservedSeq = false;
-                            for (Map.Entry<Character, String> entry: RESERVED_XML_CHARS.entrySet()) {
-                                String seq = entry.getValue();
-                                if ( sub.startsWith(seq) ) {
-                                    result.append( isDomCreation ? entry.getKey() : (props.transResCharsToNCR ? "&#" + (int)entry.getKey() + ";" : seq) );
-                                    i += seq.length() - 1;
-                                    isReservedSeq = true;
-                                    break;
-                                }
-                            }
-                            if (!isReservedSeq) {
-                                result.append( isDomCreation ? "&" : (props.transResCharsToNCR ? "&#" + (int)'&' + ";" :  RESERVED_XML_CHARS.get('&')) );
-                            }
-    						continue;
-    					}
-    					
-    					result.append("&amp;");
+    				    result.append(transResCharsToNCR ? getAmpNcr() : "&amp;");
     				}
-    			} else if (isReservedXmlChar(ch)) {
-    				result.append( props.transResCharsToNCR ? "&#" + (int)ch + ";" : (isDomCreation ? ch : RESERVED_XML_CHARS.get(ch)) );
+    			} else if ((code = SpecialEntities.INSTANCE.getSpecialEntityByUnicode(ch)) != null ) {
+    			    result.append(transResCharsToNCR ? code.getDecimalNCR() : code.getEscaped(isDomCreation));
     			} else {
     				result.append(ch);
     			}
     		}
-    		
+
     		return result.toString();
     	}
-    	
+
     	return null;
+    }
+
+    private static String ampNcr;
+
+    private static String getAmpNcr() {
+        if (ampNcr == null) {
+            ampNcr = SpecialEntities.INSTANCE.getSpecialEntityByUnicode('&').getDecimalNCR();
+        }
+
+        return ampNcr;
+    }
+
+    private static final Pattern ASCII_CHAR = Pattern.compile("\\p{Print}");
+    /**
+     * @param s
+     * @param domCreation
+     * @param recognizeUnicodeChars
+     * @param translateSpecialEntitiesToNCR 
+     * @param result
+     * @param i
+     * @return
+     */
+    public static int convertToUnicode(String s, boolean domCreation, boolean recognizeUnicodeChars, boolean translateSpecialEntitiesToNCR, StringBuffer result, int i) {
+        StringBuilder unicode = new StringBuilder();
+        int charIndex = extractCharCode(s, i, true, unicode);
+        if (unicode.length() > 0) {
+        	try {
+        	    boolean isHex = unicode.substring(0,1).equals("x");
+        		char unicodeChar = isHex ?
+                                        (char)Integer.parseInt(unicode.substring(1), 16) :
+                                        (char)Integer.parseInt(unicode.toString());
+                SpecialEntity specialEntity = SpecialEntities.INSTANCE.getSpecialEntityByUnicode(unicodeChar);
+                if (unicodeChar == 0) {
+                    // null character &#0Peanut for example
+                    // just consume character &
+                    result.append("&amp;");
+                } else if ( specialEntity != null &&
+                        // special characters that are always escaped.
+                        (!specialEntity.isHtmlSpecialEntity()
+                                // OR we are not outputting unicode characters as the characters ( they are staying escaped )
+                                || !recognizeUnicodeChars)) {
+                    result.append(domCreation? specialEntity.getHtmlString():
+                        (translateSpecialEntitiesToNCR? (isHex? specialEntity.getHexNCR(): specialEntity.getDecimalNCR()) : 
+                            specialEntity.getEscapedXmlString()));
+                } else if ( recognizeUnicodeChars ) {
+                    // output unicode characters as their actual byte code with the exception of characters that have special xml meaning.
+                    result.append( String.valueOf(unicodeChar));
+                } else if ( ASCII_CHAR.matcher(new String(new char[] { unicodeChar } )).find()) {
+                    // ascii printable character. this fancy escaping might be an attempt to slip in dangerous characters (i.e. spelling out <script> )
+                    // by converting to printable characters we can more easily detect such attacks.
+                    result.append(String.valueOf(unicodeChar));
+                } else {
+        			result.append( "&#").append(unicode).append(";" );
+        		}
+        	} catch (NumberFormatException e) {
+        	    // should never happen now
+        		result.append("&amp;#").append(unicode).append(";" );
+        	}
+        } else {
+        	result.append("&amp;");
+        }
+        return charIndex;
+    }
+
+    // TODO have pattern consume leading 0's and discard.
+    public static Pattern HEX_STRICT = Pattern.compile("^([x|X][\\p{XDigit}]+)(;?)");
+    public static Pattern HEX_RELAXED = Pattern.compile("^0*([x|X][\\p{XDigit}]+)(;?)");
+    public static Pattern DECIMAL = Pattern.compile("^([\\p{Digit}]+)(;?)");
+    /**
+     * <ul>
+     * <li>(earlier code was failing on this) - &#138A; is converted by FF to 3 characters: &#138; + 'A' + ';'</li>
+     * <li>&#0x138A; is converted by FF to 6? 7? characters: &#0 'x'+'1'+'3'+ '8' + 'A' + ';'
+     * #0 is displayed kind of weird</li>
+     * <li>&#x138A; is a single character</li>
+     * </ul>
+     *
+     * @param s
+     * @param charIndex
+     * @param relaxedUnicode '&#0x138;' is treated like '&#x138;'
+     * @param unicode
+     * @return the index to continue scanning the source string -1 so normal loop incrementing skips the ';'
+     */
+    public static int extractCharCode(String s, int charIndex, boolean relaxedUnicode, StringBuilder unicode) {
+        int len = s.length();
+        CharSequence subSequence = s.subSequence(charIndex, Math.min(len,charIndex+15));
+        Matcher matcher;
+        if( relaxedUnicode ) {
+            matcher = HEX_RELAXED.matcher(subSequence);
+        } else {
+            matcher = HEX_STRICT.matcher(subSequence);
+        }
+        // silly note: remember calling find() twice finds second match :-)
+        if (matcher.find() || ((matcher = DECIMAL.matcher(subSequence)).find())) {
+            // -1 so normal loop incrementing skips the ';'
+            charIndex += matcher.end() -1;
+            unicode.append(matcher.group(1));
+        }
+        return charIndex;
     }
 
     /**
@@ -288,7 +320,7 @@ public class Utils {
     }
 
     /**
-     * Chacks whether specified string can be valid tag name or attribute name in xml.
+     * Checks whether specified string can be valid tag name or attribute name in xml.
      * @param s String to be checked
      * @return True if string is valid xml identifier, false otherwise
      */
@@ -300,7 +332,7 @@ public class Utils {
             }
             for (int i = 0; i < len; i++) {
                 char ch = s.charAt(i);
-                if ( (i == 0 && !Character.isUnicodeIdentifierStart(ch) && ch != '_') ||
+                if ( (i == 0 && !Character.isUnicodeIdentifierStart(ch)) ||
                      (!Character.isUnicodeIdentifierStart(ch) && !Character.isDigit(ch) && !Utils.isIdentifierHelperChar(ch)) ) {
                     return false;
                 }
@@ -316,44 +348,14 @@ public class Utils {
      * @return True if specified string is null of contains only whitespace characters
      */
     public static boolean isEmptyString(Object o) {
-        return o == null || "".equals(o.toString().trim());
-    }
-
-    /**
-     * Evaluates string template for specified map of variables. Template string can contain
-     * dynamic parts in the form of ${VARNAME}. Each such part is replaced with value of the
-     * variable if such exists in the map, or with empty string otherwise.
-     * 
-     * @param template Template string
-     * @param variables Map of variables (can be null)
-     * @return Evaluated string
-     */
-    public static String evaluateTemplate(String template, Map variables) {
-        if (template == null) {
-            return template;
+        if ( o == null ) {
+            return true;
         }
-
-        StringBuilder result = new StringBuilder();
-
-        int startIndex = template.indexOf(VAR_START);
-        int endIndex = -1;
-
-        while (startIndex >= 0 && startIndex < template.length()) {
-        	result.append( template.substring(endIndex + 1, startIndex) );
-        	endIndex = template.indexOf(VAR_END, startIndex);
-
-        	if (endIndex > startIndex) {
-        		String varName = template.substring(startIndex + VAR_START.length(), endIndex);
-                Object resultObj = variables != null ? variables.get(varName.toLowerCase()) : "";
-                result.append( resultObj == null ? "" : resultObj.toString() );
-        	}
-
-        	startIndex = template.indexOf( VAR_START, Math.max(endIndex + VAR_END.length(), startIndex + 1) );
-        }
-
-        result.append( template.substring(endIndex + 1) );
-
-        return result.toString();
+        String s = o.toString();
+        String text = escapeXml(s, true, false, false, false, false, false);
+        // TODO: doesn't escapeXml handle this?
+        String last = text.replace(SpecialEntities.NON_BREAKABLE_SPACE, ' ').trim();
+        return last.length() == 0;
     }
 
     public static String[] tokenize(String s, String delimiters) {
@@ -369,88 +371,8 @@ public class Utils {
         }
 
         return result;
-    }    
-
-    public static void updateTagTransformations(CleanerTransformations transformations, String key, String value) {
-        int index = key.indexOf('.');
-
-        // new tag transformation case (tagname[=destname[,preserveatts]])
-        if (index <= 0) {
-            String destTag = null;
-            boolean preserveSourceAtts = true;
-            if (value != null) {
-                String[] tokens = tokenize(value, ",;");
-                if (tokens.length > 0) {
-                    destTag = tokens[0];
-                }
-                if (tokens.length > 1) {
-                    preserveSourceAtts = "true".equalsIgnoreCase(tokens[1]) ||
-                                         "yes".equalsIgnoreCase(tokens[1]) ||
-                                         "1".equals(tokens[1]);
-                }
-            }
-            TagTransformation newTagTrans = new TagTransformation(key, destTag, preserveSourceAtts);
-            transformations.addTransformation(newTagTrans);
-        } else {    // attribute transformation description
-            String[] parts = tokenize(key, ".");
-            String tagName = parts[0];
-            TagTransformation trans = transformations.getTransformation(tagName);
-            if (trans != null) {
-                trans.addAttributeTransformation(parts[1], value);
-            }
-        }
     }
-
-    /**
-     * Checks if specified link is full URL.
-     *
-     * @param link
-     * @return True, if full URl, false otherwise.
-     */
-    public static boolean isFullUrl(String link) {
-        if (link == null) {
-            return false;
-        }
-        link = link.trim().toLowerCase();
-        return link.startsWith("http://") || link.startsWith("https://") || link.startsWith("file://");
-    }
-
-    /**
-     * Calculates full URL for specified page URL and link
-     * which could be full, absolute or relative like there can
-     * be found in A or IMG tags.
-     */
-    public static String fullUrl(String pageUrl, String link) {
-        if (isFullUrl(link)) {
-            return link;
-        } else if (link != null && link.startsWith("?")) {
-            int qindex = pageUrl.indexOf('?');
-            int len = pageUrl.length();
-            if (qindex < 0) {
-                return pageUrl + link;
-            } else if (qindex == len - 1) {
-                return pageUrl.substring(0, len - 1) + link;
-            } else {
-                return pageUrl + "&" + link.substring(1);
-            }
-        }
-
-        boolean isLinkAbsolute = link.startsWith("/");
-
-        if (!isFullUrl(pageUrl)) {
-            pageUrl = "http://" + pageUrl;
-        }
-
-        int slashIndex = isLinkAbsolute ? pageUrl.indexOf("/", 8) : pageUrl.lastIndexOf("/");
-        if (slashIndex <= 8) {
-            pageUrl += "/";
-        } else {
-            pageUrl = pageUrl.substring(0, slashIndex + 1);
-        }
-
-        return isLinkAbsolute ? pageUrl + link.substring(1) : pageUrl + link;
-    }
-
+    
     /**
      * @param name
      * @return For xml element name or attribute name returns prefix (part before :) or null if there is no prefix
@@ -463,7 +385,7 @@ public class Utils {
 
         return null;
     }
-
+    
     /**
      * @param name
      * @return For xml element name or attribute name returns name after prefix (part after :)
@@ -476,5 +398,26 @@ public class Utils {
 
         return name;
     }
-
+    
+    public static boolean isValidInt(String s, int radix) {
+        try {
+            Integer.parseInt(s, radix);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+    
+    public static boolean isValidXmlChar(char ch) {
+        return ((ch >= 0x20) && (ch <= 0xD7FF)) ||
+               (ch == 0x9) ||
+               (ch == 0xA) ||
+               (ch == 0xD) ||
+               ((ch >= 0xE000) && (ch <= 0xFFFD)) ||
+               ((ch >= 0x10000) && (ch <= 0x10FFFF));
+    }
+    
+    public static boolean isReservedXmlChar(char ch) {
+        return RESERVED_XML_CHARS.containsKey(ch);
+    }
 }

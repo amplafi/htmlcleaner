@@ -1,35 +1,35 @@
 /*  Copyright (c) 2006-2007, Vladimir Nikic
     All rights reserved.
-	
-    Redistribution and use of this software in source and binary forms, 
-    with or without modification, are permitted provided that the following 
+
+    Redistribution and use of this software in source and binary forms,
+    with or without modification, are permitted provided that the following
     conditions are met:
-	
+
     * Redistributions of source code must retain the above
       copyright notice, this list of conditions and the
       following disclaimer.
-	
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the
       following disclaimer in the documentation and/or other
       materials provided with the distribution.
-	
-    * The name of HtmlCleaner may not be used to endorse or promote 
+
+    * The name of HtmlCleaner may not be used to endorse or promote
       products derived from this software without specific prior
       written permission.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
-	
+
     You can contact Vladimir Nikic by sending e-mail to
     nikic_vladimir@yahoo.com. Please include the word "HtmlCleaner" in the
     subject line.
@@ -37,8 +37,15 @@
 
 package org.htmlcleaner;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.*;
+
+import org.htmlcleaner.conditional.ITagNodeCondition;
+import org.htmlcleaner.conditional.TagAllCondition;
+import org.htmlcleaner.conditional.TagNodeAttExistsCondition;
+import org.htmlcleaner.conditional.TagNodeAttValueCondition;
+import org.htmlcleaner.conditional.TagNodeNameCondition;
 
 /**
  * <p>
@@ -49,112 +56,44 @@ import java.util.*;
  * </p>
  */
 public class TagNode extends TagToken implements HtmlNode {
-
-    /**
-     * Used as base for different node checkers.
-     */
-    public interface ITagNodeCondition {
-        public boolean satisfy(TagNode tagNode);
-    }
-
-    /**
-     * All nodes.
-     */
-    public class TagAllCondition implements ITagNodeCondition {
-        public boolean satisfy(TagNode tagNode) {
-            return true;
-        }
-    }
-
-    /**
-     * Checks if node has specified name.
-     */
-    public class TagNodeNameCondition implements ITagNodeCondition {
-        private String name;
-
-        public TagNodeNameCondition(String name) {
-            this.name = name;
-        }
-
-        public boolean satisfy(TagNode tagNode) {
-            return tagNode == null ? false : tagNode.name.equalsIgnoreCase(this.name);
-        }
-    }
-
-    /**
-     * Checks if node contains specified attribute.
-     */
-    public class TagNodeAttExistsCondition implements ITagNodeCondition {
-        private String attName;
-
-        public TagNodeAttExistsCondition(String attName) {
-            this.attName = attName;
-        }
-
-        public boolean satisfy(TagNode tagNode) {
-            return tagNode == null ? false : tagNode.attributes.containsKey( attName.toLowerCase() );
-        }
-    }
-
-    /**
-     * Checks if node has specified attribute with specified value.
-     */
-    public class TagNodeAttValueCondition implements ITagNodeCondition {
-        private String attName;
-        private String attValue;
-        private boolean isCaseSensitive;
-
-        public TagNodeAttValueCondition(String attName, String attValue, boolean isCaseSensitive) {
-            this.attName = attName;
-            this.attValue = attValue;
-            this.isCaseSensitive = isCaseSensitive;
-        }
-
-        public boolean satisfy(TagNode tagNode) {
-            if (tagNode == null || attName == null || attValue == null) {
-                return false;
-            } else {
-                return isCaseSensitive ?
-                        attValue.equals( tagNode.getAttributeByName(attName) ) :
-                        attValue.equalsIgnoreCase( tagNode.getAttributeByName(attName) );
-            }
-        }
-    }
-
-    private TagNode parent = null; 
+    private TagNode parent;
     private Map<String, String> attributes = new LinkedHashMap<String, String>();
     private List children = new ArrayList();
-    private DoctypeToken docType = null;
+    private DoctypeToken docType;
+    private List itemsToMove;
     private Map<String, String> nsDeclarations = null;
-    private List<BaseToken> itemsToMove = null;
 
-    private transient boolean isFormed = false;
+    private transient boolean isFormed;
 
+    /**
+     * Used to indicate a start tag that was auto generated because {@link TagInfo#isContinueAfter(String)}(closedTag.getName()) returned true
+     * For example,
+     * <pre>
+     * <b><i>foo</b>bar
+     * </pre>
+     * would result in a new <i> being created resulting in
+     * <pre>
+     * <b><i>foo</i></b><i>bar</i>
+     * </pre>
+     * The second opening <i> tag is marked as autogenerated. This allows the autogenerated tag to be removed if it is unneeded.
+     */
+    private boolean autoGenerated;
 
-    public TagNode(String name) {
+    /**
+     * Indicates that the node was marked to be pruned out of the tree.
+     */
+    private boolean pruned;
+
+	public TagNode(String name) {
         super(name == null ? null : name.toLowerCase());
     }
 
     /**
-     * Changes name of the tag
-     * @param name
-     * @return True if new name is valid, false otherwise
-     */
-    public boolean setName(String name) {
-        if (Utils.isValidXmlIdentifier(name)) {
-            this.name = name;
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * @param attName
-     * @return Value of the specified attribute, or null if it this tag doesn't contain it. 
+     * @return Value of the specified attribute, or null if it this tag doesn't contain it.
      */
     public String getAttributeByName(String attName) {
-		return attName != null ? attributes.get(attName.toLowerCase()) : null;
+		return attName != null ? (String) attributes.get(attName.toLowerCase()) : null;
 	}
 
     /**
@@ -164,60 +103,32 @@ public class TagNode extends TagToken implements HtmlNode {
 		return attributes;
 	}
 
+    public void setAttributes(Map<String, String> attributes) {
+        this.attributes= attributes;
+    }
     /**
-     * Checks existance of specified attribute.
+     * Checks existence of specified attribute.
      * @param attName
+     * @return true if TagNode has attribute
      */
     public boolean hasAttribute(String attName) {
         return attName != null ? attributes.containsKey(attName.toLowerCase()) : false;
     }
 
     /**
-     * @deprecated Use setAttribute instead
      * Adds specified attribute to this tag or overrides existing one.
      * @param attName
      * @param attValue
      */
-    @Deprecated
+    @Override
     public void addAttribute(String attName, String attValue) {
-        setAttribute(attName, attValue);
-    }
-
-    /**
-     * Adding new attribute ir overriding existing one.
-     * @param attName
-     * @param attValue
-     */
-    public void setAttribute(String attName, String attValue) {
-        if ( attName != null && !"".equals(attName.trim()) ) {
-            attName = attName.toLowerCase();
-            if ("xmlns".equals(attName)) {
-                addNamespaceDeclaration("", attValue);    
-            } else if (attName.startsWith("xmlns:")) {
-                addNamespaceDeclaration( attName.substring(6), attValue );
-            } else {
-                attributes.put(attName, attValue == null ? "" : attValue );
+        if ( attName != null ) {
+            String trim = attName.trim().toLowerCase();
+            String value = attValue == null?"":attValue.trim().replaceAll("\\p{Cntrl}", " ");
+            if ( trim.length() != 0 ) {
+                attributes.put(trim, value );
             }
         }
-    }
-
-    /**
-     * Adds namespace declaration to the node
-     * @param nsPrefix Namespace prefix
-     * @param nsURI Namespace URI
-     */
-    public void addNamespaceDeclaration(String nsPrefix, String nsURI) {
-        if (nsDeclarations == null) {
-            nsDeclarations = new TreeMap<String, String>();
-        }
-        nsDeclarations.put(nsPrefix, nsURI);
-    }
-
-    /**
-     * @return Map of namespace declarations for this node
-     */
-    public Map<String, String> getNamespaceDeclarations() {
-        return nsDeclarations;
     }
 
     /**
@@ -232,18 +143,11 @@ public class TagNode extends TagToken implements HtmlNode {
 
     /**
      * @return List of children objects. During the cleanup process there could be different kind of
-     * childern inside, however after clean there should be only TagNode instances.
+     * children inside, however after clean there should be only TagNode instances.
      */
     public List getChildren() {
 		return children;
 	}
-
-    /**
-     * @return Whether this node has child elements or not.
-     */
-    public boolean hasChildren() {
-        return children.size() > 0;
-    }
 
     void setChildren(List children) {
         this.children = children;
@@ -259,6 +163,13 @@ public class TagNode extends TagToken implements HtmlNode {
         }
 
         return childTagList;
+    }
+    
+    /**
+     * @return Whether this node has child elements or not.
+     */
+    public boolean hasChildren() {
+        return children.size() > 0;
     }
 
     /**
@@ -277,19 +188,67 @@ public class TagNode extends TagToken implements HtmlNode {
     /**
      * @return Text content of this node and it's subelements.
      */
-    public StringBuffer getText() {
+    public CharSequence getText() {
         StringBuffer text = new StringBuffer();
         for (int i = 0; i < children.size(); i++) {
             Object item = children.get(i);
             if (item instanceof ContentNode) {
-                text.append(item.toString());
+                text.append( ((ContentNode)item).getContent() );
             } else if (item instanceof TagNode) {
-                StringBuffer subtext = ((TagNode)item).getText();
+                CharSequence subtext = ((TagNode)item).getText();
                 text.append(subtext);
             }
         }
 
         return text;
+    }
+    
+    /**
+     * @param child Child to find index of
+     * @return Index of the specified child node inside this node's children, -1 if node is not the child 
+     */
+    public int getChildIndex(HtmlNode child) {
+        int index = 0;
+        for (Object curr: children) {
+            if (curr == child) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+    
+    /**
+     * Inserts specified node at specified position in array of children  
+     * @param index
+     * @param childToAdd
+     */
+    public void insertChild(int index, HtmlNode childToAdd) {
+        children.add(index, childToAdd);
+    }
+
+    /**
+     * Inserts specified node in the list of children before specified child
+     * @param node Child before which to insert new node
+     * @param nodeToInsert Node to be inserted at specified position
+     */
+    public void insertChildBefore(HtmlNode node, HtmlNode nodeToInsert) {
+        int index = getChildIndex(node);
+        if (index >= 0) {
+            insertChild(index, nodeToInsert);
+        }
+    }
+
+    /**
+     * Inserts specified node in the list of children after specified child
+     * @param node Child after which to insert new node
+     * @param nodeToInsert Node to be inserted at specified position
+     */
+    public void insertChildAfter(HtmlNode node, HtmlNode nodeToInsert) {
+        int index = getChildIndex(node);
+        if (index >= 0) {
+            insertChild(index + 1, nodeToInsert);
+        }
     }
 
     /**
@@ -313,6 +272,8 @@ public class TagNode extends TagToken implements HtmlNode {
         }
         if (child instanceof List) {
             addChildren( (List)child );
+        } else if (child instanceof ProxyTagNode) {
+        	children.add( ((ProxyTagNode)child).getToken() );
         } else {
             children.add(child);
             if (child instanceof TagNode) {
@@ -371,7 +332,7 @@ public class TagNode extends TagToken implements HtmlNode {
      * @param isRecursive
      * @return List of TagNode instances with specified name.
      */
-    private List getElementList(ITagNodeCondition condition, boolean isRecursive) {
+    public List getElementList(ITagNodeCondition condition, boolean isRecursive) {
         List result = new LinkedList();
         if (condition == null) {
             return result;
@@ -399,15 +360,16 @@ public class TagNode extends TagToken implements HtmlNode {
     /**
      * @param condition
      * @param isRecursive
-     * @return The array of all subelemets that satisfy specified condition.
+     * @return The array of all subelements that satisfy specified condition.
      */
     private TagNode[] getElements(ITagNodeCondition condition, boolean isRecursive) {
         final List list = getElementList(condition, isRecursive);
-        TagNode array[] = new TagNode[ list == null ? 0 : list.size() ];
-        for (int i = 0; i < list.size(); i++) {
-            array[i] = (TagNode) list.get(i);
+        TagNode array[];
+        if ( list == null ) {
+            array = new TagNode[ 0 ];
+        } else {
+            array = (TagNode[]) list.toArray(new TagNode[ list.size() ]);
         }
-
         return array;
     }
 
@@ -477,7 +439,7 @@ public class TagNode extends TagToken implements HtmlNode {
      * </ul>
      * </code>
      * @param xPathExpression
-     * @return
+     * @return result of XPather evaluation.
      * @throws XPatherException
      */
     public Object[] evaluateXPath(String xPathExpression) throws XPatherException {
@@ -489,12 +451,7 @@ public class TagNode extends TagToken implements HtmlNode {
      * @return True if element is removed (if it is not root node).
      */
     public boolean removeFromTree() {
-        if (parent != null) {
-            boolean existed = parent.removeChild(this);
-            parent = null;
-            return existed;
-        }
-        return false;
+        return parent != null ? parent.removeChild(this) : false;
     }
 
     /**
@@ -505,7 +462,7 @@ public class TagNode extends TagToken implements HtmlNode {
     public boolean removeChild(Object child) {
         return this.children.remove(child);
     }
-
+    
     /**
      * Removes all children (subelements and text content).
      */
@@ -513,86 +470,19 @@ public class TagNode extends TagToken implements HtmlNode {
         this.children.clear();
     }
 
-    /**
-     * Replaces specified child node with specified replacement node.
-     * @param childToReplace Child node to be replaced
-     * @param replacement Replacement node
-     */
-    public void replaceChild(HtmlNode childToReplace, HtmlNode replacement) {
-        if (replacement == null) {
-            return;
-        }
-        ListIterator it = children.listIterator();
-        while (it.hasNext()) {
-            Object curr = it.next();
-            if (curr == childToReplace) {
-                it.set(replacement);
-                break;
-            }
-        }
-    }
-
-    /**
-     * @param child Child to find index of
-     * @return Index of the specified child node inside this node's children, -1 if node is not the child 
-     */
-    public int getChildIndex(HtmlNode child) {
-        int index = 0;
-        for (Object curr: children) {
-            if (curr == child) {
-                return index;
-            }
-            index++;
-        }
-        return -1;
-    }
-
-    /**
-     * Inserts specified node at specified position in array of children  
-     * @param index
-     * @param childToAdd
-     */
-    public void insertChild(int index, HtmlNode childToAdd) {
-        children.add(index, childToAdd);
-    }
-
-    /**
-     * Inserts specified node in the list of children before specified child
-     * @param node Child before which to insert new node
-     * @param nodeToInsert Node to be inserted at specified position
-     */
-    public void insertChildBefore(HtmlNode node, HtmlNode nodeToInsert) {
-        int index = getChildIndex(node);
-        if (index >= 0) {
-            insertChild(index, nodeToInsert);
-        }
-    }
-
-    /**
-     * Inserts specified node in the list of children after specified child
-     * @param node Child after which to insert new node
-     * @param nodeToInsert Node to be inserted at specified position
-     */
-    public void insertChildAfter(HtmlNode node, HtmlNode nodeToInsert) {
-        int index = getChildIndex(node);
-        if (index >= 0) {
-            insertChild(index + 1, nodeToInsert);
-        }
-    }
-
-    void addItemForMoving(BaseToken item) {
+    void addItemForMoving(Object item) {
     	if (itemsToMove == null) {
-    		itemsToMove = new ArrayList<BaseToken>();
+    		itemsToMove = new ArrayList();
     	}
-    	
+
     	itemsToMove.add(item);
     }
-    
-    List<BaseToken> getItemsToMove() {
+
+    List getItemsToMove() {
 		return itemsToMove;
 	}
 
-    void setItemsToMove(List<BaseToken> itemsToMove) {
+    void setItemsToMove(List itemsToMove) {
         this.itemsToMove = itemsToMove;
     }
 
@@ -608,30 +498,114 @@ public class TagNode extends TagToken implements HtmlNode {
 		setFormed(true);
 	}
 
-    void transformAttributes(TagTransformation tagTrans) {
-        boolean isPreserveSourceAtts = tagTrans.isPreserveSourceAttributes();
-        boolean hasAttTransforms = tagTrans.hasAttributeTransformations();
-        if ( hasAttTransforms || !isPreserveSourceAtts) {
-            Map<String, String> newAttributes = isPreserveSourceAtts ? new LinkedHashMap<String, String>(attributes) : new LinkedHashMap<String, String>();
-            if (hasAttTransforms) {
-                Map map = tagTrans.getAttributeTransformations();
-                Iterator iterator = map.entrySet().iterator();
-                while (iterator.hasNext()) {
-                    Map.Entry entry = (Map.Entry) iterator.next();
-                    String attName = (String) entry.getKey();
-                    String template = (String) entry.getValue();
-                    if (template == null) {
-                        newAttributes.remove(attName);
-                    } else {
-                        String attValue = Utils.evaluateTemplate(template, attributes);
-                        newAttributes.put(attName, attValue);
+    /**
+     * @param autoGenerated the autoGenerated to set
+     */
+    public void setAutoGenerated(boolean autoGenerated) {
+        this.autoGenerated = autoGenerated;
+    }
+
+    /**
+     * @return the autoGenerated
+     */
+    public boolean isAutoGenerated() {
+        return autoGenerated;
+    }
+
+    /**
+     * @return true, if node was marked to be pruned.
+     */
+    public boolean isPruned() {
+		return pruned;
+	}
+
+	public void setPruned(boolean pruned) {
+		this.pruned = pruned;
+	}
+
+    public boolean isEmpty() {
+        if ( !isPruned()) {
+            for(Object child: this.children) {
+                if(child instanceof TagNode) {
+                    if (!((TagNode)child).isPruned()) {
+                        return false;
                     }
+                } else if( child instanceof ContentNode ) {
+                    if ( !((ContentNode)child).isBlank()) {
+                        return false;
+                    }
+                } else if ( child instanceof CommentNode) {
+                    // ideally could be discarded - however standard practice is to include browser specific commands in comments. :-(
+                    return false;
+                } else {
+                    return false;
                 }
             }
-            this.attributes = newAttributes;
+        }
+        return true;
+    }
+    
+    /**
+     * Adds namespace declaration to the node
+     * @param nsPrefix Namespace prefix
+     * @param nsURI Namespace URI
+     */
+    public void addNamespaceDeclaration(String nsPrefix, String nsURI) {
+        if (nsDeclarations == null) {
+            nsDeclarations = new TreeMap<String, String>();
+        }
+        nsDeclarations.put(nsPrefix, nsURI);
+    }
+    
+    /**
+     * Collect all prefixes in namespace declarations up the path to the document root from the specified node
+     * @param prefixes Set of prefixes to be collected
+     */
+    void collectNamespacePrefixesOnPath(Set<String> prefixes) {
+        Map<String, String> nsDeclarations = getNamespaceDeclarations();
+        if (nsDeclarations != null) {
+            for (String prefix: nsDeclarations.keySet()) {
+                prefixes.add(prefix);
+            }
+        }
+        if (parent != null) {
+            parent.collectNamespacePrefixesOnPath(prefixes);
         }
     }
 
+    String getNamespaceURIOnPath(String nsPrefix) {
+        if (nsDeclarations != null) {
+            for (Map.Entry<String, String> nsEntry: nsDeclarations.entrySet()) {
+                String currName = nsEntry.getKey();
+                if ( currName.equals(nsPrefix) || ("".equals(currName) && nsPrefix == null) ) {
+                    return nsEntry.getValue();
+                }
+            }
+        }
+        if (parent != null) {
+            return parent.getNamespaceURIOnPath(nsPrefix);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return Map of namespace declarations for this node
+     */
+    public Map<String, String> getNamespaceDeclarations() {
+        return nsDeclarations;
+    }
+
+    public void serialize(Serializer serializer, Writer writer) throws IOException {
+        serializer.serialize(this, writer);
+    }
+
+    public TagNode makeCopy() {
+    	TagNode copy = new TagNode(name);
+        copy.attributes.putAll(attributes);
+    	return copy;
+    }
+    
     /**
      * Traverses the tree and performs visitor's action on each node. It stops when it
      * finishes all the tree or when visitor returns false.
@@ -667,48 +641,4 @@ public class TagNode extends TagToken implements HtmlNode {
         }
         return true;
     }
-
-
-    /**
-     * Collect all prefixes in namespace declarations up the path to the document root from the specified node
-     * @param prefixes Set of prefixes to be collected
-     */
-    void collectNamespacePrefixesOnPath(Set<String> prefixes) {
-        Map<String, String> nsDeclarations = getNamespaceDeclarations();
-        if (nsDeclarations != null) {
-            for (String prefix: nsDeclarations.keySet()) {
-                prefixes.add(prefix);
-            }
-        }
-        if (parent != null) {
-            parent.collectNamespacePrefixesOnPath(prefixes);
-        }
-    }
-
-    String getNamespaceURIOnPath(String nsPrefix) {
-        if (nsDeclarations != null) {
-            for (Map.Entry<String, String> nsEntry: nsDeclarations.entrySet()) {
-                String currName = nsEntry.getKey();
-                if ( currName.equals(nsPrefix) || ("".equals(currName) && nsPrefix == null) ) {
-                    return nsEntry.getValue();
-                }
-            }
-        }
-        if (parent != null) {
-            return parent.getNamespaceURIOnPath(nsPrefix);
-        }
-
-        return null;
-    }
-
-    public void serialize(Serializer serializer, Writer writer) throws IOException {
-    	serializer.serialize(this, writer);
-    }
-    
-    TagNode makeCopy() {
-    	TagNode copy = new TagNode(name);
-        copy.attributes.putAll(attributes);
-    	return copy;
-    }
-
 }

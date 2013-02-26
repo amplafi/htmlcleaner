@@ -54,6 +54,22 @@ public abstract class XmlSerializer extends Serializer {
 	protected XmlSerializer(CleanerProperties props) {
 		super(props);
     }
+	
+	private boolean creatingHtmlDom;
+	
+	 /**
+     * @param creatingHtmlDom the creatingHtmlDom to set
+     */
+    public void setCreatingHtmlDom(boolean creatingHtmlDom) {
+        this.creatingHtmlDom = creatingHtmlDom;
+    }
+
+    /**
+     * @return the creatingHtmlDom
+     */
+    public boolean isCreatingHtmlDom() {
+        return creatingHtmlDom;
+    }
 
     /**
      * @deprecated Use writeToStream() instead.
@@ -91,7 +107,7 @@ public abstract class XmlSerializer extends Serializer {
      * @deprecated Use getAsString() instead.
      */
     @Deprecated
-    public String getXmlAsString(TagNode tagNode, String charset) throws IOException {
+    public String getXmlAsString(TagNode tagNode, String charset) {
         return super.getAsString(tagNode, charset);
     }
 
@@ -99,7 +115,7 @@ public abstract class XmlSerializer extends Serializer {
      * @deprecated Use getAsString() instead.
      */
     @Deprecated
-    public String getXmlAsString(TagNode tagNode) throws IOException {
+    public String getXmlAsString(TagNode tagNode) {
         return super.getAsString(tagNode);
     }
 
@@ -112,7 +128,7 @@ public abstract class XmlSerializer extends Serializer {
     }
 
     protected String escapeXml(String xmlContent) {
-        return Utils.escapeXml(xmlContent, props, false);
+        return Utils.escapeXml(xmlContent, props, isCreatingHtmlDom());
     }
 
     protected boolean dontEscape(TagNode tagNode) {
@@ -121,115 +137,110 @@ public abstract class XmlSerializer extends Serializer {
 
     protected boolean isMinimizedTagSyntax(TagNode tagNode) {
         final TagInfo tagInfo = props.getTagInfoProvider().getTagInfo(tagNode.getName());
-        return tagNode.getChildren().size() == 0 &&
+        return tagNode.isEmpty() && (tagInfo == null || tagInfo.isMinimizedTagPermitted()) &&
                ( props.isUseEmptyElementTags() || (tagInfo != null && tagInfo.isEmptyTag()) );
+    }
+    protected void serializeOpenTag(TagNode tagNode, Writer writer) throws IOException {
+        serializeOpenTag(tagNode, writer, true);
     }
 
     protected void serializeOpenTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
-        String tagName = tagNode.getName();
+        if ( !isForbiddenTag(tagNode)) {
+            String tagName = tagNode.getName();
+            Map tagAtttributes = tagNode.getAttributes();
 
-        if (Utils.isEmptyString(tagName)) {
-            return;
-        }
-
-        boolean nsAware = props.isNamespacesAware();
-
-        Set<String> definedNSPrefixes = null;
-        Set<String> additionalNSDeclNeeded = null;
-
-        String tagPrefix = Utils.getXmlNSPrefix(tagName);
-        if (tagPrefix != null) {
-            if (nsAware) {
-                definedNSPrefixes = new HashSet<String>();
-                tagNode.collectNamespacePrefixesOnPath(definedNSPrefixes);
-                if ( !definedNSPrefixes.contains(tagPrefix) ) {
-                    additionalNSDeclNeeded = new TreeSet<String>();
-                    additionalNSDeclNeeded.add(tagPrefix);
-                }
-            } else {
-                tagName = Utils.getXmlName(tagName);
-            }
-        }
-
-        writer.write("<" + tagName);
-
-        // write attributes
-        for (Map.Entry<String, String> entry: tagNode.getAttributes().entrySet()) {
-            String attName = entry.getKey();
-            String attPrefix = Utils.getXmlNSPrefix(attName);
-            if (attPrefix != null) {
-                if (nsAware) {
-                    // collect used namespace prefixes in attributes in order to explicitly define
-                    // ns declaration if needed; otherwise it would be ill-formed xml
-                    if (definedNSPrefixes == null) {
-                        definedNSPrefixes = new HashSet<String>();
-                        tagNode.collectNamespacePrefixesOnPath(definedNSPrefixes);
-                    }
-                    if ( !definedNSPrefixes.contains(attPrefix) ) {
-                        if (additionalNSDeclNeeded == null) {
-                            additionalNSDeclNeeded = new TreeSet<String>();
-                        }
-                        additionalNSDeclNeeded.add(attPrefix);
-                    }
-                } else {
-                    attName = Utils.getXmlName(attName);
-                }
-            }
-            writer.write(" " + attName + "=\"" + escapeXml(entry.getValue()) + "\"");
-        }
-
-        // write namespace declarations
-        if (nsAware) {
-            Map<String, String> nsDeclarations = tagNode.getNamespaceDeclarations();
-            if (nsDeclarations != null) {
-                for (Map.Entry<String, String> entry: nsDeclarations.entrySet()) {
-                    String prefix = entry.getKey();
-                    String att = "xmlns";
-                    if (prefix.length() > 0) {
-                         att += ":" + prefix;
-                    }
-                    writer.write(" " + att + "=\"" + escapeXml(entry.getValue()) + "\"");
-                }
-            }
-        }
-
-        // write additional namespace declarations needed for this tag in order xml to be well-formed
-        if (additionalNSDeclNeeded != null) {
-            for (String prefix: additionalNSDeclNeeded) {
-                writer.write(" xmlns:" + prefix + "=\"" + prefix + "\"");
-            }
-        }
-
-        if ( isMinimizedTagSyntax(tagNode) ) {
-            writer.write(" />");
-            if (newLine) {
+            // always have head and body in newline
+            if (props.isAddNewlineToHeadAndBody() && isHeadOrBody(tagName)) {
                 writer.write("\n");
             }
-        } else if (dontEscape(tagNode)) {
-            writer.write("><![CDATA[");
-        } else {
-            writer.write(">");
+
+            writer.write("<" + tagName);
+            Iterator it = tagAtttributes.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry entry = (Map.Entry) it.next();
+                String attName = (String) entry.getKey();
+                String attValue = (String) entry.getValue();
+                serializeAttribute(tagNode, writer, attName, attValue);
+            }
+
+            if ( isMinimizedTagSyntax(tagNode) ) {
+                writer.write(" />");
+                if (newLine) {
+                    writer.write("\n");
+                }
+            } else if (dontEscape(tagNode)) {
+                // because we are not considering if the file is xhtml or html,
+                // we need to put a javascript comment in front of the CDATA in case this is NOT xhtml
+                writer.write(">");
+                if (!tagNode.getText().toString().startsWith(SAFE_BEGIN_CDATA)) {
+                    writer.write(SAFE_BEGIN_CDATA);
+                }
+            } else {
+                writer.write(">");
+            }
         }
+    }
+    
+    /**
+     * @param tagNode
+     * @return
+     */
+    protected boolean isForbiddenTag(TagNode tagNode) {
+        // null tagName when rootNode is a dummy node.
+        // this happens when omitting the html envelope elements ( <html>, <head>, <body> elements )
+        String tagName = tagNode.getName();
+        return tagName == null;
+    }
+    
+    protected boolean isHeadOrBody(String tagName) {
+        return "head".equalsIgnoreCase(tagName) || "body".equalsIgnoreCase(tagName);
+    }
+    
+    /**
+     * This allows overriding to eliminate forbidden attributes (for example javascript attributes onclick, onblur, etc. )
+     * @param writer
+     * @param attName
+     * @param attValue
+     * @throws IOException
+     */
+    protected void serializeAttribute(TagNode tagNode, Writer writer, String attName, String attValue) throws IOException {
+        if (!isForbiddenAttribute(tagNode, attName, attValue)) {
+            writer.write(" " + attName + "=\"" + escapeXml(attValue) + "\"");
+        }
+    }
+    
+    /**
+     * Override to add additional conditions.
+     * @param tagNode
+     * @param attName
+     * @param value
+     * @return true if the attribute should not be outputed.
+     */
+    protected boolean isForbiddenAttribute(TagNode tagNode, String attName, String value) {
+        return !props.isNamespacesAware() && (XMLNS_NAMESPACE.equals(attName) || attName.startsWith(XMLNS_NAMESPACE +":"));
+    }
+
+    protected void serializeEndTag(TagNode tagNode, Writer writer) throws IOException {
+       serializeEndTag(tagNode, writer, true);
     }
 
     protected void serializeEndTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {
-        String tagName = tagNode.getName();
+        if ( !isForbiddenTag(tagNode)) {
+            String tagName = tagNode.getName();
+            if (dontEscape(tagNode)) {
+                // because we are not considering if the file is xhtml or html,
+                // we need to put a javascript comment in front of the CDATA in case this is NOT xhtml
 
-        if (Utils.isEmptyString(tagName)) {
-            return;
-        }
+                if (!tagNode.getText().toString().trim().endsWith(SAFE_END_CDATA)) {
+                    writer.write(SAFE_END_CDATA);
+                }
+            }
 
-        if (dontEscape(tagNode)) {
-            writer.write("]]>");
-        }
+            writer.write( "</" + tagName + ">" );
 
-        if (Utils.getXmlNSPrefix(tagName) != null && !props.isNamespacesAware()) {
-            tagName = Utils.getXmlName(tagName);
-        }
-        writer.write( "</" + tagName + ">" );
-
-        if (newLine) {
-            writer.write("\n");
+            if (newLine) {
+                writer.write("\n");
+            }
         }
     }
 

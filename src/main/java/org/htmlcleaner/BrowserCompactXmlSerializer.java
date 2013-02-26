@@ -37,66 +37,116 @@
 
 package org.htmlcleaner;
 
-import java.io.Writer;
 import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.StringTokenizer;
 
 /**
  * <p>
- *  Broswer compact XML serializer - creates resulting XML by stripping whitespaces wherever possible,
+ *  Browser compact XML serializer - creates resulting XML by stripping whitespaces wherever possible,
  *  but preserving single whitespace where at least one exists. This behaviour is well suited
- *  for web-browsers, which usualy treat multiple whitespaces as single one, but make diffrence
+ *  for web-browsers, which usually treat multiple whitespaces as single one, but make difference
  *  between single whitespace and empty text.
  * </p>
  */
 public class BrowserCompactXmlSerializer extends XmlSerializer {
 
-	public BrowserCompactXmlSerializer(CleanerProperties props) {
-		super(props);
-	}
+    private static final String PRE_TAG = "pre";
+    private static final String BR_TAG = "<br />";
+    private static final String LINE_BREAK = "\n";
 
+    public BrowserCompactXmlSerializer(CleanerProperties props) {
+        super(props);
+    }
+
+    @Override
     protected void serialize(TagNode tagNode, Writer writer) throws IOException {
         serializeOpenTag(tagNode, writer, false);
-
-        List tagChildren = tagNode.getChildren();
-        if ( !isMinimizedTagSyntax(tagNode) ) {
+        TagInfo tagInfo = props.getTagInfoProvider().getTagInfo(tagNode.getName());
+        String tagName = tagInfo!=null? tagInfo.getName() : null;
+        List tagChildren = new ArrayList (tagNode.getChildren());
+        if (!isMinimizedTagSyntax(tagNode)) {
             ListIterator childrenIt = tagChildren.listIterator();
-            while ( childrenIt.hasNext() ) {
+            while (childrenIt.hasNext()) {
                 Object item = childrenIt.next();
-                if (item instanceof ContentNode) {
-                    String content = item.toString();
-                    boolean startsWithSpace = content.length() > 0 && Character.isWhitespace( content.charAt(0) );
-                    boolean endsWithSpace = content.length() > 1 && Character.isWhitespace( content.charAt(content.length() - 1) );
-                    content = dontEscape(tagNode) ? content.trim().replaceAll("]]>", "]]&gt;") : escapeXml(content.trim());
+                if (item != null) {
+                    if (item instanceof ContentNode && !PRE_TAG.equals(tagName)) {
+                        String content = ((ContentNode) item).getContent();
+                        content = dontEscape(tagNode) ? content.replaceAll("]]>", "]]&gt;") : escapeXml(content);
+                        content = content.replaceAll("^"+SpecialEntities.NON_BREAKABLE_SPACE+"+", " ");
+                        content = content.replaceAll(SpecialEntities.NON_BREAKABLE_SPACE+"+$", " ");
+                        boolean whitespaceAllowed = tagInfo != null && tagInfo.getDisplay().isLeadingAndEndWhitespacesAllowed();
+                        boolean writeLeadingSpace = content.length() > 0 && (Character.isWhitespace(content.charAt(0))) && whitespaceAllowed;
+                        boolean writeEndingSpace = content.length() > 1 && Character.isWhitespace(content.charAt(content.length() - 1)) && whitespaceAllowed;
+                        content = content.trim();
+                        if (content.length() != 0) {
+                            boolean hasPrevContent = false;
+                            int order = tagChildren.indexOf(item);
+                            if (order >= 2 && childrenIt.hasNext()) {
+                                Object prev = tagChildren.get(order-1);
+                                hasPrevContent = isContentOrInline(prev);
+                            }
 
-                    if (startsWithSpace) {
-                        writer.write(' ');
-                    }
+                            if (writeLeadingSpace || hasPrevContent) {
+                                writer.write(' ');
+                            }
 
-                    if (content.length() != 0) {
+                            StringTokenizer tokenizer = new StringTokenizer(content, LINE_BREAK, true);
+                            String prevToken = "";
+                            while (tokenizer.hasMoreTokens()) {
+                                String token = tokenizer.nextToken();
+                                if (prevToken.equals(token) && prevToken.equals(LINE_BREAK)) {
+                                    writer.write(BR_TAG);
+                                    prevToken = "";
+                                } else if (LINE_BREAK.equals(token)) {
+                                    writer.write(' ');
+                                } else {
+                                    writer.write(token.trim());
+                                }
+                                prevToken = token;
+                            }
+
+                            boolean hasFollowingContent = false;
+                            if (childrenIt.hasNext()) {
+                                Object next = childrenIt.next();
+                                hasFollowingContent = isContentOrInline(next);
+                                childrenIt.previous();
+                            }
+
+                            if (writeEndingSpace || hasFollowingContent) {
+                                writer.write(' ');
+                            }
+                        } else{
+                            childrenIt.remove();
+                        }
+                    } else if(item instanceof ContentNode){
+                        String content = ((ContentNode) item).getContent();
                         writer.write(content);
-                        if (endsWithSpace) {
-                            writer.write(' ');
-                        }
+                    } else if (item instanceof CommentNode) {
+                    	String content = ((CommentNode) item).getCommentedContent().trim();
+                    	writer.write(content);
+                    } else {
+                    	((BaseToken)item).serialize(this, writer);
                     }
-
-                    if (childrenIt.hasNext()) {
-                        if ( !Utils.isWhitespaceString(childrenIt.next()) ) {
-                            writer.write("\n");
-                        }
-                        childrenIt.previous();
-                    }
-                } else if (item instanceof CommentNode) {
-                    String content = ((CommentNode) item).getCommentedContent().trim();
-                    writer.write(content);
-                } else if (item instanceof BaseToken) {
-                    ((BaseToken)item).serialize(this, writer);
                 }
             }
 
-            serializeEndTag(tagNode, writer, false);
+            serializeEndTag(tagNode, writer, tagInfo != null && tagInfo.getDisplay().isAfterTagLineBreakNeeded());
         }
-	}
+    }
+
+    private boolean isContentOrInline(Object node) {
+        boolean result = false;
+        if (node instanceof ContentNode) {
+            result = true;
+        } else if (node instanceof TagNode) {
+            TagInfo nextInfo = props.getTagInfoProvider().getTagInfo(((TagNode) node).getName());
+            result = nextInfo != null && nextInfo.getDisplay() == Display.inline;
+        }
+        return result;
+    }
 
 }

@@ -1,19 +1,19 @@
 /*  Copyright (c) 2006-2007, Vladimir Nikic
     All rights reserved.
-	
+    
     Redistribution and use of this software in source and binary forms, 
     with or without modification, are permitted provided that the following 
     conditions are met:
-	
+    
     * Redistributions of source code must retain the above
       copyright notice, this list of conditions and the
       following disclaimer.
-	
+    
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the
       following disclaimer in the documentation and/or other
       materials provided with the distribution.
-	
+    
     * The name of HtmlCleaner may not be used to endorse or promote 
       products derived from this software without specific prior
       written permission.
@@ -29,7 +29,7 @@
     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
     POSSIBILITY OF SUCH DAMAGE.
-	
+    
     You can contact Vladimir Nikic by sending e-mail to
     nikic_vladimir@yahoo.com. Please include the word "HtmlCleaner" in the
     subject line.
@@ -45,8 +45,8 @@ import java.util.*;
  */
 public abstract class HtmlSerializer extends Serializer {
 
-	protected HtmlSerializer(CleanerProperties props) {
-		super(props);
+    protected HtmlSerializer(CleanerProperties props) {
+        super(props);
     }
 
 
@@ -64,14 +64,14 @@ public abstract class HtmlSerializer extends Serializer {
         boolean translateSpecialEntities = props.isTranslateSpecialEntities();
 
         if (s != null) {
-    		int len = s.length();
-    		StringBuilder result = new StringBuilder(len);
+            int len = s.length();
+            StringBuilder result = new StringBuilder(len);
 
-    		for (int i = 0; i < len; i++) {
-    			char ch = s.charAt(i);
+            for (int i = 0; i < len; i++) {
+                char ch = s.charAt(i);
 
-    			if (ch == '&') {
-    				if (i < len-2 && s.charAt(i+1) == '#') {
+                if (ch == '&') {
+                    if (i < len-2 && s.charAt(i+1) == '#') {
                         boolean isHex = Character.toLowerCase(s.charAt(i+2)) == 'x';
                         int charIndex = i + (isHex ? 3 : 2);
                         int radix = isHex ? 16 : 10;
@@ -89,7 +89,7 @@ public abstract class HtmlSerializer extends Serializer {
                             }
                         }
 
-    					if (Utils.isValidInt(unicode, radix)) {
+                        if (Utils.isValidInt(unicode, radix)) {
                             char unicodeChar = (char)Integer.parseInt(unicode, radix);
                             if ( !Utils.isValidXmlChar(unicodeChar) ) {
                                 i = charIndex;
@@ -100,10 +100,10 @@ public abstract class HtmlSerializer extends Serializer {
                                 i = charIndex;
                                 result.append("&#" + unicode + ";");
                             }
-    					} else {
-    						result.append(props.transResCharsToNCR ? "&#" + (int)'&' + ";" : "&");
-    					}
-    				} else {
+                        } else {
+                            result.append(props.isTransResCharsToNCR() ? "&#" + (int)'&' + ";" : "&");
+                        }
+                    } else {
                         // get minimal following sequence required to recognize some special entitiy
                         String seq = s.substring(i, i + Math.min(SpecialEntities.INSTANCE.getMaxEntityLength() + 2, len - i));
                         int semiIndex = seq.indexOf(';');
@@ -112,7 +112,7 @@ public abstract class HtmlSerializer extends Serializer {
                             SpecialEntity entity = SpecialEntities.INSTANCE.getSpecialEntity(entityKey);
                             if (entity != null) {
                                 if (translateSpecialEntities) {
-                                    result.append(props.isTransSpecialEntitiesToNCR() ? entity.getDecimalNCR() : entity.charValue());
+                                    result.append(recognizeUnicodeChars ? entity.charValue() : entity.getDecimalNCR() );
                                 } else {
                                     result.append(entity.getEscapedValue());
                                 }
@@ -127,27 +127,27 @@ public abstract class HtmlSerializer extends Serializer {
                         for (Map.Entry<Character, String> entry: Utils.RESERVED_XML_CHARS.entrySet()) {
                             seq = entry.getValue();
                             if ( sub.startsWith(seq) ) {
-                                result.append( props.transResCharsToNCR ? "&#" + (int)entry.getKey() + ";" : seq );
+                                result.append( props.isTransResCharsToNCR() ? "&#" + (int)entry.getKey() + ";" : seq );
                                 i += seq.length() - 1;
                                 isReservedSeq = true;
                                 break;
                             }
                         }
                         if (!isReservedSeq) {
-                            result.append( props.transResCharsToNCR ? "&#" + (int)'&' + ";" : "&" );
+                            result.append( props.isTransResCharsToNCR() ? "&#" + (int)'&' + ";" : "&" );
                         }
-    				}
-    			} else if (Utils.isReservedXmlChar(ch)) {
-    				result.append( props.transResCharsToNCR ? "&#" + (int)ch + ";" : ch );
-    			} else {
-    				result.append(ch);
-    			}
-    		}
+                    }
+                } else if (Utils.isReservedXmlChar(ch)) {
+                    result.append( props.isTransResCharsToNCR() ? "&#" + (int)ch + ";" : ch );
+                } else {
+                    result.append(ch);
+                }
+            }
 
-    		return result.toString();
-    	}
+            return result.toString();
+        }
 
-    	return null;
+        return null;
     }
 
     protected void serializeOpenTag(TagNode tagNode, Writer writer, boolean newLine) throws IOException {

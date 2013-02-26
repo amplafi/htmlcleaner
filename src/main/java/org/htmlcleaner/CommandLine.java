@@ -44,16 +44,19 @@ import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Iterator;
+import java.util.logging.Logger;
+
+import org.htmlcleaner.audit.HtmlModificationListenerLogger;
 
 /**
  * <p>Command line usage class.</p>
  */
 public class CommandLine {
 
-    private static String getArgValue(String[] args, String name) {
-        for (int i = 0; i < args.length; i++) {
-            String curr = args[i];
+    private static final String OMITXMLDECL = "omitxmldecl";
+
+    private static String getArgValue(String[] args, String name, String defaultValue) {
+        for (String curr : args) {
             int eqIndex = curr.indexOf('=');
             if (eqIndex >= 0) {
                 String argName = curr.substring(0, eqIndex).trim();
@@ -65,90 +68,87 @@ public class CommandLine {
             }
         }
 
-        return "";
+        return defaultValue;
     }
 
     private static boolean toBoolean(String s) {
         return s != null && ( "on".equalsIgnoreCase(s) || "true".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s) );
     }
+    
+    private final static String className = CommandLine.class.getName();
+    private final static Logger logger = Logger.getLogger(className);
 
     public static void main(String[] args) throws IOException, XPatherException {
-        String source = getArgValue(args, "src");
+        String source = getArgValue(args, "src", "");
         if ( "".equals(source) ) {
-            System.err.println("Usage: java -jar htmlcleanerXX.jar src = <url | file> [incharset = <charset>] " +
-                               "[dest = <file>] [outcharset = <charset>] [taginfofile=<file>] [options...]");
+            System.err.println("Usage: java -jar htmlcleanerXX.jar src=<url | file> [incharset=<charset>] " +
+                               "[dest=<file>] [outcharset=<charset>] [taginfofile=<file>] [options...]");
             System.err.println("");
             System.err.println("where options include:");
-            System.err.println("    outputtype=simple* | compact | browser-compact | pretty | htmlsimple | htmlcompact | htmlpretty");
+            System.err.println("    outputtype=simple* | compact | browser-compact | pretty");
             System.err.println("    advancedxmlescape=true* | false");
-            System.err.println("    transrescharstoncr=true | false*");
             System.err.println("    usecdata=true* | false");
             System.err.println("    specialentities=true* | false");
-            System.err.println("    transspecialentitiestoncr=true | false*");
             System.err.println("    unicodechars=true* | false");
             System.err.println("    omitunknowntags=true | false*");
             System.err.println("    treatunknowntagsascontent=true | false*");
             System.err.println("    omitdeprtags=true | false*");
             System.err.println("    treatdeprtagsascontent=true | false*");
             System.err.println("    omitcomments=true | false*");
-            System.err.println("    omitxmldecl=true | false*");
+            System.err.println("    " +OMITXMLDECL +"=true* | false");
             System.err.println("    omitdoctypedecl=true* | false");
+            System.err.println("    omithtmlenvelope=true | false*");
             System.err.println("    useemptyelementtags=true* | false");
             System.err.println("    allowmultiwordattributes=true* | false");
             System.err.println("    allowhtmlinsideattributes=true | false*");
-            System.err.println("    ignoreqe=true* | false");
+            System.err.println("    ignoreqe=true | false*");
             System.err.println("    namespacesaware=true* | false");
             System.err.println("    hyphenreplacement=<string value> [=]");
             System.err.println("    prunetags=<string value> []");
             System.err.println("    booleanatts=self* | empty | true");
             System.err.println("    nodebyxpath=<xpath expression>");
-            System.err.println("    omitenvelope=true | false*");
             System.err.println("    t:<sourcetagX>[=<desttag>[,<preserveatts>]]");
             System.err.println("    t:<sourcetagX>.<destattrY>[=<template>]");
             System.exit(1);
         }
 
-        String inCharset = getArgValue(args, "incharset");
+        String inCharset = getArgValue(args, "incharset", "");
         if ("".equals(inCharset)) {
-            inCharset = HtmlCleaner.DEFAULT_CHARSET;
+            inCharset = CleanerProperties.DEFAULT_CHARSET;
         }
 
-        String outCharset = getArgValue(args, "outcharset");
+        String outCharset = getArgValue(args, "outcharset", "");
         if ("".equals(outCharset)) {
-            outCharset = HtmlCleaner.DEFAULT_CHARSET;
+            outCharset = CleanerProperties.DEFAULT_CHARSET;
         }
 
-        String destination = getArgValue(args, "dest");
-        String outputType = getArgValue(args, "outputtype");
-        String advancedXmlEscape = getArgValue(args, "advancedxmlescape");
-        String transResCharsToNCR = getArgValue(args, "transrescharstoncr");
-        String useCData = getArgValue(args, "usecdata");
-        String translateSpecialEntities = getArgValue(args, "specialentities");
-        String transSpecialEntitiesToNCR = getArgValue(args, "transspecialentitiestoncr");
-        String unicodeChars = getArgValue(args, "unicodechars");
-        String omitUnknownTags = getArgValue(args, "omitunknowntags");
-        String treatUnknownTagsAsContent = getArgValue(args, "treatunknowntagsascontent");
-        String omitDeprecatedTags = getArgValue(args, "omitdeprtags");
-        String treatDeprecatedTagsAsContent = getArgValue(args, "treatdeprtagsascontent");
-        String omitComments = getArgValue(args, "omitcomments");
-        String omitXmlDeclaration = getArgValue(args, "omitxmldecl");
-        String omitDoctypeDeclaration = getArgValue(args, "omitdoctypedecl");
-        String omitHtmlEnvelope = getArgValue(args, "omithtmlenvelope");
-        String useEmptyElementTags = getArgValue(args, "useemptyelementtags");
-        String allowMultiWordAttributes = getArgValue(args, "allowmultiwordattributes");
-        String allowHtmlInsideAttributes = getArgValue(args, "allowhtmlinsideattributes");
-        String ignoreQuestAndExclam = getArgValue(args, "ignoreqe");
-        String namespacesAware= getArgValue(args, "namespacesaware");
-        String commentHyphen = getArgValue(args, "hyphenreplacement");
-        String pruneTags = getArgValue(args, "prunetags");
-        String booleanAtts = getArgValue(args, "booleanatts");
-        String nodeByXPath = getArgValue(args, "nodebyxpath");
-
-        boolean omitEnvelope = toBoolean( getArgValue(args, "omitenvelope") );
+        String destination = getArgValue(args, "dest", "");
+        String outputType = getArgValue(args, "outputtype", "");
+        String advancedXmlEscape = getArgValue(args, "advancedxmlescape", "");
+        String useCData = getArgValue(args, "usecdata", "");
+        String translateSpecialEntities = getArgValue(args, "specialentities", "");
+        String unicodeChars = getArgValue(args, "unicodechars", "");
+        String omitUnknownTags = getArgValue(args, "omitunknowntags", "");
+        String treatUnknownTagsAsContent = getArgValue(args, "treatunknowntagsascontent", "");
+        String omitDeprecatedTags = getArgValue(args, "omitdeprtags", "");
+        String treatDeprecatedTagsAsContent = getArgValue(args, "treatdeprtagsascontent", "");
+        String omitComments = getArgValue(args, "omitcomments", "");
+        String omitXmlDeclaration = getArgValue(args, OMITXMLDECL, "");
+        String omitDoctypeDeclaration = getArgValue(args, "omitdoctypedecl", "");
+        String omitHtmlEnvelope = getArgValue(args, "omithtmlenvelope", "");
+        String useEmptyElementTags = getArgValue(args, "useemptyelementtags", "");
+        String allowMultiWordAttributes = getArgValue(args, "allowmultiwordattributes", "");
+        String allowHtmlInsideAttributes = getArgValue(args, "allowhtmlinsideattributes", "");
+        String ignoreQuestAndExclam = getArgValue(args, "ignoreqe", "");
+        String namespacesAware= getArgValue(args, "namespacesaware", "");
+        String commentHyphen = getArgValue(args, "hyphenreplacement", "");
+        String pruneTags = getArgValue(args, "prunetags", "");
+        String booleanAtts = getArgValue(args, "booleanatts", "");
+        String nodeByXPath = getArgValue(args, "nodebyxpath", "");
 
         HtmlCleaner cleaner;
 
-        String tagInfoFile = getArgValue(args, "taginfofile");
+        String tagInfoFile = getArgValue(args, "taginfofile", "");
         if ( !"".equals(tagInfoFile) ) {
             cleaner = new HtmlCleaner(new ConfigFileTagProvider(new File(tagInfoFile)));
         } else {
@@ -156,6 +156,8 @@ public class CommandLine {
         }
 
         final CleanerProperties props = cleaner.getProperties();
+
+        props.addHtmlModificationListener(new HtmlModificationListenerLogger(logger));
 
         if ( !"".equals(omitUnknownTags) ) {
             props.setOmitUnknownTags( toBoolean(omitUnknownTags) );
@@ -177,20 +179,12 @@ public class CommandLine {
             props.setAdvancedXmlEscape( toBoolean(advancedXmlEscape) );
         }
 
-        if ( !"".equals(transResCharsToNCR) ) {
-            props.setTransResCharsToNCR( toBoolean(transResCharsToNCR) );
-        }
-
         if ( !"".equals(useCData) ) {
             props.setUseCdataForScriptAndStyle( toBoolean(useCData) );
         }
 
         if ( !"".equals(translateSpecialEntities) ) {
             props.setTranslateSpecialEntities( toBoolean(translateSpecialEntities) );
-        }
-
-        if ( !"".equals(transSpecialEntitiesToNCR) ) {
-            props.setTransSpecialEntitiesToNCR( toBoolean(transSpecialEntitiesToNCR) );
         }
 
         if ( !"".equals(unicodeChars) ) {
@@ -247,8 +241,8 @@ public class CommandLine {
 
         // collect transformation info
         Map transInfos = new TreeMap();
-        for (int i = 0; i < args.length; i++) {
-            String arg = args[i];
+        for (String arg2 : args) {
+            String arg = arg2;
             if (arg.startsWith("t:") && arg.length() > 2) {
                 arg = arg.substring(2);
                 int index = arg.indexOf('=');
@@ -257,27 +251,17 @@ public class CommandLine {
                 transInfos.put(key, value);
             }
         }
-        if (transInfos != null) {
-            CleanerTransformations transformations = new CleanerTransformations();
-            Iterator iterator = transInfos.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry entry = (Map.Entry) iterator.next();
-                String tag = (String) entry.getKey();
-                String value = (String) entry.getValue();
-                Utils.updateTagTransformations(transformations, tag, value);
-            }
-            cleaner.setTransformations(transformations);
-        }
+        cleaner.initCleanerTransformations(transInfos);
 
         long start = System.currentTimeMillis();
 
         TagNode node;
 
-        String srcLowerCase = source.toLowerCase();
-        if ( srcLowerCase.startsWith("http://") || srcLowerCase.startsWith("https://") ) {
-            node = cleaner.clean(new URL(source), inCharset);
+        String src = source.toLowerCase();
+        if ( src.startsWith("http://") || src.startsWith("https://") ) {
+            node = cleaner.clean(new URL(src), inCharset);
         } else {
-            node = cleaner.clean(new File(source), inCharset);
+            node = cleaner.clean(new File(src), inCharset);
         }
 
         // if user specifies XPath expresssion to choose node for serialization, then
@@ -305,19 +289,13 @@ public class CommandLine {
         }
 
         if ( "compact".equals(outputType) ) {
-            new CompactXmlSerializer(props).writeToStream(node, out, outCharset, omitEnvelope);
+            new CompactXmlSerializer(props).writeXmlToStream(node, out, outCharset);
         } else if ( "browser-compact".equals(outputType) ) {
-            new BrowserCompactXmlSerializer(props).writeToStream(node, out, outCharset, omitEnvelope);
+            new BrowserCompactXmlSerializer(props).writeXmlToStream(node, out, outCharset);
         } else if ( "pretty".equals(outputType) ) {
-            new PrettyXmlSerializer(props).writeToStream(node, out, outCharset, omitEnvelope);
-        } else if ( "htmlsimple".equals(outputType) ) {
-            new SimpleHtmlSerializer(props).writeToStream(node, out, outCharset, omitEnvelope);
-        } else if ( "htmlcompact".equals(outputType) ) {
-            new CompactHtmlSerializer(props).writeToStream(node, out, outCharset, omitEnvelope);
-        } else if ( "htmlpretty".equals(outputType) ) {
-            new PrettyHtmlSerializer(props).writeToStream(node, out, outCharset, omitEnvelope);
+            new PrettyXmlSerializer(props).writeXmlToStream(node, out, outCharset);
         } else {
-            new SimpleXmlSerializer(props).writeToStream(node, out, outCharset, omitEnvelope);
+            new SimpleXmlSerializer(props).writeXmlToStream(node, out, outCharset);
         }
 
         System.out.println("Finished successfully in " + (System.currentTimeMillis() - start)+ "ms." );

@@ -1,8 +1,9 @@
 package org.htmlcleaner;
 
-import junit.framework.*;
+import java.io.File;
+import java.io.IOException;
 
-import java.io.*;
+import junit.framework.TestCase;
 
 /**
  * Testing XPath expressions against TagNodes results from cleaning process.

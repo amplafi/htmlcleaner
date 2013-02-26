@@ -54,15 +54,13 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
     private String text;
     private String src;
     private String dest;
-    private String incharset = HtmlCleaner.DEFAULT_CHARSET;
-    private String outcharset = HtmlCleaner.DEFAULT_CHARSET;
+    private String incharset = CleanerProperties.DEFAULT_CHARSET;
+    private String outcharset = CleanerProperties.DEFAULT_CHARSET;
     private String taginfofile = null;
     private String outputtype = "simple";
     private boolean advancedxmlescape = true;
-    private boolean transrescharstoncr = false;
     private boolean usecdata = true;
     private boolean specialentities = true;
-    private boolean transspecialentitiestoncr = false;
     private boolean unicodechars = true;
     private boolean omitunknowntags = false;
     private boolean treatunknowntagsascontent = false;
@@ -75,13 +73,12 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
     private boolean useemptyelementtags = true;
     private boolean allowmultiwordattributes = true;
     private boolean allowhtmlinsideattributes = false;
-    private boolean ignoreqe = true;
+    private boolean ignoreqe = false;
     private boolean namespacesaware = true;
     private String hyphenreplacement = "=";
     private String prunetags = "";
     private String booleanatts = CleanerProperties.BOOL_ATT_SELF;
     private String nodebyxpath = null;
-    private boolean omitenvelope = false;
 
     private String transform = null;
 
@@ -117,20 +114,12 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
         this.advancedxmlescape = advancedxmlescape;
     }
 
-    public void setTransrescharstoncr(boolean transrescharstoncr) {
-        this.transrescharstoncr = transrescharstoncr;
-    }
-
     public void setUsecdata(boolean usecdata) {
         this.usecdata = usecdata;
     }
 
     public void setSpecialentities(boolean specialentities) {
         this.specialentities = specialentities;
-    }
-
-    public void setTransspecialentitiestoncr(boolean transspecialentitiestoncr) {
-        this.transspecialentitiestoncr = transspecialentitiestoncr;
     }
 
     public void setUnicodechars(boolean unicodechars) {
@@ -206,10 +195,6 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
         this.nodebyxpath = nodebyxpath;
     }
 
-    public void setOmitenvelope(boolean omitenvelope) {
-        this.omitenvelope = omitenvelope;
-    }
-
     public void setTransform(String transform) {
         this.transform = transform;
     }
@@ -222,6 +207,7 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
      * Implementation of Ant task execution.
      * @throws BuildException
      */
+    @Override
     public void execute() throws BuildException {
         HtmlCleaner cleaner;
 
@@ -238,10 +224,8 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
         CleanerProperties props = cleaner.getProperties();
 
         props.setAdvancedXmlEscape(this.advancedxmlescape);
-        props.setTransResCharsToNCR(this.transrescharstoncr);
         props.setUseCdataForScriptAndStyle(this.usecdata);
         props.setTranslateSpecialEntities(this.specialentities);
-        props.setTransSpecialEntitiesToNCR(this.transspecialentitiestoncr);
         props.setRecognizeUnicodeChars(this.unicodechars);
         props.setOmitUnknownTags(this.omitunknowntags);
         props.setTreatUnknownTagsAsContent(this.treatunknowntagsascontent);
@@ -266,23 +250,14 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
         if ( !Utils.isEmptyString(transform) ) {
             String[] transItems = Utils.tokenize(transform, "|");
             Map transInfos = new TreeMap();
-            for (int i = 0; i < transItems.length; i++) {
-                String item = transItems[i];
+            for (String item : transItems) {
                 int index = item.indexOf('=');
                 String key = index <= 0 ? item : item.substring(0, index);
                 String value = index <= 0 ? null : item.substring(index + 1);
                 transInfos.put(key, value);
             }
 
-            CleanerTransformations transformations = new CleanerTransformations();
-            Iterator iterator = transInfos.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry entry = (Map.Entry) iterator.next();
-                String tag = (String) entry.getKey();
-                String value = (String) entry.getValue();
-                Utils.updateTagTransformations(transformations, tag, value);
-            }
-            cleaner.setTransformations(transformations);
+            cleaner.initCleanerTransformations(transInfos);
         }
 
         try {
@@ -303,9 +278,9 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
             // try to evaluate XPath and look for first TagNode instance in the resulting array
             if ( nodebyxpath != null ) {
                 final Object[] xpathResult = node.evaluateXPath(nodebyxpath);
-                for (int i = 0; i < xpathResult.length; i++) {
-                    if ( xpathResult[i] instanceof TagNode ) {
-                        node = (TagNode) xpathResult[i];
+                for (Object element : xpathResult) {
+                    if ( element instanceof TagNode ) {
+                        node = (TagNode) element;
                         break;
                     }
                 }
@@ -317,21 +292,15 @@ public class HtmlCleanerForAnt extends org.apache.tools.ant.Task {
             } else {
                 out = new FileOutputStream(dest);
             }
-                
+
             if ( "compact".equals(outputtype) ) {
-                new CompactXmlSerializer(props).writeToStream(node, out, outcharset, omitenvelope);
+                new CompactXmlSerializer(props).writeXmlToStream(node, out, outcharset);
             } else if ( "browser-compact".equals(outputtype) ) {
-                new BrowserCompactXmlSerializer(props).writeToStream(node, out, outcharset, omitenvelope);
+                new BrowserCompactXmlSerializer(props).writeXmlToStream(node, out, outcharset);
             } else if ( "pretty".equals(outputtype) ) {
-                new PrettyXmlSerializer(props).writeToStream(node, out, outcharset, omitenvelope);
-            } else if ( "htmlsimple".equals(outputtype) ) {
-                new SimpleHtmlSerializer(props).writeToStream(node, out, outcharset, omitenvelope);
-            } else if ( "htmlcompact".equals(outputtype) ) {
-                new CompactHtmlSerializer(props).writeToStream(node, out, outcharset, omitenvelope);
-            } else if ( "htmlpretty".equals(outputtype) ) {
-                new PrettyHtmlSerializer(props).writeToStream(node, out, outcharset, omitenvelope);
+                new PrettyXmlSerializer(props).writeXmlToStream(node, out, outcharset);
             } else {
-                new SimpleXmlSerializer(props).writeToStream(node, out, outcharset, omitenvelope);
+                new SimpleXmlSerializer(props).writeXmlToStream(node, out, outcharset);
             }
         } catch (IOException e) {
              throw new BuildException(e);

@@ -1,21 +1,52 @@
 package org.htmlcleaner;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+
 import junit.framework.TestCase;
+
+import org.apache.tools.ant.util.FileUtils;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
-import java.io.*;
-
 /**
- * Tests parsing and tag balancing.  
+ * Tests parsing and tag balancing.
  */
 public class TagBalancingTest extends TestCase {
 
+    @Override
     protected void setUp() throws Exception {
     }
-
+    
+    public void testShouldReopenTagHavingItemsToMove() throws XPatherException, IOException  {
+    	HtmlCleaner cleaner = new HtmlCleaner();
+    	cleaner.getProperties().setOmitXmlDeclaration(true);
+    	cleaner.getProperties().setOmitComments(true);
+    	SimpleXmlSerializer serializer = new SimpleXmlSerializer(cleaner.getProperties());
+    	
+    	String expected = FileUtils.readFully(new FileReader((new File("src/test/resources/reopenTagHavingItemsToMove-cleaned.html"))));
+    	String actual = serializer.getAsString(cleaner.clean(new File("src/test/resources/reopenTagHavingItemsToMove.html")));
+    	assertEquals(expected.trim(), actual.trim());
+    }
+    
+    public void testShouldSupportBreakingSeveralOpenTags() throws XPatherException, IOException {
+    	HtmlCleaner cleaner = new HtmlCleaner();
+    	cleaner.getProperties().setOmitXmlDeclaration(true);
+    	cleaner.getProperties().setOmitComments(true);
+    	SimpleXmlSerializer serializer = new SimpleXmlSerializer(cleaner.getProperties());
+    	
+    	String expected = FileUtils.readFully(new FileReader((new File("src/test/resources/severalTagsClosedByChildBreak-cleaned.html"))));
+    	String actual = serializer.getAsString(cleaner.clean(new File("src/test/resources/severalTagsClosedByChildBreak.html")));
+    	
+    	assertEquals(expected.trim(), actual.trim());
+    }
+    
     public void testBalancing() throws XPatherException, IOException {
         assertHtml(
                 "<u>aa<i>a<b>at</u> fi</i>rst</b> text",
@@ -26,6 +57,10 @@ public class TagBalancingTest extends TestCase {
                 "<html><head /><body><u>a<big>a<i>a<b>at<sup /></b></i></big></u><big><i><b><sup>fi</sup>" +
                         "</b></i></big><i><b><sup>rst</sup></b><sup>text</sup></i></body></html>"
         );
+        assertHtml(
+            "<u><big><i>a",
+            "<html><head /><body><u><big><i>a</i></big></u></body></html>"
+        );
         assertHtml(new File("src/test/resources/test3.html"), "/head/noscript/meta/@http-equiv", "Refresh");
         assertHtml(new File("src/test/resources/test3.html"), "count(/head/*)", "24");
         assertHtml(new File("src/test/resources/test3.html"), "/head/meta[1]/@name", "verify-v1");
@@ -33,7 +68,7 @@ public class TagBalancingTest extends TestCase {
         assertHtml(new File("src/test/resources/test7.html"), "/head/noscript/meta/@http-equiv", "refresh");
     }
 
-    public void testTagProviders() throws XPatherException, IOException {
+    public void testTagProviders() throws IOException {
         HtmlCleaner cleaner1 = new HtmlCleaner();
         HtmlCleaner cleaner2 = new HtmlCleaner(new ConfigFileTagProvider(new File("default.xml")));
         SimpleXmlSerializer serializer = new SimpleXmlSerializer(cleaner1.getProperties());

@@ -1,35 +1,35 @@
 /*  Copyright (c) 2006-2007, Vladimir Nikic
     All rights reserved.
-	
-    Redistribution and use of this software in source and binary forms, 
-    with or without modification, are permitted provided that the following 
+
+    Redistribution and use of this software in source and binary forms,
+    with or without modification, are permitted provided that the following
     conditions are met:
-	
+
     * Redistributions of source code must retain the above
       copyright notice, this list of conditions and the
       following disclaimer.
-	
+
     * Redistributions in binary form must reproduce the above
       copyright notice, this list of conditions and the
       following disclaimer in the documentation and/or other
       materials provided with the distribution.
-	
-    * The name of HtmlCleaner may not be used to endorse or promote 
+
+    * The name of HtmlCleaner may not be used to endorse or promote
       products derived from this software without specific prior
       written permission.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
-	
+
     You can contact Vladimir Nikic by sending e-mail to
     nikic_vladimir@yahoo.com. Please include the word "HtmlCleaner" in the
     subject line.
@@ -46,87 +46,69 @@ import java.util.*;
  * open tag tokens, end tag tokens, contents (text) and comments.
  * As soon as new item is added to token list, cleaner is invoked
  * to clean current list at the end.</p>
+ *
+ * Created by: Vladimir Nikic.<br>
+ * Date: November, 2006
+
  */
-abstract public class HtmlTokenizer {
-	
+public class HtmlTokenizer {
+
 	private final static int WORKING_BUFFER_SIZE = 1024;
 
     private BufferedReader _reader;
     private char[] _working = new char[WORKING_BUFFER_SIZE];
-    
-    private transient int _pos = 0;
+
+    private transient int _pos;
     private transient int _len = -1;
+    private transient int _row = 1;
+    private transient int _col = 1;
+    
 
-    private transient char _saved[] = new char[512];
-    private transient int _savedLen = 0;
+    private transient StringBuffer _saved = new StringBuffer(512);
 
-    private transient DoctypeToken _docType = null;
-    private transient TagToken _currentTagToken = null;
+    private transient boolean _isLateForDoctype;
+    private transient DoctypeToken _docType;
+    private transient TagToken _currentTagToken;
     private transient List<BaseToken> _tokenList = new ArrayList<BaseToken>();
+    private transient Set<String> _namespacePrefixes = new HashSet<String>();
 
     private boolean _asExpected = true;
 
-    private boolean _isScriptContext = false;
+    private boolean _isScriptContext;
 
+    private HtmlCleaner cleaner;
     private CleanerProperties props;
-
-    private boolean isOmitUnknownTags;
-    private boolean isTreatUnknownTagsAsContent;
-    private boolean isOmitDeprecatedTags;
-    private boolean isTreatDeprecatedTagsAsContent;
-    private boolean isNamespacesAware;
-    private boolean isOmitComments;
-    private boolean isAllowMultiWordAttributes;
-    private boolean isAllowHtmlInsideAttributes;
-
     private CleanerTransformations transformations;
-    private ITagInfoProvider tagInfoProvider;
 
-    private StringBuilder commonStr = new StringBuilder();
 
     /**
-     * Constructor - cretes instance of the parser with specified content.
-     * 
+     * Constructor - creates instance of the parser with specified content.
+     * @param cleaner
      * @param reader
-     * @param props
-     * @param transformations
-     * @param tagInfoProvider
-     * 
-     * @throws IOException
      */
-    public HtmlTokenizer(Reader reader, CleanerProperties props, CleanerTransformations transformations, ITagInfoProvider tagInfoProvider) throws IOException {
+    public HtmlTokenizer(HtmlCleaner cleaner, Reader reader) {
         this._reader = new BufferedReader(reader);
-        this.props = props;
-        this.isOmitUnknownTags = props.isOmitUnknownTags();
-        this.isTreatUnknownTagsAsContent = props.isTreatUnknownTagsAsContent();
-        this.isOmitDeprecatedTags = props.isOmitDeprecatedTags();
-        this.isTreatDeprecatedTagsAsContent = props.isTreatDeprecatedTagsAsContent();
-        this.isNamespacesAware = props.isNamespacesAware();
-        this.isOmitComments = props.isOmitComments();
-        this.isAllowMultiWordAttributes = props.isAllowMultiWordAttributes();
-        this.isAllowHtmlInsideAttributes = props.isAllowHtmlInsideAttributes();
-        this.transformations = transformations;
-        this.tagInfoProvider = tagInfoProvider;
+        this.cleaner = cleaner;
+        this.props = cleaner.getProperties();
+        this.transformations = cleaner.getTransformations();
     }
 
     private void addToken(BaseToken token) {
+        token.setRow(_row);
+        token.setCol(_col);
         _tokenList.add(token);
-        makeTree(_tokenList);
+        cleaner.makeTree( _tokenList, _tokenList.listIterator(_tokenList.size() - 1) );
     }
-
-    abstract void makeTree(List<BaseToken> tokenList);
-
-    abstract TagNode createTagNode(String name);
 
     private void readIfNeeded(int neededChars) throws IOException {
         if (_len == -1 && _pos + neededChars >= WORKING_BUFFER_SIZE) {
             int numToCopy = WORKING_BUFFER_SIZE - _pos;
             System.arraycopy(_working, _pos, _working, 0, numToCopy);
-    		_pos = 0;
+            _pos = 0;
 
             int expected = WORKING_BUFFER_SIZE - numToCopy;
             int size = 0;
-            int charsRead;
+            int charsRead = 0;
             int offset = numToCopy;
             do {
                 charsRead = _reader.read(_working, offset, expected);
@@ -138,7 +120,8 @@ abstract public class HtmlTokenizer {
             } while (charsRead >= 0 && expected > 0);
 
             if (expected > 0) {
-    			_len = size + numToCopy;
+    		_len = size + numToCopy;
+    		
             }
 
             // convert invalid XML characters to spaces
@@ -155,9 +138,12 @@ abstract public class HtmlTokenizer {
     	return this._tokenList;
     }
 
+    Set<String> getNamespacePrefixes() {
+        return _namespacePrefixes;
+    }
+
     private void go() throws IOException {
-    	_pos++;
-    	readIfNeeded(0);
+    	go(1);
     }
 
     private void go(int step) throws IOException {
@@ -189,22 +175,6 @@ abstract public class HtmlTokenizer {
         return true;
     }
 
-    private boolean startsWithSimple(String value) throws IOException {
-        int valueLen = value.length();
-        readIfNeeded(valueLen);
-        if (_len >= 0 && _pos + valueLen  > _len) {
-            return false;
-        }
-
-        for (int i = 0; i < valueLen; i++) {
-        	if (value.charAt(i) != _working[_pos + i]) {
-        		return false;
-        	}
-        }
-
-        return true;
-    }
-
     /**
      * Checks if character at specified position is whitespace.
      * @param position
@@ -224,10 +194,6 @@ abstract public class HtmlTokenizer {
      */
     private boolean isWhitespace() {
         return isWhitespace(_pos);
-    }
-
-    private boolean isWhitespaceSafe() {
-        return Character.isWhitespace( _working[_pos] );
     }
 
     /**
@@ -253,22 +219,6 @@ abstract public class HtmlTokenizer {
         return isChar(_pos, ch);
     }
 
-    private boolean isCharSimple(char ch) {
-        return (_len < 0 || _pos < _len) && (ch == _working[_pos]);
-    }
-
-    /**
-     * @return Current character to be read, but first it must be checked if it exists.
-     * This method is made for performance reasons to be used instead of isChar(...).
-     */
-    private char getCurrentChar() {
-        return _working[_pos];
-    }
-
-    private boolean isCharEquals(char ch) {
-        return _working[_pos] == ch;
-    }
-
     /**
      * Checks if character at specified position can be identifier start.
      * @param position
@@ -280,7 +230,7 @@ abstract public class HtmlTokenizer {
         }
 
         char ch = _working[position];
-        return Character.isUnicodeIdentifierStart(ch) || ch == '_';
+        return Character.isUnicodeIdentifierStart(ch);
     }
 
     /**
@@ -304,14 +254,6 @@ abstract public class HtmlTokenizer {
         return Character.isUnicodeIdentifierStart(ch) || Character.isDigit(ch) || Utils.isIdentifierHelperChar(ch);
     }
 
-    private boolean isValidXmlChar() {
-        return isAllRead() || Utils.isValidXmlChar(_working[_pos]);
-    }
-
-    private boolean isValidXmlCharSafe() {
-        return Utils.isValidXmlChar(_working[_pos]);
-    }
-
     /**
      * Checks if end of the content is reached.
      */
@@ -324,12 +266,23 @@ abstract public class HtmlTokenizer {
      * @param ch
      */
     private void save(char ch) {
-        if (_savedLen >= _saved.length) {
-            char newSaved[] = new char[_saved.length + 512];
-            System.arraycopy(_saved, 0, newSaved, 0, _saved.length);
-            _saved = newSaved;
+        updateCoordinates(ch);
+        _saved.append(ch);
+    }
+
+    /**
+     * Looks onto the char passed and updates current position coordinates. 
+     * If char is a line break, increments row coordinate, if not -- col coordinate. 
+     * 
+     * @param ch - char to analyze.
+     */
+    private void updateCoordinates(char ch) {
+        if(ch == '\n'){
+            _row++;
+            _col = 1;
+        }else{
+            _col++;
         }
-        _saved[_savedLen++] = ch;
     }
 
     /**
@@ -339,10 +292,6 @@ abstract public class HtmlTokenizer {
         if (!isAllRead()) {
             save( _working[_pos] );
         }
-    }
-
-    private void saveCurrentSafe() {
-        save( _working[_pos] );
     }
 
     /**
@@ -365,16 +314,16 @@ abstract public class HtmlTokenizer {
      * @throws IOException
      */
     private void skipWhitespaces() throws IOException {
-        while ( !isAllRead() && isWhitespaceSafe() ) {
-            saveCurrentSafe();
+        while ( !isAllRead() && isWhitespace() ) {
+            saveCurrent();
             go();
         }
     }
 
     private boolean addSavedAsContent() {
-        if (_savedLen > 0) {
-            addToken(new ContentNode(_saved, _savedLen));
-            _savedLen = 0;
+        if (_saved.length() > 0) {
+            addToken( new ContentNode(_saved.toString()) );
+            _saved.delete(0, _saved.length());
             return true;
         }
 
@@ -391,8 +340,8 @@ abstract public class HtmlTokenizer {
         _tokenList.clear();
         _asExpected = true;
         _isScriptContext = false;
-
-        boolean isLateForDoctype = false;
+        _isLateForDoctype = false;
+        _namespacePrefixes.clear();
 
         this._pos = WORKING_BUFFER_SIZE;
         readIfNeeded(0);
@@ -401,7 +350,7 @@ abstract public class HtmlTokenizer {
 
         while ( !isAllRead() ) {
             // resets all the runtime values
-            _savedLen = 0;
+            _saved.delete(0, _saved.length());
             _currentTagToken = null;
             _asExpected = true;
 
@@ -411,12 +360,12 @@ abstract public class HtmlTokenizer {
             if (_isScriptContext) {
                 if ( startsWith("</script") && (isWhitespace(_pos + 8) || isChar(_pos + 8, '>')) ) {
                     tagEnd();
-                } else if ( isScriptEmpty && startsWithSimple("<!--") ) {
+                } else if ( isScriptEmpty && startsWith("<!--") ) {
                     comment();
                 } else {
                     boolean isTokenAdded = content();
                     if (isScriptEmpty && isTokenAdded) {
-                        final BaseToken lastToken = _tokenList.get(_tokenList.size() - 1);
+                        final BaseToken lastToken = (BaseToken) _tokenList.get(_tokenList.size() - 1);
                         if (lastToken != null) {
                             final String lastTokenAsString = lastToken.toString();
                             if (lastTokenAsString != null && lastTokenAsString.trim().length() > 0) {
@@ -430,23 +379,23 @@ abstract public class HtmlTokenizer {
                 }
             } else {
                 if ( startsWith("<!doctype") ) {
-                	if ( !isLateForDoctype ) {
+                	if ( !_isLateForDoctype ) {
                 		doctype();
-                		isLateForDoctype = true;
+                		_isLateForDoctype = true;
                 	} else {
                 		ignoreUntil('<');
                 	}
-                } else if ( startsWithSimple("</") && isIdentifierStartChar(_pos + 2) ) {
-                	isLateForDoctype = true;
+                } else if ( startsWith("</") && isIdentifierStartChar(_pos + 2) ) {
+                	_isLateForDoctype = true;
                     tagEnd();
-                } else if ( startsWithSimple("<!--") ) {
+                } else if ( startsWith("<!--") ) {
                     comment();
-                } else if ( startsWithSimple("<") && isIdentifierStartChar(_pos + 1) ) {
-                	isLateForDoctype = true;
+                } else if ( startsWith("<") && isIdentifierStartChar(_pos + 1) ) {
+                	_isLateForDoctype = true;
                     tagStart();
-                } else if ( props.isIgnoreQuestAndExclam() && (startsWithSimple("<!") || startsWithSimple("<?")) ) {
+                } else if ( props.isIgnoreQuestAndExclam() && (startsWith("<!") || startsWith("<?")) ) {
                     ignoreUntil('>');
-                    if (isCharSimple('>')) {
+                    if (isChar('>')) {
                         go();
                     }
                 } else {
@@ -464,8 +413,7 @@ abstract public class HtmlTokenizer {
      * @return
      */
     private boolean isReservedTag(String tagName) {
-        tagName = tagName.toLowerCase();
-        return "html".equals(tagName) || "head".equals(tagName) || "body".equals(tagName);
+        return "html".equalsIgnoreCase(tagName) || "head".equalsIgnoreCase(tagName) || "body".equalsIgnoreCase(tagName);
     }
 
     /**
@@ -482,26 +430,20 @@ abstract public class HtmlTokenizer {
             return;
         }
 
-        String tagName = identifier();
-
-        TagTransformation tagTransformation = null;
-        if (transformations != null && transformations.hasTransformationForTag(tagName)) {
-            tagTransformation = transformations.getTransformation(tagName);
-            if (tagTransformation != null) {
-                tagName = tagTransformation.getDestTag();
-            }
-        }
+        String originalTagName = identifier();
+        String tagName = transformations.getTagName(originalTagName);
 
         if (tagName != null) {
+            ITagInfoProvider tagInfoProvider = cleaner.getTagInfoProvider();
             TagInfo tagInfo = tagInfoProvider.getTagInfo(tagName);
-            if ( (tagInfo == null && !isOmitUnknownTags && isTreatUnknownTagsAsContent && !isReservedTag(tagName)) ||
-                 (tagInfo != null && tagInfo.isDeprecated() && !isOmitDeprecatedTags && isTreatDeprecatedTagsAsContent) ) {
+            if ( (tagInfo == null && !props.isOmitUnknownTags() && props.isTreatUnknownTagsAsContent() && !isReservedTag(tagName)) ||
+                 (tagInfo != null && tagInfo.isDeprecated() && !props.isOmitDeprecatedTags() && props.isTreatDeprecatedTagsAsContent()) ) {
                 content();
                 return;
             }
         }
 
-        TagNode tagNode = createTagNode(tagName);
+        TagNode tagNode = new TagNode(tagName);
         _currentTagToken = tagNode;
 
         if (_asExpected) {
@@ -509,22 +451,19 @@ abstract public class HtmlTokenizer {
             tagAttributes();
 
             if (tagName != null) {
-                if (tagTransformation != null) {
-                    tagNode.transformAttributes(tagTransformation);
+                if (transformations != null) {
+                    tagNode.setAttributes(transformations.transformAttributes(originalTagName, tagNode.getAttributes()));
                 }
                 addToken(_currentTagToken);
             }
 
-            if ( isCharSimple('>') ) {
+            if ( isChar('>') ) {
             	go();
                 if ( "script".equalsIgnoreCase(tagName) ) {
                     _isScriptContext = true;
                 }
-            } else if ( startsWithSimple("/>") ) {
+            } else if ( startsWith("/>") ) {
             	go(2);
-                if ( "script".equalsIgnoreCase(tagName) ) {
-                    addToken( new EndTagToken(tagName) );
-                }
             }
 
             _currentTagToken = null;
@@ -543,6 +482,7 @@ abstract public class HtmlTokenizer {
     private void tagEnd() throws IOException {
         saveCurrent(2);
         go(2);
+        _col += 2;
 
         if ( isAllRead() ) {
             return;
@@ -557,9 +497,10 @@ abstract public class HtmlTokenizer {
         }
 
         if (tagName != null) {
+            ITagInfoProvider tagInfoProvider = cleaner.getTagInfoProvider();
             TagInfo tagInfo = tagInfoProvider.getTagInfo(tagName);
-            if ( (tagInfo == null && !isOmitUnknownTags && isTreatUnknownTagsAsContent && !isReservedTag(tagName)) ||
-                 (tagInfo != null && tagInfo.isDeprecated() && !isOmitDeprecatedTags && isTreatDeprecatedTagsAsContent) ) {
+            if ( (tagInfo == null && !props.isOmitUnknownTags() && props.isTreatUnknownTagsAsContent() && !isReservedTag(tagName)) ||
+                 (tagInfo != null && tagInfo.isDeprecated() && !props.isOmitDeprecatedTags() && props.isTreatDeprecatedTagsAsContent()) ) {
                 content();
                 return;
             }
@@ -575,7 +516,7 @@ abstract public class HtmlTokenizer {
                 addToken(_currentTagToken);
             }
 
-            if ( isCharSimple('>') ) {
+            if ( isChar('>') ) {
             	go();
             }
 
@@ -601,24 +542,24 @@ abstract public class HtmlTokenizer {
             return null;
         }
 
-        commonStr.delete(0, commonStr.length());
+        StringBuffer identifierValue = new StringBuffer();
 
         while ( !isAllRead() && isIdentifierChar() ) {
-            saveCurrentSafe();
-            commonStr.append( _working[_pos] );
+            saveCurrent();
+            identifierValue.append( _working[_pos] );
             go();
         }
 
         // strip invalid characters from the end
-        while ( commonStr.length() > 0 && Utils.isIdentifierHelperChar(commonStr.charAt(commonStr.length() - 1)) ) {
-            commonStr.deleteCharAt( commonStr.length() - 1 );
+        while ( identifierValue.length() > 0 && Utils.isIdentifierHelperChar(identifierValue.charAt(identifierValue.length() - 1)) ) {
+            identifierValue.deleteCharAt( identifierValue.length() - 1 );
         }
 
-        if ( commonStr.length() == 0 ) {
+        if ( identifierValue.length() == 0 ) {
             return null;
         }
 
-        String id = commonStr.toString();
+        String id = identifierValue.toString();
 
         int columnIndex = id.indexOf(':');
         if (columnIndex >= 0) {
@@ -628,7 +569,14 @@ abstract public class HtmlTokenizer {
             if (nextColumnIndex >= 0) {
                 suffix = suffix.substring(0, nextColumnIndex);
             }
-            id = isNamespacesAware ? (prefix + ":" + suffix) : suffix;
+            if (props.isNamespacesAware()) {
+                id = prefix + ":" + suffix;
+                if ( !"xmlns".equalsIgnoreCase(prefix) ) {
+                    _namespacePrefixes.add( prefix.toLowerCase() );
+                }
+            } else {
+                id = suffix;
+            }
         }
 
         return id;
@@ -639,19 +587,17 @@ abstract public class HtmlTokenizer {
      * @throws IOException
      */
     private void tagAttributes() throws IOException {
-        while( !isAllRead() && _asExpected && !isCharSimple('>') && !startsWithSimple("/>") ) {
+        while( !isAllRead() && _asExpected && !isChar('>') && !startsWith("/>") ) {
             skipWhitespaces();
             String attName = identifier();
 
             if (!_asExpected) {
-                if ( !isCharSimple('<') && !isCharSimple('>') && !startsWithSimple("/>") ) {
-                    if (isValidXmlChar()) {
-                        saveCurrent();
-                    }
+                if ( !isChar('<') && !isChar('>') && !startsWith("/>") ) {
+                    saveCurrent();
                     go();
                 }
 
-                if (!isCharSimple('<')) {
+                if (!isChar('<')) {
                     _asExpected = true;
                 }
 
@@ -661,20 +607,20 @@ abstract public class HtmlTokenizer {
             String attValue;
 
             skipWhitespaces();
-            if ( isCharSimple('=') ) {
-                saveCurrentSafe();
+            if ( isChar('=') ) {
+                saveCurrent();
                 go();
                 attValue = attributeValue();
-            } else if (CleanerProperties.BOOL_ATT_EMPTY.equals(props.booleanAttributeValues)) {
+            } else if (CleanerProperties.BOOL_ATT_EMPTY.equals(props.getBooleanAttributeValues())) {
                 attValue = "";
-            } else if (CleanerProperties.BOOL_ATT_TRUE.equals(props.booleanAttributeValues)) {
+            } else if (CleanerProperties.BOOL_ATT_TRUE.equals(props.getBooleanAttributeValues())) {
                 attValue = "true";
             } else {
                 attValue = attName;
             }
 
             if (_asExpected) {
-                _currentTagToken.setAttribute(attName, attValue);
+                _currentTagToken.addAttribute(attName, attValue);
             }
         }
     }
@@ -689,58 +635,58 @@ abstract public class HtmlTokenizer {
      */
     private String attributeValue() throws IOException {
         skipWhitespaces();
-        
-        if ( isCharSimple('<') || isCharSimple('>') || startsWithSimple("/>") ) {
+
+        if ( isChar('<') || isChar('>') || startsWith("/>") ) {
         	return "";
         }
 
         boolean isQuoteMode = false;
         boolean isAposMode = false;
 
-        commonStr.delete(0, commonStr.length());
+        StringBuffer result = new StringBuffer();
 
-        if ( isCharSimple('\'') ) {
+        if ( isChar('\'') ) {
             isAposMode = true;
-            saveCurrentSafe();
+            saveCurrent();
             go();
-        } else if ( isCharSimple('\"') ) {
+        } else if ( isChar('\"') ) {
             isQuoteMode = true;
-            saveCurrentSafe();
+            saveCurrent();
             go();
         }
+
+        boolean isMultiWord = props.isAllowMultiWordAttributes();
+
+        boolean allowHtml = props.isAllowHtmlInsideAttributes();
 
         while ( !isAllRead() &&
-                ( ((isAposMode && !isCharEquals('\'') || isQuoteMode && !isCharEquals('\"')) && (isAllowHtmlInsideAttributes || !isCharEquals('>') && !isCharEquals('<')) && (isAllowMultiWordAttributes || !isWhitespaceSafe())) ||
-                  (!isAposMode && !isQuoteMode && !isWhitespaceSafe() && !isCharEquals('>') && !isCharEquals('<'))
+                ( (isAposMode && !isChar('\'') && (allowHtml || !isChar('>') && !isChar('<')) && (isMultiWord || !isWhitespace())) ||
+                  (isQuoteMode && !isChar('\"') && (allowHtml || !isChar('>') && !isChar('<')) && (isMultiWord || !isWhitespace())) ||
+                  (!isAposMode && !isQuoteMode && !isWhitespace() && !isChar('>') && !isChar('<'))
                 )
               ) {
-            if (isValidXmlCharSafe()) {
-                commonStr.append( _working[_pos] );
-                saveCurrentSafe();
-            }
+            result.append( _working[_pos] );
+            saveCurrent();
             go();
         }
 
-        if ( isCharSimple('\'') && isAposMode ) {
-            saveCurrentSafe();
+        if ( isChar('\'') && isAposMode ) {
+            saveCurrent();
             go();
-        } else if ( isCharSimple('\"') && isQuoteMode ) {
-            saveCurrentSafe();
+        } else if ( isChar('\"') && isQuoteMode ) {
+            saveCurrent();
             go();
         }
 
 
-        return commonStr.toString();
+        return result.toString();
     }
 
     private boolean content() throws IOException {
         while ( !isAllRead() ) {
-            if (isValidXmlCharSafe()) {
-                saveCurrentSafe();
-            }
+            saveCurrent();
             go();
-
-            if ( isCharSimple('<') ) {
+            if (isTagStartOrEnd()) {
                 break;
             }
         }
@@ -748,9 +694,23 @@ abstract public class HtmlTokenizer {
         return addSavedAsContent();
     }
 
+    /**
+     * Not all '<' (lt) symbols mean tag start or end. For example '<' can be part of 
+     * mathematical expression. To avoid false breaks of content tags use this method to
+     * determine content tag end.     
+     * 
+     * @return true if current position is tag start or end. 
+     * 
+     * @throws IOException
+     */
+    private boolean isTagStartOrEnd() throws IOException {
+        return startsWith("</") || startsWith("<!") || startsWith("<?") || ((startsWith("<") && isIdentifierStartChar(_pos+1)));
+    }
+
     private void ignoreUntil(char ch) throws IOException {
         while ( !isAllRead() ) {
         	go();
+        	updateCoordinates(_working[_pos]);
             if ( isChar(ch) ) {
                 break;
             }
@@ -759,21 +719,19 @@ abstract public class HtmlTokenizer {
 
     private void comment() throws IOException {
     	go(4);
-        while ( !isAllRead() && !startsWithSimple("-->") ) {
-            if (isValidXmlCharSafe()) {
-                saveCurrentSafe();
-            }
+        while ( !isAllRead() && !startsWith("-->") ) {
+            saveCurrent();
             go();
         }
 
-        if (startsWithSimple("-->")) {
+        if (startsWith("-->")) {
         	go(3);
         }
 
-        if (_savedLen > 0) {
-            if (!isOmitComments) {
+        if (_saved.length() > 0) {
+            if ( !props.isOmitComments() ) {
                 String hyphenRepl = props.getHyphenReplacementInComment();
-                String comment = new String(_saved, 0, _savedLen).replaceAll("--", hyphenRepl + hyphenRepl);
+                String comment = _saved.toString().replaceAll("--", hyphenRepl + hyphenRepl);
 
         		if ( comment.length() > 0 && comment.charAt(0) == '-' ) {
         			comment = hyphenRepl + comment.substring(1);
@@ -785,10 +743,10 @@ abstract public class HtmlTokenizer {
 
         		addToken( new CommentNode(comment) );
         	}
-            _savedLen = 0;
+            _saved.delete(0, _saved.length());
         }
     }
-    
+
     private void doctype() throws IOException {
     	go(9);
 
@@ -800,14 +758,14 @@ abstract public class HtmlTokenizer {
 	    String part3 = attributeValue();
 	    skipWhitespaces();
 	    String part4 = attributeValue();
-	    
+
 	    ignoreUntil('<');
-	    
+
 	    _docType = new DoctypeToken(part1, part2, part3, part4);
     }
 
     public DoctypeToken getDocType() {
         return _docType;
     }
-    
+
 }

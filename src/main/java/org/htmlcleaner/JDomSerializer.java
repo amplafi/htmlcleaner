@@ -1,14 +1,20 @@
 package org.htmlcleaner;
 
-import org.jdom.*;
-
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.jdom.Comment;
+import org.jdom.DefaultJDOMFactory;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.jdom.Text;
+
 /**
- * <p>JDom serializer - creates xml JDom instance out of the TagNode.</p>
+ * <p>
+ * JDom serializer - creates xml JDom instance out of the TagNode.
+ * </p>
  */
 public class JDomSerializer {
 
@@ -85,17 +91,18 @@ public class JDomSerializer {
     private void defineNamespaceDeclarations(TagNode node, Element element) {
         Map<String, String> nsDeclarations = node.getNamespaceDeclarations();
         if (nsDeclarations != null) {
-            for (Map.Entry<String, String> nsEntry: nsDeclarations.entrySet()) {
+            for (Map.Entry<String, String> nsEntry : nsDeclarations.entrySet()) {
                 String nsPrefix = nsEntry.getKey();
                 String nsURI = nsEntry.getValue();
-                Namespace ns = nsPrefix == null || "".equals(nsPrefix) ? Namespace.getNamespace(nsURI) : Namespace.getNamespace(nsPrefix, nsURI);
+                Namespace ns = nsPrefix == null || "".equals(nsPrefix) ? Namespace.getNamespace(nsURI) : Namespace
+                        .getNamespace(nsPrefix, nsURI);
                 element.addNamespaceDeclaration(ns);
             }
         }
     }
 
     private void setAttributes(TagNode node, Element element) {
-        for (Map.Entry<String, String> entry: node.getAttributes().entrySet()) {
+        for (Map.Entry<String, String> entry : node.getAttributes().entrySet()) {
             String attrName = entry.getKey();
             String attrValue = entry.getValue();
             if (escapeXml) {
@@ -110,7 +117,9 @@ public class JDomSerializer {
                     if (nsURI == null) {
                         nsURI = attPrefix;
                     }
-                    ns = Namespace.getNamespace(attPrefix, nsURI);
+                    if (!attPrefix.startsWith("xml")) {
+                        ns = Namespace.getNamespace(attPrefix, nsURI);
+                    }
                 }
             }
             if (ns == null) {
@@ -128,13 +137,13 @@ public class JDomSerializer {
                 Object item = it.next();
                 if (item instanceof CommentNode) {
                     CommentNode commentNode = (CommentNode) item;
-                    Comment comment = factory.comment( commentNode.getContent().toString() );
+                    Comment comment = factory.comment(commentNode.getContent().toString());
                     element.addContent(comment);
                 } else if (item instanceof ContentNode) {
                     String nodeName = element.getName();
                     String content = item.toString();
-                    boolean specialCase = props.isUseCdataForScriptAndStyle() &&
-                                          ("script".equalsIgnoreCase(nodeName) || "style".equalsIgnoreCase(nodeName));                    
+                    boolean specialCase = props.isUseCdataForScriptAndStyle()
+                            && ("script".equalsIgnoreCase(nodeName) || "style".equalsIgnoreCase(nodeName));
                     if (escapeXml && !specialCase) {
                         content = Utils.escapeXml(content, props, true);
                     }

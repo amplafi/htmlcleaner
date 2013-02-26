@@ -37,23 +37,28 @@
 
 package org.htmlcleaner;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * <p>Utility for searching cleaned document tree with XPath expressions.</p>
  * Examples of supported axes:
  * <code>
  * <ul>
- *      <li>//div//a</li>  
- *      <li>//div//a[@id][@class]</li>  
+ *      <li>//div//a</li>
+ *      <li>//div//a[@id][@class]</li>
  *      <li>/body/*[1]/@type</li>
- *      <li>//div[3]//a[@id][@href='r/n4']</li>  
- *      <li>//div[last() >= 4]//./div[position() = last()])[position() > 22]//li[2]//a</li>  
- *      <li>//div[2]/@*[2]</li>  
- *      <li>data(//div//a[@id][@class])</li>  
- *      <li>//p/last()</li>  
- *      <li>//body//div[3][@class]//span[12.2<position()]/@id</li>  
- *      <li>data(//a['v' < @id])</li>  
+ *      <li>//div[3]//a[@id][@href='r/n4']</li>
+ *      <li>//div[last() >= 4]//./div[position() = last()])[position() > 22]//li[2]//a</li>
+ *      <li>//div[2]/@*[2]</li>
+ *      <li>data(//div//a[@id][@class])</li>
+ *      <li>//p/last()</li>
+ *      <li>//body//div[3][@class]//span[12.2<position()]/@id</li>
+ *      <li>data(//a['v' < @id])</li>
  * </ul>
  * </code>
  */
@@ -72,7 +77,7 @@ public class XPather {
         tokenArray = new String[tokenCount];
 
         int index = 0;
-        
+
         // this is not real XPath compiler, rather simple way to recognize basic XPaths expressions
         // and interpret them against some TagNode instance.
         while (tokenizer.hasMoreTokens()) {
@@ -116,7 +121,7 @@ public class XPather {
                                        Collection filterSource) throws XPatherException {
         if (from >= 0 && to < tokenArray.length && from <= to) {
             if ("".equals(tokenArray[from].trim())) {
-                return evaluateAgainst(object, from + 1, to, isRecursive, position, last, isFilterContext, filterSource); 
+                return evaluateAgainst(object, from + 1, to, isRecursive, position, last, isFilterContext, filterSource);
             } else if (isToken("(", from)) {
                 int closingBracket = findClosingIndex(from, to);
                 if (closingBracket > 0) {
@@ -127,7 +132,7 @@ public class XPather {
                 }
             } else if (isToken("[", from)) {
                 int closingBracket = findClosingIndex(from, to);
-                if (closingBracket > 0 && object instanceof Collection) {
+                if (closingBracket > 0 && object != null) {
                     Collection value = filterByCondition(object, from + 1, closingBracket - 1);
                     return evaluateAgainst(value, closingBracket + 1, to, false, position, last, isFilterContext, filterSource);
                 } else {
@@ -171,10 +176,10 @@ public class XPather {
                 Collection funcValue = evaluateFunction(object, from, to, position, last, isFilterContext);
                 return evaluateAgainst(funcValue, closingBracketIndex + 1, to, false, 1, last, isFilterContext, filterSource);
             } else if (isValidInteger(tokenArray[from])) {
-                Collection value = singleton(new Integer(tokenArray[from]));
+                Collection value = singleton(Integer.valueOf(tokenArray[from]));
                 return evaluateAgainst(value, from + 1, to, false, position, last, isFilterContext, filterSource);
             } else if (isValidDouble(tokenArray[from])) {
-                Collection value = singleton(new Double(tokenArray[from]));
+                Collection value = singleton(Double.valueOf(tokenArray[from]));
                 return evaluateAgainst(value, from + 1, to, false, position, last, isFilterContext, filterSource);
             } else {
                 return getElementsByName(object, from, to, isRecursive, isFilterContext);
@@ -225,7 +230,7 @@ public class XPather {
         if (s == null) {
             return false;
         }
-        
+
         s = s.trim();
         if (s.length() > 0) {
             if ( !Character.isLetter(s.charAt(0)) ) {
@@ -246,19 +251,19 @@ public class XPather {
      * Checks if tokens in specified range represents valid function call.
      * @param from
      * @param to
-     * @return True if it is valid function call, false otherwise. 
+     * @return True if it is valid function call, false otherwise.
      */
     private boolean isFunctionCall(int from, int to) {
         if ( !isIdentifier(tokenArray[from]) && !isToken("(", from + 1) ) {
             return false;
         }
-        
+
         return findClosingIndex(from + 1, to) > from + 1;
     }
 
     /**
      * Evaluates specified function.
-     * Currently, following XPath functions are supported: last, position, text, count, data 
+     * Currently, following XPath functions are supported: last, position, text, count, data
      * @param source
      * @param from
      * @param to
@@ -282,9 +287,9 @@ public class XPather {
             Object curr = iterator.next();
             index++;
             if ( "last".equals(name) ) {
-                result.add( new Integer(isFilterContext ? last : size) );
+                result.add( Integer.valueOf(isFilterContext ? last : size) );
             } else if ( "position".equals(name) ) {
-                result.add( new Integer(isFilterContext ? position : index) );
+                result.add( Integer.valueOf(isFilterContext ? position : index) );
             } else if ( "text".equals(name) ) {
                 if (curr instanceof TagNode) {
                     result.add( ((TagNode)curr).getText() );
@@ -294,7 +299,7 @@ public class XPather {
             } else if ( "count".equals(name) ) {
                 Collection argumentEvaluated =
                         evaluateAgainst(source, from + 2, to - 1, false, position, 0, isFilterContext, null);
-                result.add( new Integer(argumentEvaluated.size()) );
+                result.add( Integer.valueOf(argumentEvaluated.size()) );
             } else if ( "data".equals(name) ) {
                 Collection argumentEvaluated = evaluateAgainst(source, from + 2, to - 1, false, position, 0, isFilterContext, null);
                 Iterator it = argumentEvaluated.iterator();
@@ -362,7 +367,7 @@ public class XPather {
     private int findClosingIndex(int from, int to) {
         if (from < to) {
             String currToken = tokenArray[from];
-            
+
             if ("\"".equals(currToken)) {
                 for (int i = from + 1; i <= to; i++) {
                     if ("\"".equals(tokenArray[i])) {
@@ -434,7 +439,7 @@ public class XPather {
      * @param from
      * @param to
      * @param isRecursive
-     * @return Colection of TagNode instances or collection of String instances.              
+     * @return Colection of TagNode instances or collection of String instances.
      */
     private Collection getElementsByName(Collection source, int from, int to, boolean isRecursive, boolean isFilterContext) throws XPatherException {
         String name = tokenArray[from].trim();

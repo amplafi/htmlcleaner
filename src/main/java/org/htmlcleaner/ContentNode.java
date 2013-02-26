@@ -43,29 +43,30 @@ import java.io.Writer;
 /**
  * <p>HTML text token.</p>
  */
-public class ContentNode implements BaseToken, HtmlNode {
+public class ContentNode extends BaseTokenImpl implements HtmlNode {
 
-    private StringBuilder content;
+    private final String content;
+    private final boolean blank;
 
     public ContentNode(String content) {
-        this.content = new StringBuilder(content);
+        this.content = content;
+        this.blank = Utils.isEmptyString(this.content);
     }
 
-    ContentNode(char content[], int len) {
-        this.content = new StringBuilder(len + 16);
-        this.content.append(content, 0, len);
-    }
-
-    public String toString() {
-        return content.toString();
-    }
-
-    public StringBuilder getContent() {
+    public String getContent() {
         return content;
     }
 
-    public void serialize(Serializer serializer, Writer writer) throws IOException {
-    	writer.write( content.toString() );
+    @Override
+    public String toString() {
+        return getContent();
     }
 
+    public void serialize(Serializer serializer, Writer writer) throws IOException {
+    	writer.write( content );
+    }
+
+    public boolean isBlank() {
+        return this.blank;
+    }
 }

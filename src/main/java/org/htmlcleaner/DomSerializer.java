@@ -31,79 +31,28 @@ public class DomSerializer {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
         Document document = factory.newDocumentBuilder().newDocument();
-        Element rootElement = createElement(rootNode, document);
+        Element rootElement = document.createElement(rootNode.getName());
         document.appendChild(rootElement);
-
-        setAttributes(rootNode, rootElement);
 
         createSubnodes(document, rootElement, rootNode.getChildren());
 
         return document;
     }
 
-    private Element createElement(TagNode node, Document document) {
-        String name = node.getName();
-        boolean nsAware = props.isNamespacesAware();
-        String prefix = Utils.getXmlNSPrefix(name);
-        Map<String, String> nsDeclarations = node.getNamespaceDeclarations();
-        String nsURI = null;
-        if (prefix != null) {
-            if (nsAware) {
-                if (nsDeclarations != null) {
-                    nsURI = nsDeclarations.get(prefix);
-                }
-                if (nsURI == null) {
-                    nsURI = node.getNamespaceURIOnPath(prefix);
-                }
-                if (nsURI == null) {
-                    nsURI = prefix;
-                }
-            } else {
-                name = Utils.getXmlName(name);
-            }
-        } else {
-            if (nsAware) {
-                if (nsDeclarations != null) {
-                    nsURI = nsDeclarations.get("");
-                }
-                if (nsURI == null) {
-                    nsURI = node.getNamespaceURIOnPath(prefix);
-                }
-            }
-        }
-
-        if (nsAware && nsURI != null) {
-            return document.createElementNS(nsURI, name);
-        } else {
-            return document.createElement(name);
-        }
+    protected boolean isScriptOrStyle(Element element) {
+        String tagName = element.getNodeName();
+        return "script".equalsIgnoreCase(tagName) || "style".equalsIgnoreCase(tagName);
     }
-
-    private void setAttributes(TagNode node, Element element) {
-        for (Map.Entry<String, String> entry: node.getAttributes().entrySet()) {
-            String attrName = entry.getKey();
-            String attrValue = entry.getValue();
-            if (escapeXml) {
-                attrValue = Utils.escapeXml(attrValue, props, true);
-            }
-            
-            String attPrefix = Utils.getXmlNSPrefix(attrName);
-            if (attPrefix != null) {
-                if (props.isNamespacesAware()) {
-                    String nsURI = node.getNamespaceURIOnPath(attPrefix);
-                    if (nsURI == null) {
-                        nsURI = attPrefix;
-                    }
-                    element.setAttributeNS(nsURI, attrName, attrValue);
-                } else {
-                    element.setAttribute(Utils.getXmlName(attrName), attrValue);
-                }
-            } else {
-                element.setAttribute(attrName, attrValue);
-            }
-        }
+    /**
+     * encapsulate content with <[CDATA[ ]]> for things like script and style elements
+     * @param tagNode
+     * @return true if <[CDATA[ ]]> should be used.
+     */
+    protected boolean dontEscape(Element element) {
+        // make sure <script src=..></script> doesn't get turned into <script src=..><[CDATA[]]></script>
+        // TODO check for blank content as well.
+        return props.isUseCdataForScriptAndStyle() && isScriptOrStyle(element) && !element.hasChildNodes();
     }
-
     private void createSubnodes(Document document, Element element, List tagChildren) {
         if (tagChildren != null) {
             Iterator it = tagChildren.iterator();
@@ -111,22 +60,30 @@ public class DomSerializer {
                 Object item = it.next();
                 if (item instanceof CommentNode) {
                     CommentNode commentNode = (CommentNode) item;
-                    Comment comment = document.createComment( commentNode.getContent().toString() );
+                    Comment comment = document.createComment( commentNode.getContent() );
                     element.appendChild(comment);
                 } else if (item instanceof ContentNode) {
-                    String nodeName = element.getNodeName();
-                    String content = item.toString();
-                    boolean specialCase = props.isUseCdataForScriptAndStyle() &&
-                                          ("script".equalsIgnoreCase(nodeName) || "style".equalsIgnoreCase(nodeName));
+                    ContentNode contentNode = (ContentNode) item;
+                    String content = contentNode.getContent();
+                    boolean specialCase = dontEscape(element);
                     if (escapeXml && !specialCase) {
                         content = Utils.escapeXml(content, props, true);
                     }
                     element.appendChild( specialCase ? document.createCDATASection(content) : document.createTextNode(content) );
                 } else if (item instanceof TagNode) {
                     TagNode subTagNode = (TagNode) item;
-                    Element subelement = createElement(subTagNode, document);
-
-                    setAttributes(subTagNode, subelement);
+                    Element subelement = document.createElement( subTagNode.getName() );
+                    Map attributes =  subTagNode.getAttributes();
+                    Iterator entryIterator = attributes.entrySet().iterator();
+                    while (entryIterator.hasNext()) {
+                        Map.Entry entry = (Map.Entry) entryIterator.next();
+                        String attrName = (String) entry.getKey();
+                        String attrValue = (String) entry.getValue();
+                        if (escapeXml) {
+                            attrValue = Utils.escapeXml(attrValue, props, true);
+                        }
+                        subelement.setAttribute(attrName, attrValue);
+                    }
 
                     // recursively create subnodes
                     createSubnodes(document, subelement, subTagNode.getChildren());

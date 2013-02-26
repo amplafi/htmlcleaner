@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import java.io.IOException;
 import java.io.File;
+import java.util.regex.Pattern;
 
 /**
  * Testing tag transformations.
@@ -12,29 +13,31 @@ public class TransformationTest extends TestCase {
 
     private HtmlCleaner cleaner;
 
+    @Override
     protected void setUp() throws Exception {
         cleaner = new HtmlCleaner();
     }
 
-    public void test1() throws XPatherException, IOException {
+    public void test1() throws IOException {
         CleanerTransformations transformations = new CleanerTransformations();
         TagTransformation tagTransformation = new TagTransformation("strong", "span", false);
         tagTransformation.addAttributeTransformation("style", "font-weight:bold");
         transformations.addTransformation(tagTransformation);
-        cleaner.setTransformations(transformations);
         CleanerProperties props = cleaner.getProperties();
+        props.setCleanerTransformations(transformations);
         props.setOmitXmlDeclaration(true);
+        props.setAddNewlineToHeadAndBody(false);
         TagNode node = cleaner.clean("<div><strong>Mama</strong></div>");
         assertEquals(
-                new CompactXmlSerializer(props).getAsString(node),
-                "<html><head /><body><div><span style=\"font-weight:bold\">Mama</span></div></body></html>"
+                "<html><head /><body><div><span style=\"font-weight:bold\">Mama</span></div></body></html>",
+                new CompactXmlSerializer(props).getAsString(node)
         );
     }
 
     public void test2() throws IOException {
         CleanerProperties props = cleaner.getProperties();
 
-        CleanerTransformations transformations = new CleanerTransformations();
+        CleanerTransformations transformations = props.getCleanerTransformations();
 
         TagTransformation t = new TagTransformation("blockquote");
         transformations.addTransformation(t);
@@ -55,13 +58,11 @@ public class TransformationTest extends TestCase {
         t.addAttributeTransformation("name", "${face}_1");
         transformations.addTransformation(t);
 
-        cleaner.setTransformations(transformations);
-        
         TagNode node = cleaner.clean( new File("src/test/resources/test8.html"), "UTF-8" );
 
         String xml = new PrettyXmlSerializer(props).getAsString(node);
 
-        assertTrue( xml.indexOf("blockquote") < 0 );
+        assertTrue("Shouldn't have blockquote in it "+xml, xml.indexOf("blockquote") < 0 );
         assertTrue( xml.indexOf("&quot;Hi there!&quot;") >= 0 );
         assertTrue( xml.indexOf("tags:bold") < 0 );
         assertTrue( xml.indexOf("<td style=\"font-weight:bold;\">This is BOLD text?!</td>") >= 0 );
@@ -77,6 +78,28 @@ public class TransformationTest extends TestCase {
         assertTrue( xml.indexOf("id=\"fnt_1\"") >= 0 );
         assertTrue( xml.indexOf("name=\"Arial_1\"") >= 0 );
         assertTrue( xml.indexOf("style=\";font-family:Arial;font-size:16;color:red;\"") >= 0 );
+    }
+    
+    /**
+     * 
+     * @throws IOException
+     */
+    public void testGlobalTransformations() throws IOException {
+        CleanerTransformations transformations = new CleanerTransformations();
+        // no "on*" attributes
+        AttributeTransformationPatternImpl attPattern = new AttributeTransformationPatternImpl(Pattern.compile("^\\s*on", Pattern.CASE_INSENSITIVE), null, null);
+        transformations.addGlobalTransformation(attPattern);
+        AttributeTransformationPatternImpl attPattern1 = new AttributeTransformationPatternImpl(null, Pattern.compile("^\\s*javascript:", Pattern.CASE_INSENSITIVE), null);
+        transformations.addGlobalTransformation(attPattern1);
+        CleanerProperties props = cleaner.getProperties();
+        props.setCleanerTransformations(transformations);
+        props.setOmitXmlDeclaration(true);
+        props.setAddNewlineToHeadAndBody(false);
+        TagNode node = cleaner.clean("<div onfoo=\"bar\" ONNot=\"\"><p bad=\" javascript:  \" class=\"javascript\" unknown=\"good\">Mama</p></div>");
+        assertEquals(
+                "<html><head /><body><div><p class=\"javascript\" unknown=\"good\">Mama</p></div></body></html>",
+                new CompactXmlSerializer(props).getAsString(node)
+        );
     }
 
 }
