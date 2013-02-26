@@ -1,10 +1,10 @@
 package org.htmlcleaner;
 
-import junit.framework.TestCase;
-
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.util.regex.Matcher;
+
+import junit.framework.TestCase;
 
 /**
  * Testing node manipulation after cleaning.
@@ -415,9 +415,9 @@ public class PropertiesTest extends TestCase {
         SimpleXmlSerializer simpleXmlSerializer = new SimpleXmlSerializer(properties);
         simpleXmlSerializer.setCreatingHtmlDom(false);
 
-        String xmlString = simpleXmlSerializer.getAsString(TestTagNodeUtils.getTagNode(properties, "<div>&#138A;</div>"), "UTF-8");
+        String xmlString = simpleXmlSerializer.getXmlAsString( "<div>&#138A;</div>", "UTF-8");
         assertEquals("<div>"+new String(new char[] {138, 'A',';'})+"</div>", xmlString);
-        xmlString = simpleXmlSerializer.getAsString(TestTagNodeUtils.getTagNode(properties,  "<div>&#x138A;</div>"), "UTF-8");
+        xmlString = simpleXmlSerializer.getXmlAsString( "<div>&#x138A;</div>", "UTF-8");
         assertEquals("<div>"+new String(new char[] {0x138A})+"</div>", xmlString);
         properties.reset();
 
@@ -480,8 +480,8 @@ public class PropertiesTest extends TestCase {
         cleanerProperties.setOmitXmlDeclaration(true);
         cleanerProperties.setUseEmptyElementTags(false);
         // right tick is special unicode character 8217
-        String output = new SimpleXmlSerializer(cleanerProperties).getAsString(TestTagNodeUtils.getTagNode(
-                cleanerProperties, "<h3><u><strong>President’s Message</strong></u><div> </h3>"), "UTF-8");
+        String output = new SimpleXmlSerializer(cleanerProperties).getXmlAsString(
+                "<h3><u><strong>President’s Message</strong></u><div> </h3>", "UTF-8");
         assertEquals("<h3><u><strong>President’s Message</strong></u><div> </div></h3>", output);
     }
 
