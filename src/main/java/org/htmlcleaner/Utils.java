@@ -218,19 +218,19 @@ public class Utils {
     				} else {
     					if (translateSpecialEntities) {
                             // get minimal following sequence required to recognize some special entitiy
-                            String seq = s.substring(i, i + Math.min(SpecialEntity.getMaxEntityLength() + 2, len - i));
+                            String seq = s.substring(i, i + Math.min(SpecialEntities.INSTANCE.getMaxEntityLength() + 2, len - i));
     						int semiIndex = seq.indexOf(';');
     						if (semiIndex > 0) {
     							String entityKey = seq.substring(1, semiIndex);
-    							SpecialEntity entity = SpecialEntity.getEntity(entityKey);
+    							SpecialEntity entity = SpecialEntities.INSTANCE.getSpecialEntity(entityKey);
     							if (entity != null) {
-                                    result.append(props.isTransSpecialEntitiesToNCR() ? entity.getDecimalNCR() : entity.getCharacter());
+                                    result.append(props.isTransSpecialEntitiesToNCR() ? entity.getDecimalNCR() : entity.charValue());
     								i += entityKey.length() + 1;
     								continue;
     							}
     						}
     					}
-    					
+
     					if (advanced) {
                             String sub = s.substring(i);
                             boolean isReservedSeq = false;

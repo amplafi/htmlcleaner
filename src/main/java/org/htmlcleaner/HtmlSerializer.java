@@ -105,14 +105,14 @@ public abstract class HtmlSerializer extends Serializer {
     					}
     				} else {
                         // get minimal following sequence required to recognize some special entitiy
-                        String seq = s.substring(i, i + Math.min(SpecialEntity.getMaxEntityLength() + 2, len - i));
+                        String seq = s.substring(i, i + Math.min(SpecialEntities.INSTANCE.getMaxEntityLength() + 2, len - i));
                         int semiIndex = seq.indexOf(';');
                         if (semiIndex > 0) {
                             String entityKey = seq.substring(1, semiIndex);
-                            SpecialEntity entity = SpecialEntity.getEntity(entityKey);
+                            SpecialEntity entity = SpecialEntities.INSTANCE.getSpecialEntity(entityKey);
                             if (entity != null) {
                                 if (translateSpecialEntities) {
-                                    result.append(props.isTransSpecialEntitiesToNCR() ? entity.getDecimalNCR() : entity.getCharacter());
+                                    result.append(props.isTransSpecialEntitiesToNCR() ? entity.getDecimalNCR() : entity.charValue());
                                 } else {
                                     result.append(entity.getEscapedValue());
                                 }
