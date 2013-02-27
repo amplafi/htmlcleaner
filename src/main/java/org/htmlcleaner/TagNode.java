@@ -144,6 +144,7 @@ public class TagNode extends TagToken implements HtmlNode {
     /**
      * @return List of child TagNode objects.
      * @deprecated use {@link TagNode#getChildTagList()}, will be refactored and possibly removed in future versions.
+     * TODO This method should be refactored because is does not properly match the commonly used Java's getter/setter strategy.
      */
     public List<TagNode> getChildren() {
 		return getChildTagList();
