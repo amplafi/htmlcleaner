@@ -52,7 +52,7 @@ public class SimpleHtmlSerializer extends HtmlSerializer {
         serializeOpenTag(tagNode, writer, false);
 
         if ( !isMinimizedTagSyntax(tagNode) ) {
-            for (Object item: tagNode.getChildren()) {
+            for (Object item: tagNode.getAllChildren()) {
                 if ( item instanceof ContentNode) {
                     String content = item.toString();
                     writer.write( dontEscape(tagNode) ? content : escapeText(content) );

@@ -22,7 +22,7 @@ public class TagNodeInsignificantBrCondition implements ITagNodeCondition {
 			return false;
 		}
 		TagNode parent = tagNode.getParent();
-		List children = parent.getChildren();
+		List children = parent.getAllChildren();
 		int brIndex = children.indexOf(tagNode);		
 		return checkSublist(0, brIndex, children) || checkSublist (brIndex, children.size(), children);
 	}

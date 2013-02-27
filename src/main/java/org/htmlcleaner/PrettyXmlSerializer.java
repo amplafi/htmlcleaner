@@ -133,7 +133,7 @@ public class PrettyXmlSerializer extends XmlSerializer {
     }
 
     protected void serializePrettyXml(TagNode tagNode, Writer writer, int level) throws IOException {
-        List tagChildren = tagNode.getChildren();
+        List tagChildren = tagNode.getAllChildren();
         boolean isHeadlessNode = Utils.isEmptyString(tagNode.getName());
         String indent = isHeadlessNode ? "" : getIndent(level);
 

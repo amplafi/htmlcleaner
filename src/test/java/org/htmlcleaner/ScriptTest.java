@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -24,12 +23,7 @@ public class ScriptTest {
         TagNode head = html.findElementByName("head", false);
         
         ArrayList<TagNode> scripts = new ArrayList<TagNode>();
-		@SuppressWarnings("unchecked")
-		
-		// 
-		// This test currently fails, replace with head.getChildTagList and it works
-		//
-		List<TagNode> children = head.getChildren();	
+		List<TagNode> children = head.getChildTagList();	
 		
 		for(TagNode child : children){						
 			if(child.getName().equals("script")){				

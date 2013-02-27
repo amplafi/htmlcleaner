@@ -142,23 +142,31 @@ public class TagNode extends TagToken implements HtmlNode {
     }
 
     /**
-     * @return List of children objects. During the cleanup process there could be different kind of
-     * children inside, however after clean there should be only TagNode instances.
+     * @return List of child TagNode objects.
+     * @deprecated use {@link TagNode#getChildTagList()}, will be refactored and possibly removed in future versions.
+     * TODO This method should be refactored because is does not properly match the commonly used Java's getter/setter strategy.
      */
-    public List getChildren() {
-		return children;
+    public List<TagNode> getChildren() {
+		return getChildTagList();
 	}
 
     void setChildren(List children) {
         this.children = children;
     }
+    
+    public List getAllChildren() {
+        return children;
+    }
 
-    public List getChildTagList() {
-        List childTagList = new ArrayList();
+    /**
+     * @return List of child TagNode objects.
+     */
+    public List<TagNode> getChildTagList() {
+        List<TagNode> childTagList = new ArrayList<TagNode>();
         for (int i = 0; i < children.size(); i++) {
             Object item = children.get(i);
             if (item instanceof TagNode) {
-                childTagList.add(item);
+                childTagList.add((TagNode)item);
             }
         }
 
