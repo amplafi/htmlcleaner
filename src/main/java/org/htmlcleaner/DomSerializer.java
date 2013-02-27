@@ -34,7 +34,7 @@ public class DomSerializer {
         Element rootElement = document.createElement(rootNode.getName());
         document.appendChild(rootElement);
 
-        createSubnodes(document, rootElement, rootNode.getChildren());
+        createSubnodes(document, rootElement, rootNode.getAllChildren());
 
         return document;
     }
@@ -86,7 +86,7 @@ public class DomSerializer {
                     }
 
                     // recursively create subnodes
-                    createSubnodes(document, subelement, subTagNode.getChildren());
+                    createSubnodes(document, subelement, subTagNode.getAllChildren());
 
                     element.appendChild(subelement);
                 } else if (item instanceof List) {

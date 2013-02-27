@@ -447,7 +447,7 @@ public class HtmlCleaner {
     			if(addIfNeededToPruneSet(node)) {
 			        nodesPruned = true;
     			} else if (!node.isEmpty()){
-    				nodesPruned |= markNodesToPrune(node.getChildren());
+    				nodesPruned |= markNodesToPrune(node.getAllChildren());
     			}
     		}
     	}
@@ -466,7 +466,7 @@ public class HtmlCleaner {
         this.rootNode =  this.htmlNode;
 // original behavior -- just take the first html element ignoring all other content, or later html elements.
 //        if (properties.isOmitHtmlEnvelope()) {
-//            List bodyChildren = this.bodyNode.getChildren();
+//            List bodyChildren = this.bodyNode.getAllChildren();
 //            if (bodyChildren != null) {
 //                Iterator iterator = bodyChildren.iterator();
 //                while (iterator.hasNext()) {
@@ -480,7 +480,7 @@ public class HtmlCleaner {
 //        }
         // new behavior -- wrap in null TagNode
         if (properties.isOmitHtmlEnvelope()) {
-            List bodyChildren = this.bodyNode.getChildren();
+            List bodyChildren = this.bodyNode.getAllChildren();
             this.rootNode = new TagNode(null);
             if (bodyChildren != null) {
                 for(Iterator iterator = bodyChildren.iterator(); iterator.hasNext(); ) {
@@ -1093,7 +1093,7 @@ public class HtmlCleaner {
             TagNode innerRootNode = clean( html.toString() );
             TagNode cleanedNode = innerRootNode.findElementHavingAttribute(MARKER_ATTRIBUTE, true);
             if (cleanedNode != null) {
-                node.setChildren( cleanedNode.getChildren() );
+                node.setChildren( cleanedNode.getAllChildren() );
             }
         }
     }

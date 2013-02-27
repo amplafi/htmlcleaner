@@ -64,7 +64,7 @@ public class TagNodeEmptyContentCondition implements ITagNodeCondition {
                 if (tagNode.isEmpty()) {
                     return true;
                 } else {
-                    for(Object child: tagNode.getChildren()) {
+                    for(Object child: tagNode.getAllChildren()) {
                         // TODO : similar check as in tagNode.isEmpty() argues for a visitor pattern
                         // but allow empty td, ths to be pruned.
                         if ( child instanceof TagNode) {

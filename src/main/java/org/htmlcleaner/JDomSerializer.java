@@ -39,7 +39,7 @@ public class JDomSerializer {
 
         setAttributes(rootNode, rootElement);
 
-        createSubnodes(rootElement, rootNode.getChildren());
+        createSubnodes(rootElement, rootNode.getAllChildren());
 
         return document;
     }
@@ -156,7 +156,7 @@ public class JDomSerializer {
                     setAttributes(subTagNode, subelement);
 
                     // recursively create subnodes
-                    createSubnodes(subelement, subTagNode.getChildren());
+                    createSubnodes(subelement, subTagNode.getAllChildren());
 
                     element.addContent(subelement);
                 } else if (item instanceof List) {
