@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.htmlcleaner</groupId>
+    <groupId>net.sourceforge.htmlcleaner</groupId>
     <artifactId>htmlcleaner</artifactId>
     <packaging>jar</packaging>
     <version>2.4</version>
@@ -10,8 +11,6 @@
     <description>
         HtmlCleaner is an HTML parser written in Java. It transforms dirty HTML to well-formed XML following
         the same rules that most web-browsers use.
-        Fork From :
-    	http://htmlcleaner.sourceforge.net/
     </description>
     <url>http://htmlcleaner.sourceforge.net/</url>
     <inceptionYear>2006</inceptionYear>
@@ -22,7 +21,7 @@
             <url>http://www.opensource.org/licenses/bsd-license.php</url>
             <comments>
                 OWNER = Vladimir Nikic
-                YEAR = 2006-2008
+                YEAR = 2006-2013
             </comments>
             <distribution>repo</distribution>
         </license>
@@ -43,6 +42,7 @@
             <name>Patrick Moore</name>
             <id>patmoore</id>
             <roles>
+                <role>Project Admin</role>
                 <role>Developer</role>
             </roles>
             <timezone>-8</timezone>
@@ -59,7 +59,9 @@
             <email>scottbw@apache.org</email>
         </developer>
     </developers>
-    <!-- <scm> <url>http://htmlcleaner.svn.sourceforge.net/</url> </scm> -->
+    <prerequisites>
+        <maven>3.0.4</maven>
+    </prerequisites>
     <scm>
         <developerConnection>scm:git:${github-base}${project.artifactId}.git</developerConnection>
     </scm>
@@ -72,19 +74,8 @@
     <dependencies>
         <dependency>
             <groupId>org.jdom</groupId>
-            <artifactId>jdom</artifactId>
-            <version>1.1.2</version>
-            <exclusions>
-                <!-- 1.1.2 refers to unreleased jaxen 1.1.3  -->
-                <exclusion>
-                    <groupId>jaxen</groupId>
-                    <artifactId>jaxen</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>jdom2</artifactId>
+            <version>2.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
@@ -95,7 +86,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11-beta-1</version>
+            <version>4.11</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -138,32 +129,30 @@
                     </archive>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>3.0</version>
                 <configuration>
+                    <!-- 1.5 to allow usage on android -->
                     <source>1.5</source>
                     <target>1.5</target>
                     <encoding>UTF-8</encoding>
                     <optimize>true</optimize>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-eclipse-plugin</artifactId>
+                <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.9</version>
-                <!-- eclipse:configure-workspace adds M2_REPO to eclipse -->
-                <!-- workspaceActiveCodeStyleProfileName Name of a profile in workspaceCodeStylesURL to activate. Default is the first profile name in the code style file in workspaceCodeStylesURL -->
-                <!-- workspaceCodeStylesURL String Point to a URL containing code styles content. -->
-                <configuration>
-                    <!-- <workspaceCodeStylesURL></workspaceCodeStylesURL> -->
-                    <buildOutputDirectory>bin</buildOutputDirectory>
-
-                </configuration>
-
+                  <executions>
+                    <execution>
+                      <id>attach-javadocs</id>
+                      <goals>
+                        <goal>jar</goal>
+                      </goals>
+                    </execution>
+                  </executions>
             </plugin>
         </plugins>
         <extensions>
