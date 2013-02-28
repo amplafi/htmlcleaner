@@ -17,6 +17,7 @@ public class SerializationTest extends TestCase {
     private HtmlCleaner cleaner;
     private CleanerProperties properties;
 
+    @Override
     protected void setUp() throws Exception {
         cleaner = new HtmlCleaner();
         properties = cleaner.getProperties();

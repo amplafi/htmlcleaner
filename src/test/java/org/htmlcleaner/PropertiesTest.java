@@ -415,9 +415,9 @@ public class PropertiesTest extends TestCase {
         SimpleXmlSerializer simpleXmlSerializer = new SimpleXmlSerializer(properties);
         simpleXmlSerializer.setCreatingHtmlDom(false);
 
-        String xmlString = simpleXmlSerializer.getXmlAsString( "<div>&#138A;</div>", "UTF-8");
+        String xmlString = simpleXmlSerializer.getAsString( "<div>&#138A;</div>");
         assertEquals("<div>"+new String(new char[] {138, 'A',';'})+"</div>", xmlString);
-        xmlString = simpleXmlSerializer.getXmlAsString( "<div>&#x138A;</div>", "UTF-8");
+        xmlString = simpleXmlSerializer.getAsString( "<div>&#x138A;</div>");
         assertEquals("<div>"+new String(new char[] {0x138A})+"</div>", xmlString);
         properties.reset();
 
@@ -480,8 +480,8 @@ public class PropertiesTest extends TestCase {
         cleanerProperties.setOmitXmlDeclaration(true);
         cleanerProperties.setUseEmptyElementTags(false);
         // right tick is special unicode character 8217
-        String output = new SimpleXmlSerializer(cleanerProperties).getXmlAsString(
-                "<h3><u><strong>President’s Message</strong></u><div> </h3>", "UTF-8");
+        String output = new SimpleXmlSerializer(cleanerProperties).getAsString(
+                "<h3><u><strong>President’s Message</strong></u><div> </h3>");
         assertEquals("<h3><u><strong>President’s Message</strong></u><div> </div></h3>", output);
     }
 
