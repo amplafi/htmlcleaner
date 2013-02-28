@@ -10,10 +10,10 @@ import java.io.StringReader;
 import junit.framework.TestCase;
 
 import org.apache.tools.ant.util.FileUtils;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 /**
  * Tests parsing and tag balancing.

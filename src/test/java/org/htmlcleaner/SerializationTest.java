@@ -36,8 +36,8 @@ public class SerializationTest extends TestCase {
 
     //TODO This should be properly tested, not only constructor
     public void testJDomSerializer() throws ParserConfigurationException, IOException {
-        final org.jdom.Document jdom1 = new JDomSerializer(properties, true).createJDom(getTestTagNode());
-        final org.jdom.Document jdom2 = new JDomSerializer(properties, false).createJDom(getTestTagNode());
+        final org.jdom2.Document jdom1 = new JDomSerializer(properties, true).createJDom(getTestTagNode());
+        final org.jdom2.Document jdom2 = new JDomSerializer(properties, false).createJDom(getTestTagNode());
     }
 
     public void testPrettyXmlSerializer() throws IOException {
