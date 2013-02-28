@@ -28,13 +28,13 @@ public class BrowserCompactXmlSerializerTest extends TestCase {
      * @throws IOException 
      */
     public void testRemoveInsignificantWhitespaces() throws IOException{
-        String cleaned = compactXmlSerializer.getXmlAsString( "        <u>text here, </u><b>some text</b>      ", "UTF-8");
+        String cleaned = compactXmlSerializer.getAsString( "        <u>text here, </u><b>some text</b>      ");
         assertEquals("<u>text here, </u><b>some text</b>", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString( "    <div class=\"foo\">2 roots < here >  </div>", "UTF-8");
+        cleaned = compactXmlSerializer.getAsString( "    <div class=\"foo\">2 roots < here >  </div>");
         assertEquals("<div class=\"foo\">2 roots &lt; here &gt;</div>\n", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString( "    <div class=\"foo\">2 roots \n    < here >  </div>", "UTF-8");
+        cleaned = compactXmlSerializer.getAsString( "    <div class=\"foo\">2 roots \n    < here >  </div>");
         assertEquals("<div class=\"foo\">2 roots &lt; here &gt;</div>\n", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString( "    <div class=\"foo\">2 roots \n\n    < here >  </div>", "UTF-8");
+        cleaned = compactXmlSerializer.getAsString( "    <div class=\"foo\">2 roots \n\n    < here >  </div>");
         assertEquals("<div class=\"foo\">2 roots <br />&lt; here &gt;</div>\n", cleaned);
     }
     
@@ -43,18 +43,18 @@ public class BrowserCompactXmlSerializerTest extends TestCase {
      * @throws IOException 
      */
     public void testRemoveLeadingAndEndingNbsp() throws IOException {
-        String cleaned = compactXmlSerializer.getXmlAsString( 
-                "&nbsp;&nbsp;We have just released Jericho Road. Listen to Still Waters the lead-off track.", "UTF-8");
+        String cleaned = compactXmlSerializer.getAsString( 
+                "&nbsp;&nbsp;We have just released Jericho Road. Listen to Still Waters the lead-off track.");
         assertEquals("We have just released Jericho Road. Listen to Still Waters the lead-off track.", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString( 
-                "&#160;We have just released Jericho Road. Listen to Still Waters the lead-off track.&#160;", "UTF-8");
+        cleaned = compactXmlSerializer.getAsString( 
+                "&#160;We have just released Jericho Road. Listen to Still Waters the lead-off track.&#160;");
         assertEquals("We have just released Jericho Road. Listen to Still Waters the lead-off track.", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString( 
-                "&#xA0;We have just released Jericho Road. Listen to Still Waters the lead-off track.&#xA0;", "UTF-8");
+        cleaned = compactXmlSerializer.getAsString( 
+                "&#xA0;We have just released Jericho Road. Listen to Still Waters the lead-off track.&#xA0;");
         assertEquals("We have just released Jericho Road. Listen to Still Waters the lead-off track.", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString( SpecialEntities.NON_BREAKABLE_SPACE
+        cleaned = compactXmlSerializer.getAsString( SpecialEntities.NON_BREAKABLE_SPACE
                 + "We have just released Jericho Road. Listen to Still Waters the lead-off track.&#xA0;"
-                + SpecialEntities.NON_BREAKABLE_SPACE, "UTF-8");
+                + SpecialEntities.NON_BREAKABLE_SPACE);
         assertEquals("We have just released Jericho Road. Listen to Still Waters the lead-off track.", cleaned);
     }
     
@@ -63,11 +63,11 @@ public class BrowserCompactXmlSerializerTest extends TestCase {
      * @throws IOException 
      */
     public void testPreTagIsUntouched() throws IOException{
-        String cleaned = compactXmlSerializer.getXmlAsString( "   <pre>some text</pre>", "UTF-8");
+        String cleaned = compactXmlSerializer.getAsString( "   <pre>some text</pre>");
         assertEquals("<pre>some text</pre>\n", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString( "<pre>     some text</pre>", "UTF-8");
+        cleaned = compactXmlSerializer.getAsString( "<pre>     some text</pre>");
         assertEquals("<pre>     some text</pre>\n", cleaned);
-        cleaned = compactXmlSerializer.getXmlAsString( "<pre>some /n/n text</pre>", "UTF-8");
+        cleaned = compactXmlSerializer.getAsString( "<pre>some /n/n text</pre>");
         assertEquals("<pre>some /n/n text</pre>\n", cleaned);
     }
 }

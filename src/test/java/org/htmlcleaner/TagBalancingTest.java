@@ -10,10 +10,10 @@ import java.io.StringReader;
 import junit.framework.TestCase;
 
 import org.apache.tools.ant.util.FileUtils;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 /**
  * Tests parsing and tag balancing.
@@ -23,30 +23,30 @@ public class TagBalancingTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
     }
-    
+
     public void testShouldReopenTagHavingItemsToMove() throws XPatherException, IOException  {
     	HtmlCleaner cleaner = new HtmlCleaner();
     	cleaner.getProperties().setOmitXmlDeclaration(true);
     	cleaner.getProperties().setOmitComments(true);
     	SimpleXmlSerializer serializer = new SimpleXmlSerializer(cleaner.getProperties());
-    	
+
     	String expected = FileUtils.readFully(new FileReader((new File("src/test/resources/reopenTagHavingItemsToMove-cleaned.html"))));
     	String actual = serializer.getAsString(cleaner.clean(new File("src/test/resources/reopenTagHavingItemsToMove.html")));
     	assertEquals(expected.trim(), actual.trim());
     }
-    
+
     public void testShouldSupportBreakingSeveralOpenTags() throws XPatherException, IOException {
     	HtmlCleaner cleaner = new HtmlCleaner();
     	cleaner.getProperties().setOmitXmlDeclaration(true);
     	cleaner.getProperties().setOmitComments(true);
     	SimpleXmlSerializer serializer = new SimpleXmlSerializer(cleaner.getProperties());
-    	
+
     	String expected = FileUtils.readFully(new FileReader((new File("src/test/resources/severalTagsClosedByChildBreak-cleaned.html"))));
     	String actual = serializer.getAsString(cleaner.clean(new File("src/test/resources/severalTagsClosedByChildBreak.html")));
-    	
+
     	assertEquals(expected.trim(), actual.trim());
     }
-    
+
     public void testBalancing() throws XPatherException, IOException {
         assertHtml(
                 "<u>aa<i>a<b>at</u> fi</i>rst</b> text",

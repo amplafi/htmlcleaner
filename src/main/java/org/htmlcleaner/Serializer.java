@@ -105,7 +105,7 @@ public abstract class Serializer {
      * @throws IOException
      */
     public void writeToStream(TagNode tagNode, OutputStream out, boolean omitEnvelope) throws IOException {
-         writeToStream( tagNode, out, CleanerProperties.DEFAULT_CHARSET, omitEnvelope );
+         writeToStream( tagNode, out, props.getCharset(), omitEnvelope );
     }
 
     /**
@@ -151,7 +151,7 @@ public abstract class Serializer {
      * @throws IOException
      */
     public void writeToFile(TagNode tagNode, String fileName, boolean omitEnvelope) throws IOException {
-        writeToFile(tagNode,fileName, CleanerProperties.DEFAULT_CHARSET, omitEnvelope);
+        writeToFile(tagNode,fileName, props.getCharset(), omitEnvelope);
     }
 
     /**
@@ -197,7 +197,7 @@ public abstract class Serializer {
      * @throws IOException
      */
     public String getAsString(TagNode tagNode, boolean omitEnvelope) {
-        return getAsString(tagNode, CleanerProperties.DEFAULT_CHARSET, omitEnvelope);
+        return getAsString(tagNode, props.getCharset(), omitEnvelope);
     }
 
     /**
@@ -209,10 +209,10 @@ public abstract class Serializer {
         return getAsString(tagNode, false);
     }
 
-    public String getXmlAsString(String htmlContent, String charset) {
+    public String getAsString(String htmlContent) {
         HtmlCleaner htmlCleaner = new HtmlCleaner(this.props);
         TagNode tagNode = htmlCleaner.clean(htmlContent);
-        return getAsString(tagNode, charset==null||charset.length()==0?props.getCharset():charset);
+        return getAsString(tagNode, props.getCharset());
     }
 
 

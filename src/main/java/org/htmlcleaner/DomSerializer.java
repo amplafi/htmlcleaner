@@ -45,7 +45,7 @@ public class DomSerializer {
     }
     /**
      * encapsulate content with <[CDATA[ ]]> for things like script and style elements
-     * @param tagNode
+     * @param element
      * @return true if <[CDATA[ ]]> should be used.
      */
     protected boolean dontEscape(Element element) {
@@ -55,9 +55,7 @@ public class DomSerializer {
     }
     private void createSubnodes(Document document, Element element, List tagChildren) {
         if (tagChildren != null) {
-            Iterator it = tagChildren.iterator();
-            while (it.hasNext()) {
-                Object item = it.next();
+            for(Object item : tagChildren) {
                 if (item instanceof CommentNode) {
                     CommentNode commentNode = (CommentNode) item;
                     Comment comment = document.createComment( commentNode.getContent() );

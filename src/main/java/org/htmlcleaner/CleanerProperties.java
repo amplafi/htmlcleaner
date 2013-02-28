@@ -82,7 +82,7 @@ public class CleanerProperties implements HtmlModificationListener{
     private boolean allowHtmlInsideAttributes;
     private boolean namespacesAware;
     private boolean transSpecialEntitiesToNCR;
-    
+
     /**
      * "cause the cleaner cannot keep track of whitespace at that level",
      * there are 2 lists built: one for the head , one for the body. So whitespace that falls outside of the head and body is not preserved
@@ -113,7 +113,7 @@ public class CleanerProperties implements HtmlModificationListener{
      * the list of allowed tags (whitelist approach v. blacklist approach of pruneTags )
      */
     private Set<ITagNodeCondition> allowTagSet = new HashSet<ITagNodeCondition>();
-    private String charset;
+    private String charset = DEFAULT_CHARSET;
     private boolean transResCharsToNCR;
 
     public CleanerProperties() {
@@ -357,7 +357,7 @@ public class CleanerProperties implements HtmlModificationListener{
         allowTagSet.clear();
         addTagNameConditions(allowTagSet, allowTags);
     }
-    
+
 
     public boolean isTransSpecialEntitiesToNCR() {
         return transSpecialEntitiesToNCR;
