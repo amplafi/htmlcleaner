@@ -84,7 +84,7 @@ public class TagNode extends TagToken implements HtmlNode {
      */
     private boolean pruned;
 
-	public TagNode(String name) {
+    public TagNode(String name) {
         super(name == null ? null : name.toLowerCase());
     }
 
@@ -93,21 +93,23 @@ public class TagNode extends TagToken implements HtmlNode {
      * @return Value of the specified attribute, or null if it this tag doesn't contain it.
      */
     public String getAttributeByName(String attName) {
-		return attName != null ? (String) attributes.get(attName.toLowerCase()) : null;
-	}
+        return attName != null ? (String) attributes.get(attName.toLowerCase()) : null;
+    }
 
     /**
      * @return Map instance containing all attribute name/value pairs.
      */
     public Map<String, String> getAttributes() {
-		return attributes;
-	}
+        return attributes;
+    }
 
     public void setAttributes(Map<String, String> attributes) {
-        this.attributes= attributes;
+        this.attributes = attributes;
     }
+
     /**
      * Checks existence of specified attribute.
+     *
      * @param attName
      * @return true if TagNode has attribute
      */
@@ -117,43 +119,47 @@ public class TagNode extends TagToken implements HtmlNode {
 
     /**
      * Adds specified attribute to this tag or overrides existing one.
+     *
      * @param attName
      * @param attValue
      */
     @Override
     public void addAttribute(String attName, String attValue) {
-        if ( attName != null ) {
+        if (attName != null) {
             String trim = attName.trim().toLowerCase();
-            String value = attValue == null?"":attValue.trim().replaceAll("\\p{Cntrl}", " ");
-            if ( trim.length() != 0 ) {
-                attributes.put(trim, value );
+            String value = attValue == null ? "" : attValue.trim().replaceAll("\\p{Cntrl}", " ");
+            if (trim.length() != 0) {
+                attributes.put(trim, value);
             }
         }
     }
 
     /**
      * Removes specified attribute from this tag.
+     *
      * @param attName
      */
     public void removeAttribute(String attName) {
-        if ( attName != null && !"".equals(attName.trim()) ) {
-            attributes.remove( attName.toLowerCase() );
+        if (attName != null && !"".equals(attName.trim())) {
+            attributes.remove(attName.toLowerCase());
         }
     }
 
     /**
      * @return List of child TagNode objects.
-     * @deprecated use {@link TagNode#getChildTagList()}, will be refactored and possibly removed in future versions.
-     * TODO This method should be refactored because is does not properly match the commonly used Java's getter/setter strategy.
+     * @deprecated use {@link TagNode#getChildTagList()}, will be refactored and possibly removed in
+     *             future versions. TODO This method should be refactored because is does not
+     *             properly match the commonly used Java's getter/setter strategy.
      */
+    @Deprecated
     public List<TagNode> getChildren() {
-		return getChildTagList();
-	}
+        return getChildTagList();
+    }
 
     void setChildren(List children) {
         this.children = children;
     }
-    
+
     public List getAllChildren() {
         return children;
     }
@@ -163,21 +169,20 @@ public class TagNode extends TagToken implements HtmlNode {
      */
     public List<TagNode> getChildTagList() {
         List<TagNode> childTagList = new ArrayList<TagNode>();
-        for (int i = 0; i < children.size(); i++) {
-            Object item = children.get(i);
+        for (Object item: children) {
             if (item instanceof TagNode) {
-                childTagList.add((TagNode)item);
+                childTagList.add((TagNode) item);
             }
         }
 
         return childTagList;
     }
-    
+
     /**
      * @return Whether this node has child elements or not.
      */
     public boolean hasChildren() {
-        return children.size() > 0;
+        return !children.isEmpty();
     }
 
     /**
@@ -197,27 +202,27 @@ public class TagNode extends TagToken implements HtmlNode {
      * @return Text content of this node and it's subelements.
      */
     public CharSequence getText() {
-        StringBuffer text = new StringBuffer();
-        for (int i = 0; i < children.size(); i++) {
-            Object item = children.get(i);
+        StringBuilder text = new StringBuilder();
+        for (Object item :children) {
             if (item instanceof ContentNode) {
-                text.append( ((ContentNode)item).getContent() );
+                text.append(((ContentNode) item).getContent());
             } else if (item instanceof TagNode) {
-                CharSequence subtext = ((TagNode)item).getText();
+                CharSequence subtext = ((TagNode) item).getText();
                 text.append(subtext);
             }
         }
 
         return text;
     }
-    
+
     /**
      * @param child Child to find index of
-     * @return Index of the specified child node inside this node's children, -1 if node is not the child 
+     * @return Index of the specified child node inside this node's children, -1 if node is not the
+     *         child
      */
     public int getChildIndex(HtmlNode child) {
         int index = 0;
-        for (Object curr: children) {
+        for (Object curr : children) {
             if (curr == child) {
                 return index;
             }
@@ -225,9 +230,10 @@ public class TagNode extends TagToken implements HtmlNode {
         }
         return -1;
     }
-    
+
     /**
-     * Inserts specified node at specified position in array of children  
+     * Inserts specified node at specified position in array of children
+     *
      * @param index
      * @param childToAdd
      */
@@ -237,6 +243,7 @@ public class TagNode extends TagToken implements HtmlNode {
 
     /**
      * Inserts specified node in the list of children before specified child
+     *
      * @param node Child before which to insert new node
      * @param nodeToInsert Node to be inserted at specified position
      */
@@ -249,6 +256,7 @@ public class TagNode extends TagToken implements HtmlNode {
 
     /**
      * Inserts specified node in the list of children after specified child
+     *
      * @param node Child after which to insert new node
      * @param nodeToInsert Node to be inserted at specified position
      */
@@ -263,8 +271,8 @@ public class TagNode extends TagToken implements HtmlNode {
      * @return Parent of this node, or null if this is the root node.
      */
     public TagNode getParent() {
-		return parent;
-	}
+        return parent;
+    }
 
     public DoctypeToken getDocType() {
         return docType;
@@ -279,13 +287,13 @@ public class TagNode extends TagToken implements HtmlNode {
             return;
         }
         if (child instanceof List) {
-            addChildren( (List)child );
+            addChildren((List) child);
         } else if (child instanceof ProxyTagNode) {
-        	children.add( ((ProxyTagNode)child).getToken() );
+            children.add(((ProxyTagNode) child).getToken());
         } else {
             children.add(child);
             if (child instanceof TagNode) {
-                TagNode childTagNode = (TagNode)child;
+                TagNode childTagNode = (TagNode) child;
                 childTagNode.parent = this;
             }
         }
@@ -293,49 +301,46 @@ public class TagNode extends TagToken implements HtmlNode {
 
     /**
      * Add all elements from specified list to this node.
+     *
      * @param newChildren
      */
     public void addChildren(List newChildren) {
-    	if (newChildren != null) {
-    		Iterator it = newChildren.iterator();
-    		while (it.hasNext()) {
-    			Object child = it.next();
-    			addChild(child);
-    		}
-    	}
+        if (newChildren != null) {
+            for (Object child: newChildren) {
+                addChild(child);
+            }
+        }
     }
 
     /**
      * Finds first element in the tree that satisfy specified condition.
+     *
      * @param condition
      * @param isRecursive
      * @return First TagNode found, or null if no such elements.
      */
     private TagNode findElement(ITagNodeCondition condition, boolean isRecursive) {
-        if (condition == null) {
-            return null;
-        }
-
-        for (int i = 0; i < children.size(); i++) {
-            Object item = children.get(i);
-            if (item instanceof TagNode) {
-                TagNode currNode = (TagNode) item;
-                if ( condition.satisfy(currNode) ) {
-                    return currNode;
-                } else if (isRecursive) {
-                    TagNode inner = currNode.findElement(condition, isRecursive);
-                    if (inner != null) {
-                        return inner;
+        if (condition != null) {
+            for (Object item : children) {
+                if (item instanceof TagNode) {
+                    TagNode currNode = (TagNode) item;
+                    if (condition.satisfy(currNode)) {
+                        return currNode;
+                    } else if (isRecursive) {
+                        TagNode inner = currNode.findElement(condition, isRecursive);
+                        if (inner != null) {
+                            return inner;
+                        }
                     }
                 }
             }
         }
-
         return null;
     }
 
     /**
      * Get all elements in the tree that satisfy specified condition.
+     *
      * @param condition
      * @param isRecursive
      * @return List of TagNode instances with specified name.
@@ -346,11 +351,10 @@ public class TagNode extends TagToken implements HtmlNode {
             return result;
         }
 
-        for (int i = 0; i < children.size(); i++) {
-            Object item = children.get(i);
+        for (Object item : children) {
             if (item instanceof TagNode) {
                 TagNode currNode = (TagNode) item;
-                if ( condition.satisfy(currNode) ) {
+                if (condition.satisfy(currNode)) {
                     result.add(currNode);
                 }
                 if (isRecursive) {
@@ -373,57 +377,56 @@ public class TagNode extends TagToken implements HtmlNode {
     private TagNode[] getElements(ITagNodeCondition condition, boolean isRecursive) {
         final List list = getElementList(condition, isRecursive);
         TagNode array[];
-        if ( list == null ) {
-            array = new TagNode[ 0 ];
+        if (list == null) {
+            array = new TagNode[0];
         } else {
-            array = (TagNode[]) list.toArray(new TagNode[ list.size() ]);
+            array = (TagNode[]) list.toArray(new TagNode[list.size()]);
         }
         return array;
     }
 
-
     public List getAllElementsList(boolean isRecursive) {
-        return getElementList( new TagAllCondition(), isRecursive );
+        return getElementList(new TagAllCondition(), isRecursive);
     }
 
     public TagNode[] getAllElements(boolean isRecursive) {
-        return getElements( new TagAllCondition(), isRecursive );
+        return getElements(new TagAllCondition(), isRecursive);
     }
 
     public TagNode findElementByName(String findName, boolean isRecursive) {
-        return findElement( new TagNodeNameCondition(findName), isRecursive );
+        return findElement(new TagNodeNameCondition(findName), isRecursive);
     }
 
     public List getElementListByName(String findName, boolean isRecursive) {
-        return getElementList( new TagNodeNameCondition(findName), isRecursive );
+        return getElementList(new TagNodeNameCondition(findName), isRecursive);
     }
 
     public TagNode[] getElementsByName(String findName, boolean isRecursive) {
-        return getElements( new TagNodeNameCondition(findName), isRecursive );
+        return getElements(new TagNodeNameCondition(findName), isRecursive);
     }
 
     public TagNode findElementHavingAttribute(String attName, boolean isRecursive) {
-        return findElement( new TagNodeAttExistsCondition(attName), isRecursive );
+        return findElement(new TagNodeAttExistsCondition(attName), isRecursive);
     }
 
     public List getElementListHavingAttribute(String attName, boolean isRecursive) {
-        return getElementList( new TagNodeAttExistsCondition(attName), isRecursive );
+        return getElementList(new TagNodeAttExistsCondition(attName), isRecursive);
     }
 
     public TagNode[] getElementsHavingAttribute(String attName, boolean isRecursive) {
-        return getElements( new TagNodeAttExistsCondition(attName), isRecursive );
+        return getElements(new TagNodeAttExistsCondition(attName), isRecursive);
     }
 
     public TagNode findElementByAttValue(String attName, String attValue, boolean isRecursive, boolean isCaseSensitive) {
-        return findElement( new TagNodeAttValueCondition(attName, attValue, isCaseSensitive), isRecursive );
+        return findElement(new TagNodeAttValueCondition(attName, attValue, isCaseSensitive), isRecursive);
     }
 
     public List getElementListByAttValue(String attName, String attValue, boolean isRecursive, boolean isCaseSensitive) {
-        return getElementList( new TagNodeAttValueCondition(attName, attValue, isCaseSensitive), isRecursive );
+        return getElementList(new TagNodeAttValueCondition(attName, attValue, isCaseSensitive), isRecursive);
     }
 
     public TagNode[] getElementsByAttValue(String attName, String attValue, boolean isRecursive, boolean isCaseSensitive) {
-        return getElements( new TagNodeAttValueCondition(attName, attValue, isCaseSensitive), isRecursive );
+        return getElements(new TagNodeAttValueCondition(attName, attValue, isCaseSensitive), isRecursive);
     }
 
     /**
@@ -431,8 +434,7 @@ public class TagNode extends TagToken implements HtmlNode {
      * <em>
      *  This is not fully supported XPath parser and evaluator.
      *  Examples below show supported elements:
-     * </em>
-     * <code>
+     * </em> <code>
      * <ul>
      *      <li>//div//a</li>
      *      <li>//div//a[@id][@class]</li>
@@ -446,6 +448,7 @@ public class TagNode extends TagToken implements HtmlNode {
      *      <li>data(//a['v' < @id])</li>
      * </ul>
      * </code>
+     *
      * @param xPathExpression
      * @return result of XPather evaluation.
      * @throws XPatherException
@@ -456,6 +459,7 @@ public class TagNode extends TagToken implements HtmlNode {
 
     /**
      * Remove this node from the tree.
+     *
      * @return True if element is removed (if it is not root node).
      */
     public boolean removeFromTree() {
@@ -464,13 +468,14 @@ public class TagNode extends TagToken implements HtmlNode {
 
     /**
      * Remove specified child element from this node.
+     *
      * @param child
      * @return True if child object existed in the children list.
      */
     public boolean removeChild(Object child) {
         return this.children.remove(child);
     }
-    
+
     /**
      * Removes all children (subelements and text content).
      */
@@ -479,32 +484,32 @@ public class TagNode extends TagToken implements HtmlNode {
     }
 
     void addItemForMoving(Object item) {
-    	if (itemsToMove == null) {
-    		itemsToMove = new ArrayList();
-    	}
+        if (itemsToMove == null) {
+            itemsToMove = new ArrayList();
+        }
 
-    	itemsToMove.add(item);
+        itemsToMove.add(item);
     }
 
     List getItemsToMove() {
-		return itemsToMove;
-	}
+        return itemsToMove;
+    }
 
     void setItemsToMove(List itemsToMove) {
         this.itemsToMove = itemsToMove;
     }
 
-	boolean isFormed() {
-		return isFormed;
-	}
+    boolean isFormed() {
+        return isFormed;
+    }
 
-	void setFormed(boolean isFormed) {
-		this.isFormed = isFormed;
-	}
+    void setFormed(boolean isFormed) {
+        this.isFormed = isFormed;
+    }
 
-	void setFormed() {
-		setFormed(true);
-	}
+    void setFormed() {
+        setFormed(true);
+    }
 
     /**
      * @param autoGenerated the autoGenerated to set
@@ -524,25 +529,25 @@ public class TagNode extends TagToken implements HtmlNode {
      * @return true, if node was marked to be pruned.
      */
     public boolean isPruned() {
-		return pruned;
-	}
+        return pruned;
+    }
 
-	public void setPruned(boolean pruned) {
-		this.pruned = pruned;
-	}
+    public void setPruned(boolean pruned) {
+        this.pruned = pruned;
+    }
 
     public boolean isEmpty() {
-        if ( !isPruned()) {
-            for(Object child: this.children) {
-                if(child instanceof TagNode) {
-                    if (!((TagNode)child).isPruned()) {
+        if (!isPruned()) {
+            for (Object child : this.children) {
+                if (child instanceof TagNode) {
+                    if (!((TagNode) child).isPruned()) {
                         return false;
                     }
-                } else if( child instanceof ContentNode ) {
-                    if ( !((ContentNode)child).isBlank()) {
+                } else if (child instanceof ContentNode) {
+                    if (!((ContentNode) child).isBlank()) {
                         return false;
                     }
-                } else if ( child instanceof CommentNode) {
+                } else if (child instanceof CommentNode) {
                     // ideally could be discarded - however standard practice is to include browser specific commands in comments. :-(
                     return false;
                 } else {
@@ -552,9 +557,10 @@ public class TagNode extends TagToken implements HtmlNode {
         }
         return true;
     }
-    
+
     /**
      * Adds namespace declaration to the node
+     *
      * @param nsPrefix Namespace prefix
      * @param nsURI Namespace URI
      */
@@ -564,15 +570,17 @@ public class TagNode extends TagToken implements HtmlNode {
         }
         nsDeclarations.put(nsPrefix, nsURI);
     }
-    
+
     /**
-     * Collect all prefixes in namespace declarations up the path to the document root from the specified node
+     * Collect all prefixes in namespace declarations up the path to the document root from the
+     * specified node
+     *
      * @param prefixes Set of prefixes to be collected
      */
     void collectNamespacePrefixesOnPath(Set<String> prefixes) {
         Map<String, String> nsDeclarations = getNamespaceDeclarations();
         if (nsDeclarations != null) {
-            for (String prefix: nsDeclarations.keySet()) {
+            for (String prefix : nsDeclarations.keySet()) {
                 prefixes.add(prefix);
             }
         }
@@ -583,9 +591,9 @@ public class TagNode extends TagToken implements HtmlNode {
 
     String getNamespaceURIOnPath(String nsPrefix) {
         if (nsDeclarations != null) {
-            for (Map.Entry<String, String> nsEntry: nsDeclarations.entrySet()) {
+            for (Map.Entry<String, String> nsEntry : nsDeclarations.entrySet()) {
                 String currName = nsEntry.getKey();
-                if ( currName.equals(nsPrefix) || ("".equals(currName) && nsPrefix == null) ) {
+                if (currName.equals(nsPrefix) || ("".equals(currName) && nsPrefix == null)) {
                     return nsEntry.getValue();
                 }
             }
@@ -609,20 +617,20 @@ public class TagNode extends TagToken implements HtmlNode {
     }
 
     public TagNode makeCopy() {
-    	TagNode copy = new TagNode(name);
+        TagNode copy = new TagNode(name);
         copy.attributes.putAll(attributes);
-    	return copy;
+        return copy;
     }
-    
+
     /**
-     * Traverses the tree and performs visitor's action on each node. It stops when it
-     * finishes all the tree or when visitor returns false.
+     * Traverses the tree and performs visitor's action on each node. It stops when it finishes all
+     * the tree or when visitor returns false.
+     *
      * @param visitor TagNodeVisitor implementation
      */
     public void traverse(TagNodeVisitor visitor) {
         traverseInternally(visitor);
     }
-
 
     private boolean traverseInternally(TagNodeVisitor visitor) {
         if (visitor != null) {
@@ -634,13 +642,13 @@ public class TagNode extends TagToken implements HtmlNode {
             } else if (hasParent && parent == null) {
                 return true; // if this node is pruned from the tree during the visit, then don't go deeper
             }
-            for (Object child: children.toArray()) {  // make an array to avoid ConcurrentModificationException when some node is cut 
+            for (Object child : children.toArray()) { // make an array to avoid ConcurrentModificationException when some node is cut
                 if (child instanceof TagNode) {
-                    toContinue = ((TagNode)child).traverseInternally(visitor);
+                    toContinue = ((TagNode) child).traverseInternally(visitor);
                 } else if (child instanceof ContentNode) {
-                    toContinue = visitor.visit(this, (ContentNode)child);
+                    toContinue = visitor.visit(this, (ContentNode) child);
                 } else if (child instanceof CommentNode) {
-                    toContinue = visitor.visit(this, (CommentNode)child);
+                    toContinue = visitor.visit(this, (CommentNode) child);
                 }
                 if (!toContinue) {
                     return false;
