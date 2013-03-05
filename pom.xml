@@ -159,6 +159,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.4</version>
+                <!-- required signing jars even when doing just development mvn install. I tried putting the phase as deploy but that was unsuccessful ( I didn't try really hard though )
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
@@ -168,6 +169,7 @@
                         </goals>
                     </execution>
                 </executions>
+                 -->
             </plugin>
         </plugins>
         <extensions>
@@ -186,16 +188,17 @@
     
     <!-- For publishing on Sonatype -->
     <parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-	</parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+    <!-- https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide#SonatypeOSSMavenRepositoryUsageGuide-6.CentralSyncRequirement 
+      they don't want repositories listed in poms
     <pluginRepositories>
-		<pluginRepository>
-			<id>oss-sonatype-snapshots</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-		</pluginRepository>
-	</pluginRepositories>
-
-
+        <pluginRepository>
+            <id>oss-sonatype-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </pluginRepository>
+    </pluginRepositories>
+    -->
 </project>

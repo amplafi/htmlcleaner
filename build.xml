@@ -1,37 +1,65 @@
-<project name="HtmlCleaner" default="build" basedir=".">
+<project name="HtmlCleaner" default="deploy-to-mvnrepo" basedir=".">
+    <description>HtmlCleaner</description>
+    <property name="version" value="2.4"/>
 
-	<description>HtmlCleaner</description>
-
-	<property name="version" value="2_2_1"/>
-	<property name="dir.src" value="src/main/java"/>
+    <!-- override if you a poor windows user -->
+    <!-- probably should be done within maven using ant-run -->
+    <property name="mvn" value="mvn"/>
+    <target name="deploy-to-mvnrepo">
+        <copy file="pom.xml" tofile="target/htmlcleaner-${version}.pom"></copy>
+        <antcall target="_deploy-to-mvnrepository">
+            <param name="_file" value="target/htmlcleaner-${version}.jar"/>
+            <param name="_classifier" value=""/>
+        </antcall>
+        <antcall target="_deploy-to-mvnrepository">
+            <param name="_file" value="target/htmlcleaner-javadoc-${version}.jar"/>
+            <param name="_classifier" value="-Dclassifier=javadoc"/>
+        </antcall>
+        <antcall target="_deploy-to-mvnrepository">
+            <param name="_file" value="target/htmlcleaner-sources-${version}.jar"/>
+            <param name="_classifier" value="-Dclassifier=sources"/>
+        </antcall>
+    </target>
+    <target name="_deploy-to-mvnrepository">
+        <exec executable="${mvn}">
+            <arg value="gpg:sign-and-deploy-file"/>
+            <arg value="-Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/"/>
+            <arg value="-DrepositoryId=sonatype-nexus-staging"/>
+            <arg value="-DpomFile=target/htmlcleaner-${version}.pom"/>
+            <arg value="-Dfile=${_file}"/>            
+            <arg value="${_classifier}"/>           
+        </exec>
+    </target>
+    <!-- everything below is old and probably broken/not used since project shifted to start using maven for building -->
+    <property name="dir.src" value="src/main/java"/>
     <property name="dir.lib" value="lib"/>
     <property name="dir.doc" value="doc"/>
     <property name="dir.dist" value="dist"/>
     <property name="dir.zip" value="zip"/>
-	<property name="jarfile" value="htmlcleaner${version}.jar"/>
+    <property name="jarfile" value="htmlcleaner${version}.jar"/>
 
-	<!-- classpath -->
-	<path id="classpath.compile">
-		<pathelement location="${dir.lib}/ant.jar"/>
-		<pathelement location="${dir.lib}/jdom.jar"/>
-	</path>
+    <!-- classpath -->
+    <path id="classpath.compile">
+        <pathelement location="${dir.lib}/ant.jar"/>
+        <pathelement location="${dir.lib}/jdom.jar"/>
+    </path>
 
     <!--  sources targets -->
-	<target name="build" description="compilation of source files">
-		<mkdir dir="${dir.dist}"/>
-		<javac srcdir="${dir.src}" destdir="${dir.dist}" listfiles="on" source="1.5" target="1.5">
-			<classpath refid="classpath.compile"/>
-		</javac>
+    <target name="build" description="compilation of source files">
+        <mkdir dir="${dir.dist}"/>
+        <javac srcdir="${dir.src}" destdir="${dir.dist}" listfiles="on" source="1.5" target="1.5">
+            <classpath refid="classpath.compile"/>
+        </javac>
     </target>
 
-	<!--  creates jar library -->
-	<target name="jar" depends="build" description="creates jar library">
-		<jar destfile="${jarfile}" basedir="${dir.dist}" manifest="config/MANIFEST.MF"/>
+    <!--  creates jar library -->
+    <target name="jar" depends="build" description="creates jar library">
+        <jar destfile="${jarfile}" basedir="${dir.dist}" manifest="config/MANIFEST.MF"/>
     </target>
 
-	<!--  delete distribution folders -->
-	<target name="clean" description="cleans distribution">
-		<delete file="${jarfile}"/>
+    <!--  delete distribution folders -->
+    <target name="clean" description="cleans distribution">
+        <delete file="${jarfile}"/>
         <delete dir="${dir.dist}"/>
         <delete dir="${dir.zip}"/>
         <delete dir="${dir.doc}"/>
