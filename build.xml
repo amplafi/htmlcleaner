@@ -1,10 +1,31 @@
-<project name="HtmlCleaner" default="deploy-to-mvnrepo" basedir=".">
+<project name="HtmlCleaner" default="prepare-for-mvn-repo-deploy" basedir=".">
     <description>HtmlCleaner</description>
     <property name="version" value="2.4"/>
 
     <!-- override if you a poor windows user -->
     <!-- probably should be done within maven using ant-run -->
     <property name="mvn" value="mvn"/>
+    <target name="prepare-for-mvn-repo-deploy" description="it works">
+        <!-- do "mvn clean install package gpg:sign"  manually so you can enter passphrase
+        <exec executable="${mvn}">
+            <arg value="clean"/>
+            <arg value="install"/>
+            <arg value="package"/>
+            <arg value="gpg:sign"/>
+        </exec>
+        -->
+        <copy file="pom.xml" tofile="target/htmlcleaner-${version}.pom"></copy>
+        <jar destfile="htmlcleaner-${version}-bundle.jar" basedir="target">
+            <include name="htmlcleaner-${version}.pom"/>
+            <include name="htmlcleaner-${version}.pom.asc"/>
+            <include name="htmlcleaner-${version}.jar"/>
+            <include name="htmlcleaner-${version}.jar.asc"/>
+            <include name="htmlcleaner-${version}-sources.jar"/>
+            <include name="htmlcleaner-${version}-sources.jar.asc"/>
+            <include name="htmlcleaner-${version}-javadoc.jar"/>
+            <include name="htmlcleaner-${version}-javadoc.jar.asc"/>
+        </jar>
+    </target>
     <target name="deploy-to-mvnrepo">
         <copy file="pom.xml" tofile="target/htmlcleaner-${version}.pom"></copy>
         <antcall target="_deploy-to-mvnrepository">
