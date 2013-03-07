@@ -5,3 +5,5 @@
 /.project
 /test-output
 pom.xml.versionsBackup
+*.swp
+*.jar
