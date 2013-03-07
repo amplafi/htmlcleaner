@@ -154,6 +154,22 @@
                     </execution>
                   </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.4</version>
+                <!-- required signing jars even when doing just development mvn install. I tried putting the phase as deploy but that was unsuccessful ( I didn't try really hard though )
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                 -->
+            </plugin>
         </plugins>
         <extensions>
             <extension>
@@ -166,7 +182,6 @@
                 <artifactId>wagon-ftp</artifactId>
                 <version>${wagon-build}</version>
             </extension>
-            <!-- sftp patmoore,amplafi-flow@web.sourceforge.net <extension> <groupId>org.apache.maven.wagon</groupId> <artifactId>wagon-sftp</artifactId> <version>${wagon-build}</version> </extension> -->
         </extensions>
     </build>
     <distributionManagement>
