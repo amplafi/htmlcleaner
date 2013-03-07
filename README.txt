@@ -1,3 +1,14 @@
+
+
+NOTE: This fork of htmlcleaner is now merged back into the http://htmlcleaner.sourceforge.net/ project as of version 2.4
+
+2.4 is officially released!
+
+This fork is kept only to help with patch submission to the official version.
+
+==========================================================================
+
+
 * omitHtmlEnvelope behavior change:
  * output all the html contained in the body not just first TagNode contents. ( useful for cleaning html fragments )  ( creates a new blank TagNode to hold the nodes to be outputed
  * omitHtmlEnvelope also triggers omitDoctype
