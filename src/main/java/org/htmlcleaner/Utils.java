@@ -39,8 +39,6 @@ package org.htmlcleaner;
 
 import java.io.*;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,66 +51,17 @@ import java.util.regex.Pattern;
  */
 public class Utils {
 
-    public static final Map<Character, String> RESERVED_XML_CHARS = new HashMap<Character, String>();
-
-    static {
-        RESERVED_XML_CHARS.put('&', "&amp;");
-        RESERVED_XML_CHARS.put('<', "&lt;");
-        RESERVED_XML_CHARS.put('>', "&gt;");
-        RESERVED_XML_CHARS.put('\"', "&quot;");
-        RESERVED_XML_CHARS.put('\'', "&apos;");
-    }
-    
-    /**
-     * Trims specified string from left.
-     * @param s
-     */
-    public static String ltrim(String s) {
-        if (s == null) {
-            return null;
-        }
-
-        int index = 0;
-        int len = s.length();
-
-        while ( index < len && Character.isWhitespace(s.charAt(index)) ) {
-            index++;
-        }
-
-        return (index >= len) ? "" : s.substring(index);
-    }
-
-    /**
-     * Trims specified string from right.
-     * @param s
-     */
-    public static String rtrim(String s) {
-        if (s == null) {
-            return null;
-        }
-
-        int len = s.length();
-        int index = len;
-
-        while ( index > 0 && Character.isWhitespace(s.charAt(index-1)) ) {
-            index--;
-        }
-
-        return (index <= 0) ? "" : s.substring(0, index);
-    }
-
     /**
      * Reads content from the specified URL with specified charset into string
      * @param url
      * @param charset
      * @throws IOException
      */
-    public static StringBuffer readUrl(URL url, String charset) throws IOException {
-        StringBuffer buffer = new StringBuffer(1024);
-
-        Object content = url.getContent();
-        if (content instanceof InputStream) {
-            InputStreamReader reader = new InputStreamReader((InputStream)content, charset);
+    static CharSequence readUrl(URL url, String charset) throws IOException {
+        StringBuilder buffer = new StringBuilder(1024);
+        InputStream inputStream = url.openStream();
+        try {
+            InputStreamReader reader = new InputStreamReader(inputStream, charset);
             char[] charArray = new char[1024];
 
             int charsRead = 0;
@@ -122,6 +71,8 @@ public class Utils {
                     buffer.append(charArray, 0, charsRead);
                 }
             } while (charsRead > 0);
+        } finally {
+            inputStream.close();
         }
 
         return buffer;
@@ -158,7 +109,7 @@ public class Utils {
                                    boolean isDomCreation, boolean transResCharsToNCR, boolean translateSpecialEntitiesToNCR) {
         if (s != null) {
     		int len = s.length();
-    		StringBuffer result = new StringBuffer(len);
+    		StringBuilder result = new StringBuilder(len);
 
     		for (int i = 0; i < len; i++) {
     			char ch = s.charAt(i);
@@ -218,7 +169,7 @@ public class Utils {
      * @param i
      * @return
      */
-    public static int convertToUnicode(String s, boolean domCreation, boolean recognizeUnicodeChars, boolean translateSpecialEntitiesToNCR, StringBuffer result, int i) {
+    private static int convertToUnicode(String s, boolean domCreation, boolean recognizeUnicodeChars, boolean translateSpecialEntitiesToNCR, StringBuilder result, int i) {
         StringBuilder unicode = new StringBuilder();
         int charIndex = extractCharCode(s, i, true, unicode);
         if (unicode.length() > 0) {
@@ -278,7 +229,7 @@ public class Utils {
      * @param unicode
      * @return the index to continue scanning the source string -1 so normal loop incrementing skips the ';'
      */
-    public static int extractCharCode(String s, int charIndex, boolean relaxedUnicode, StringBuilder unicode) {
+    private static int extractCharCode(String s, int charIndex, boolean relaxedUnicode, StringBuilder unicode) {
         int len = s.length();
         CharSequence subSequence = s.subSequence(charIndex, Math.min(len,charIndex+15));
         Matcher matcher;
@@ -296,18 +247,6 @@ public class Utils {
         return charIndex;
     }
 
-    /**
-     * Checks whether specified object's string representation is empty string (containing of only whitespaces).
-     * @param object Object whose string representation is checked
-     * @return true, if empty string, false otherwise
-     */
-    public static boolean isWhitespaceString(Object object) {
-        if (object != null) {
-            String s = object.toString();
-            return s != null && "".equals(s.trim());
-        }
-        return false;
-    }
 
     /**
      * Checks if specified character can be part of xml identifier (tag name of attribute name)
@@ -372,7 +311,7 @@ public class Utils {
 
         return result;
     }
-    
+
     /**
      * @param name
      * @return For xml element name or attribute name returns prefix (part before :) or null if there is no prefix
@@ -385,7 +324,7 @@ public class Utils {
 
         return null;
     }
-    
+
     /**
      * @param name
      * @return For xml element name or attribute name returns name after prefix (part after :)
@@ -399,7 +338,7 @@ public class Utils {
         return name;
     }
     
-    public static boolean isValidInt(String s, int radix) {
+    static boolean isValidInt(String s, int radix) {
         try {
             Integer.parseInt(s, radix);
             return true;
@@ -408,7 +347,7 @@ public class Utils {
         }
     }
     
-    public static boolean isValidXmlChar(char ch) {
+    static boolean isValidXmlChar(char ch) {
         return ((ch >= 0x20) && (ch <= 0xD7FF)) ||
                (ch == 0x9) ||
                (ch == 0xA) ||
@@ -417,7 +356,4 @@ public class Utils {
                ((ch >= 0x10000) && (ch <= 0x10FFFF));
     }
     
-    public static boolean isReservedXmlChar(char ch) {
-        return RESERVED_XML_CHARS.containsKey(ch);
-    }
 }

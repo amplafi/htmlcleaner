@@ -65,7 +65,7 @@ public class CompactXmlSerializer extends XmlSerializer {
                         writer.write( dontEscape(tagNode) ? content.replaceAll("]]>", "]]&gt;") : escapeXml(content) );
 
                         if (childrenIt.hasNext()) {
-                            if ( !Utils.isWhitespaceString(childrenIt.next()) ) {
+                            if ( !isWhitespaceString(childrenIt.next()) ) {
                                 writer.write("\n");
                             }
                             childrenIt.previous();
@@ -83,4 +83,16 @@ public class CompactXmlSerializer extends XmlSerializer {
         }
 	}
 
+    /**
+     * Checks whether specified object's string representation is empty string (containing of only whitespaces).
+     * @param object Object whose string representation is checked
+     * @return true, if empty string, false otherwise
+     */
+    private boolean isWhitespaceString(Object object) {
+        if (object != null) {
+            String s = object.toString();
+            return s != null && "".equals(s.trim());
+        }
+        return false;
+    }
 }

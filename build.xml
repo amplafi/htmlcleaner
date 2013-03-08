@@ -15,7 +15,7 @@
         </exec>
         -->
         <copy file="pom.xml" tofile="target/htmlcleaner-${version}.pom"></copy>
-        <jar destfile="htmlcleaner-${version}-bundle.jar" basedir="target">
+        <jar destfile="target/htmlcleaner-${version}-bundle.jar" basedir="target">
             <include name="htmlcleaner-${version}.pom"/>
             <include name="htmlcleaner-${version}.pom.asc"/>
             <include name="htmlcleaner-${version}.jar"/>

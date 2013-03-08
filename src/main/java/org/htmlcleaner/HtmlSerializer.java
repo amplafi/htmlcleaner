@@ -45,6 +45,23 @@ import java.util.*;
  */
 public abstract class HtmlSerializer extends Serializer {
 
+    // Begin Deprecated note: I think that SpecialEntities and SpecialEntity classes handle this.
+    private static final Map<Character, String> RESERVED_XML_CHARS = new HashMap<Character, String>();
+
+    static {
+        RESERVED_XML_CHARS.put('&', "&amp;");
+        RESERVED_XML_CHARS.put('<', "&lt;");
+        RESERVED_XML_CHARS.put('>', "&gt;");
+        RESERVED_XML_CHARS.put('\"', "&quot;");
+        RESERVED_XML_CHARS.put('\'', "&apos;");
+    }
+
+    @Deprecated
+    private boolean isReservedXmlChar(char ch) {
+        return RESERVED_XML_CHARS.containsKey(ch);
+    }
+    // End Deprecated
+
     protected HtmlSerializer(CleanerProperties props) {
         super(props);
     }
@@ -93,7 +110,7 @@ public abstract class HtmlSerializer extends Serializer {
                             char unicodeChar = (char)Integer.parseInt(unicode, radix);
                             if ( !Utils.isValidXmlChar(unicodeChar) ) {
                                 i = charIndex;
-                            } else if ( !Utils.isReservedXmlChar(unicodeChar) ) {
+                            } else if ( !isReservedXmlChar(unicodeChar) ) {
                                 result.append( recognizeUnicodeChars ? String.valueOf(unicodeChar) : "&#" + unicode + ";" );
                                 i = charIndex;
                             } else {
@@ -124,7 +141,7 @@ public abstract class HtmlSerializer extends Serializer {
 
                         String sub = s.substring(i);
                         boolean isReservedSeq = false;
-                        for (Map.Entry<Character, String> entry: Utils.RESERVED_XML_CHARS.entrySet()) {
+                        for (Map.Entry<Character, String> entry: RESERVED_XML_CHARS.entrySet()) {
                             seq = entry.getValue();
                             if ( sub.startsWith(seq) ) {
                                 result.append( props.isTransResCharsToNCR() ? "&#" + (int)entry.getKey() + ";" : seq );
@@ -137,7 +154,7 @@ public abstract class HtmlSerializer extends Serializer {
                             result.append( props.isTransResCharsToNCR() ? "&#" + (int)'&' + ";" : "&" );
                         }
                     }
-                } else if (Utils.isReservedXmlChar(ch)) {
+                } else if (isReservedXmlChar(ch)) {
                     result.append( props.isTransResCharsToNCR() ? "&#" + (int)ch + ";" : ch );
                 } else {
                     result.append(ch);

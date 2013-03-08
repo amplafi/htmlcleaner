@@ -60,7 +60,8 @@ public class PrettyXmlSerializer extends XmlSerializer {
         this.indentString = indentString;
 	}
 
-	protected void serialize(TagNode tagNode, Writer writer) throws IOException {
+	@Override
+    protected void serialize(TagNode tagNode, Writer writer) throws IOException {
 		serializePrettyXml(tagNode, writer, 0);
 	}
 
@@ -112,12 +113,12 @@ public class PrettyXmlSerializer extends XmlSerializer {
 
                 // if first item trims it from left
                 if (isFirst) {
-                	content = Utils.ltrim(content);
+                	content = ltrim(content);
                 }
 
                 // if last item trims it from right
                 if (!childrenIt.hasNext()) {
-                	content = Utils.rtrim(content);
+                	content = rtrim(content);
                 }
 
                 if ( content.indexOf("\n") >= 0 || content.indexOf("\r") >= 0 ) {
@@ -174,5 +175,41 @@ public class PrettyXmlSerializer extends XmlSerializer {
             serializeEndTag(tagNode, writer, true);
         }
     }
+    /**
+     * Trims specified string from left.
+     * @param s
+     */
+    private String ltrim(String s) {
+        if (s == null) {
+            return null;
+        }
 
+        int index = 0;
+        int len = s.length();
+
+        while ( index < len && Character.isWhitespace(s.charAt(index)) ) {
+            index++;
+        }
+
+        return (index >= len) ? "" : s.substring(index);
+    }
+
+    /**
+     * Trims specified string from right.
+     * @param s
+     */
+    private String rtrim(String s) {
+        if (s == null) {
+            return null;
+        }
+
+        int len = s.length();
+        int index = len;
+
+        while ( index > 0 && Character.isWhitespace(s.charAt(index-1)) ) {
+            index--;
+        }
+
+        return (index <= 0) ? "" : s.substring(0, index);
+    }
 }

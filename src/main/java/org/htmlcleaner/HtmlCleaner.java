@@ -356,7 +356,7 @@ public class HtmlCleaner {
     }
 
     public TagNode clean(URL url, String charset) throws IOException {
-        StringBuffer content = Utils.readUrl(url, charset);
+        CharSequence content = Utils.readUrl(url, charset);
         Reader reader = new StringReader( content.toString() );
         return clean(reader);
     }
