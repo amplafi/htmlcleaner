@@ -78,7 +78,7 @@ public class HtmlCleanerTest extends TestCase {
 	
 	private String readFile(String filename) throws IOException {
 		File file = new File(filename);		
-		StringBuffer content = Utils.readUrl(file.toURI().toURL(), "UTF-8");
+		CharSequence content = Utils.readUrl(file.toURI().toURL(), "UTF-8");
 		return content.toString();
 	}
 
