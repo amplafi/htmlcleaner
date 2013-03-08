@@ -296,18 +296,6 @@ public class Utils {
         return charIndex;
     }
 
-    /**
-     * Checks whether specified object's string representation is empty string (containing of only whitespaces).
-     * @param object Object whose string representation is checked
-     * @return true, if empty string, false otherwise
-     */
-    public static boolean isWhitespaceString(Object object) {
-        if (object != null) {
-            String s = object.toString();
-            return s != null && "".equals(s.trim());
-        }
-        return false;
-    }
 
     /**
      * Checks if specified character can be part of xml identifier (tag name of attribute name)
@@ -372,7 +360,7 @@ public class Utils {
 
         return result;
     }
-    
+
     /**
      * @param name
      * @return For xml element name or attribute name returns prefix (part before :) or null if there is no prefix
@@ -385,7 +373,7 @@ public class Utils {
 
         return null;
     }
-    
+
     /**
      * @param name
      * @return For xml element name or attribute name returns name after prefix (part after :)
