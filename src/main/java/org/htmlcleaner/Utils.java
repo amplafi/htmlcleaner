@@ -64,44 +64,6 @@ public class Utils {
     }
     
     /**
-     * Trims specified string from left.
-     * @param s
-     */
-    public static String ltrim(String s) {
-        if (s == null) {
-            return null;
-        }
-
-        int index = 0;
-        int len = s.length();
-
-        while ( index < len && Character.isWhitespace(s.charAt(index)) ) {
-            index++;
-        }
-
-        return (index >= len) ? "" : s.substring(index);
-    }
-
-    /**
-     * Trims specified string from right.
-     * @param s
-     */
-    public static String rtrim(String s) {
-        if (s == null) {
-            return null;
-        }
-
-        int len = s.length();
-        int index = len;
-
-        while ( index > 0 && Character.isWhitespace(s.charAt(index-1)) ) {
-            index--;
-        }
-
-        return (index <= 0) ? "" : s.substring(0, index);
-    }
-
-    /**
      * Reads content from the specified URL with specified charset into string
      * @param url
      * @param charset
