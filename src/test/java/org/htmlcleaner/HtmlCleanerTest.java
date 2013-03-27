@@ -48,7 +48,7 @@ public class HtmlCleanerTest extends TestCase {
 	}
 	
 	/** 
-	 * Mentioned in #2901 - yet another collapse test. 
+	 * Collapsing empty tr to <tr />
 	 */
 	public void testUselessTr2() throws IOException {
 		cleaner.getProperties().setAddNewlineToHeadAndBody(false);
@@ -69,6 +69,17 @@ public class HtmlCleanerTest extends TestCase {
 				start + "<style type=\"text/css\">/*<![CDATA[*/\n#ampmep_188 { }\n/*]]>*/</style>" + end);
 	}	
 	
+	/**
+	 * Report in issue #64 as causing issues.
+	 * @throws Exception
+	 */
+	public void testChineseParsing() throws Exception {
+	    String initial = readFile("src/test/resources/test-chinese-issue-64.html");
+	    TagNode node = cleaner.clean(initial);
+	    final TagNode[] imgNodes = node.getElementsByName("img", true);
+	    assertEquals(5, imgNodes.length);
+	}
+
 	private void assertCleaned(String initial, String expected) throws IOException {
         TagNode node = cleaner.clean(initial);
         StringWriter writer = new StringWriter();
