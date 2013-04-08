@@ -53,7 +53,7 @@ public abstract class Serializer {
         private HeadlessTagNode(TagNode wrappedNode) {
             super("");
             getAttributes().putAll(wrappedNode.getAttributes());
-            getChildren().addAll(wrappedNode.getAllChildren());
+            addChildren(wrappedNode.getAllChildren());
             setDocType(wrappedNode.getDocType());
             Map<String, String> nsDecls = getNamespaceDeclarations();
             if (nsDecls != null) {
