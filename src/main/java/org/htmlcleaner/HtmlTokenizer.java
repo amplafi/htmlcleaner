@@ -758,10 +758,16 @@ public class HtmlTokenizer {
 	    String part3 = attributeValue();
 	    skipWhitespaces();
 	    String part4 = attributeValue();
+	    skipWhitespaces();
+	    String part5 = attributeValue();
 
 	    ignoreUntil('<');
 
-	    _docType = new DoctypeToken(part1, part2, part3, part4);
+	    if (part5 == null || part5.isEmpty()){
+	    	_docType = new DoctypeToken(part1, part2, part3, part4);
+	    } else {
+	    	_docType = new DoctypeToken(part1, part2, part3, part4, part5);	    	
+	    }
     }
 
     public DoctypeToken getDocType() {
