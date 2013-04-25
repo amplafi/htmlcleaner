@@ -67,7 +67,6 @@ public class XmlDeclarationsTest {
 		TagNode cleaned = cleaner.clean("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n<html><head /><body><p>test</p></body></html>");
 		
 		String output = serializer.getAsString(cleaned);
-		System.out.println(output);
 		
 		assertEquals(DoctypeToken.XHTML1_0_STRICT, cleaned.getDocType().getType());
 		assertTrue(cleaned.getDocType().isValid());
@@ -83,7 +82,6 @@ public class XmlDeclarationsTest {
 
 		
 		String output = serializer.getAsString(cleaned);
-		System.out.println(output);
 		
 		assertEquals(DoctypeToken.XHTML1_0_STRICT, cleaned.getDocType().getType());
 		assertTrue(cleaned.getDocType().isValid());
@@ -95,7 +93,6 @@ public class XmlDeclarationsTest {
 		TagNode cleaned = cleaner.clean("<?xml version=\"1.0\"?><!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n<html><head /><body><p>test</p></body></html>");
 		
 		String output = serializer.getAsString(cleaned);
-		System.out.println(output);
 		
 		assertEquals(DoctypeToken.XHTML1_0_STRICT, cleaned.getDocType().getType());
 		assertTrue(cleaned.getDocType().isValid());

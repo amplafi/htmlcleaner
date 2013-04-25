@@ -378,29 +378,31 @@ public class HtmlTokenizer {
                     isScriptEmpty = true;
                 }
             } else {
-                if ( startsWith("<!doctype") ) {
-                	if ( !_isLateForDoctype ) {
-                		doctype();
-                		_isLateForDoctype = true;
-                	} else {
-                		ignoreUntil('<');
-                	}
-                } else if ( startsWith("</") && isIdentifierStartChar(_pos + 2) ) {
-                	_isLateForDoctype = true;
-                    tagEnd();
-                } else if ( startsWith("<!--") ) {
-                    comment();
-                } else if ( startsWith("<") && isIdentifierStartChar(_pos + 1) ) {
-                	_isLateForDoctype = true;
-                    tagStart();
-                } else if ( props.isIgnoreQuestAndExclam() && (startsWith("<!") || startsWith("<?")) ) {
-                    ignoreUntil('>');
-                    if (isChar('>')) {
-                        go();
-                    }
-                } else {
-                    content();
-                }
+            	if ( startsWith("<!doctype") ) {
+            		if ( !_isLateForDoctype ) {
+            			doctype();
+            			_isLateForDoctype = true;
+            		} else {
+            			ignoreUntil('<');
+            		}
+            	} else if ( startsWith("</") && isIdentifierStartChar(_pos + 2) ) {
+            		_isLateForDoctype = true;
+            		tagEnd();
+            	} else if ( startsWith("<!--") ) {
+            		comment();
+            	} else if ( startsWith("<") && isIdentifierStartChar(_pos + 1) ) {
+            		_isLateForDoctype = true;
+            		tagStart();
+            	} else if ( props.isIgnoreQuestAndExclam() && (startsWith("<!") || startsWith("<?")) ) {
+            		ignoreUntil('>');
+            		if (isChar('>')) {
+            			go();
+            		}
+            	} else if ( startsWith("<?xml")){
+            		ignoreUntil('<');
+            	} else {
+            		content();
+            	}
             }
         }
 
