@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import java.io.IOException;
 import java.io.File;
 
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -22,7 +23,7 @@ public class SerializationTest extends TestCase {
         cleaner = new HtmlCleaner();
         properties = cleaner.getProperties();
     }
-
+    
     private TagNode getTestTagNode() throws IOException {
         TagNode node = cleaner.clean(new File("src/test/resources/test6.html"), "UTF-8");
 
@@ -34,6 +35,27 @@ public class SerializationTest extends TestCase {
         final Document dom1 = new DomSerializer(properties, true).createDOM(getTestTagNode());
         final Document dom2 = new DomSerializer(properties, false).createDOM(getTestTagNode());
     }
+    
+    
+    /**
+     * Test if we handle xml:lang with DomSerializer 
+     * @throws IOException 
+     * @throws ParserConfigurationException 
+     */
+    @Test
+    public void testXmlNameSpace() throws IOException, ParserConfigurationException{
+        TagNode node = cleaner.clean(new File("src/test/resources/test10.html"), "UTF-8");
+        cleaner.getProperties().setNamespacesAware(true);
+        Document dom = new DomSerializer(properties, true).createDOM(node);
+        String simpleXml = new SimpleXmlSerializer(cleaner.getProperties()).getAsString(node);
+        String prettyXml = new PrettyXmlSerializer(cleaner.getProperties()).getAsString(node);
+        String compactXml = new CompactXmlSerializer(cleaner.getProperties()).getAsString(node);
+        assertFalse(simpleXml.contains("xmlns:xml"));
+        assertFalse(prettyXml.contains("xmlns:xml"));
+        assertFalse(compactXml.contains("xmlns:xml"));
+
+    }
+
 
     //TODO This should be properly tested, not only constructor
     public void testJDomSerializer() throws ParserConfigurationException, IOException {

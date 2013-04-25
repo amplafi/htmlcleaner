@@ -496,7 +496,10 @@ public class HtmlCleaner {
             while (iterator.hasNext()) {
                 String prefix = iterator.next();
                 String xmlnsAtt = "xmlns:" + prefix;
-                if ( !atts.containsKey(xmlnsAtt) ) {
+                //
+                // Don't include the XML NS
+                // 
+                if ( !atts.containsKey(xmlnsAtt) && !prefix.equals("xml")) {
                     this.rootNode.addAttribute(xmlnsAtt, prefix);
                 }
             }
