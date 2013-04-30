@@ -61,7 +61,7 @@ public class TagNode extends TagToken implements HtmlNode {
     private List children = new ArrayList();
     private DoctypeToken docType;
     private List itemsToMove;
-    private Map<String, String> nsDeclarations = null;
+    private Map<String, String> nsDeclarations;
 
     private transient boolean isFormed;
 
@@ -612,6 +612,7 @@ public class TagNode extends TagToken implements HtmlNode {
         return nsDeclarations;
     }
 
+    @Override
     public void serialize(Serializer serializer, Writer writer) throws IOException {
         serializer.serialize(this, writer);
     }
