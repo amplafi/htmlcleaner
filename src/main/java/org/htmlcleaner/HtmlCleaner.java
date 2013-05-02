@@ -347,14 +347,38 @@ public class HtmlCleaner {
 
     public TagNode clean(File file, String charset) throws IOException {
         FileInputStream in = new FileInputStream(file);
-        Reader reader = new InputStreamReader(in, charset);
-        return clean(reader);
-    }
+        Reader reader = null;
+        try {
+            reader = new InputStreamReader(in, charset);
+            return clean(reader);
+        } catch (RuntimeException exception) {
+            if ( reader != null) {
+                reader.close();
+            }
+            in.close();
+            throw exception;
+        } catch (IOException exception) {
+            if ( reader != null) {
+                reader.close();
+            }
+            in.close();
+            throw exception;
+        }
+     }
 
     public TagNode clean(File file) throws IOException {
         return clean(file, properties.getCharset());
     }
 
+    /**
+     * Deprecated because unmanaged network IO does not handle proxies, slow servers or broken connections well.
+     * the htmlcleaner caller should be managing the connections themselves and just providing the htmlcleaner library with a stream.
+     * @param url
+     * @param charset
+     * @return
+     * @throws IOException
+     */
+    @Deprecated // Removing network I/O will make htmlcleaner better suited to a server environment which needs managed connections
     public TagNode clean(URL url, String charset) throws IOException {
         CharSequence content = Utils.readUrl(url, charset);
         Reader reader = new StringReader( content.toString() );
@@ -383,7 +407,7 @@ public class HtmlCleaner {
 
     /**
      * Basic version of the cleaning call.
-     * @param reader
+     * @param reader (not closed)
      * @return An instance of TagNode object which is the root of the XML tree.
      * @throws IOException
      */
@@ -498,7 +522,7 @@ public class HtmlCleaner {
                 String xmlnsAtt = "xmlns:" + prefix;
                 //
                 // Don't include the XML NS
-                // 
+                //
                 if ( !atts.containsKey(xmlnsAtt) && !prefix.equals("xml")) {
                     this.rootNode.addAttribute(xmlnsAtt, prefix);
                 }

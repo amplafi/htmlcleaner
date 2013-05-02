@@ -57,6 +57,7 @@ public class Utils {
      * @param charset
      * @throws IOException
      */
+    @Deprecated // Removing network I/O will make htmlcleaner better suited to a server environment which needs managed connections
     static CharSequence readUrl(URL url, String charset) throws IOException {
         StringBuilder buffer = new StringBuilder(1024);
         InputStream inputStream = url.openStream();
