@@ -5,7 +5,7 @@
     <groupId>net.sourceforge.htmlcleaner</groupId>
     <artifactId>htmlcleaner</artifactId>
     <packaging>jar</packaging>
-    <version>2.5-SNAPSHOT</version>
+    <version>2.5</version>
     <name>HtmlCleaner</name>
     <description>
         HtmlCleaner is an HTML parser written in Java. It transforms dirty HTML to well-formed XML following
