@@ -612,7 +612,6 @@ public class TagNode extends TagToken implements HtmlNode {
         return nsDeclarations;
     }
 
-    @Override
     public void serialize(Serializer serializer, Writer writer) throws IOException {
         serializer.serialize(this, writer);
     }
