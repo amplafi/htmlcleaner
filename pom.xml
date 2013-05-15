@@ -5,7 +5,7 @@
     <groupId>net.sourceforge.htmlcleaner</groupId>
     <artifactId>htmlcleaner</artifactId>
     <packaging>jar</packaging>
-    <version>2.5</version>
+    <version>2.5-SNAPSHOT</version>
     <name>HtmlCleaner</name>
     <description>
         HtmlCleaner is an HTML parser written in Java. It transforms dirty HTML to well-formed XML following
@@ -62,9 +62,9 @@
         <maven>3.0.4</maven>
     </prerequisites>
     <scm>
-        <url>http://htmlcleaner.svn.sourceforge.net/tags/htmlcleaner-2.5</url>
-        <connection>scm:svn:http://htmlcleaner.svn.sourceforge.net/svnroot/htmlcleaner/tags/htmlcleaner-2.5</connection>
-        <developerConnection>scm:svn:https://htmlcleaner.svn.sourceforge.net/svnroot/htmlcleaner/tags/htmlcleaner-2.5</developerConnection>
+        <url>https://htmlcleaner.svn.sourceforge.net/svnroot/htmlcleaner/trunk/</url>
+        <connection>scm:svn:https://htmlcleaner.svn.sourceforge.net/svnroot/htmlcleaner/trunk</connection>
+        <developerConnection>scm:svn:https://htmlcleaner.svn.sourceforge.net/svnroot/htmlcleaner/trunk</developerConnection>
     </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
