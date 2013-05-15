@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.sourceforge.htmlcleaner</groupId>
     <artifactId>htmlcleaner</artifactId>
     <packaging>jar</packaging>
-    <version>2.5-SNAPSHOT</version>
+    <version>2.5</version>
     <name>HtmlCleaner</name>
     <description>
         HtmlCleaner is an HTML parser written in Java. It transforms dirty HTML to well-formed XML following
@@ -63,9 +62,9 @@
         <maven>3.0.4</maven>
     </prerequisites>
     <scm>
-        <url>http://htmlcleaner.svn.sourceforge.net/</url>
-        <connection>scm:svn:http://htmlcleaner.svn.sourceforge.net/svnroot/htmlcleaner/trunk</connection>
-        <developerConnection>scm:svn:https://htmlcleaner.svn.sourceforge.net/svnroot/htmlcleaner/trunk</developerConnection>
+        <url>http://htmlcleaner.svn.sourceforge.net/tags/htmlcleaner-2.5</url>
+        <connection>scm:svn:http://htmlcleaner.svn.sourceforge.net/svnroot/htmlcleaner/tags/htmlcleaner-2.5</connection>
+        <developerConnection>scm:svn:https://htmlcleaner.svn.sourceforge.net/svnroot/htmlcleaner/tags/htmlcleaner-2.5</developerConnection>
     </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
