@@ -61,7 +61,7 @@ public class TagNode extends TagToken implements HtmlNode {
     private List children = new ArrayList();
     private DoctypeToken docType;
     private List itemsToMove;
-    private Map<String, String> nsDeclarations = null;
+    private Map<String, String> nsDeclarations;
 
     private transient boolean isFormed;
 

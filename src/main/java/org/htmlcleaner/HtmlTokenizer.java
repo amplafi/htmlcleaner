@@ -378,29 +378,31 @@ public class HtmlTokenizer {
                     isScriptEmpty = true;
                 }
             } else {
-                if ( startsWith("<!doctype") ) {
-                	if ( !_isLateForDoctype ) {
-                		doctype();
-                		_isLateForDoctype = true;
-                	} else {
-                		ignoreUntil('<');
-                	}
-                } else if ( startsWith("</") && isIdentifierStartChar(_pos + 2) ) {
-                	_isLateForDoctype = true;
-                    tagEnd();
-                } else if ( startsWith("<!--") ) {
-                    comment();
-                } else if ( startsWith("<") && isIdentifierStartChar(_pos + 1) ) {
-                	_isLateForDoctype = true;
-                    tagStart();
-                } else if ( props.isIgnoreQuestAndExclam() && (startsWith("<!") || startsWith("<?")) ) {
-                    ignoreUntil('>');
-                    if (isChar('>')) {
-                        go();
-                    }
-                } else {
-                    content();
-                }
+            	if ( startsWith("<!doctype") ) {
+            		if ( !_isLateForDoctype ) {
+            			doctype();
+            			_isLateForDoctype = true;
+            		} else {
+            			ignoreUntil('<');
+            		}
+            	} else if ( startsWith("</") && isIdentifierStartChar(_pos + 2) ) {
+            		_isLateForDoctype = true;
+            		tagEnd();
+            	} else if ( startsWith("<!--") ) {
+            		comment();
+            	} else if ( startsWith("<") && isIdentifierStartChar(_pos + 1) ) {
+            		_isLateForDoctype = true;
+            		tagStart();
+            	} else if ( props.isIgnoreQuestAndExclam() && (startsWith("<!") || startsWith("<?")) ) {
+            		ignoreUntil('>');
+            		if (isChar('>')) {
+            			go();
+            		}
+            	} else if ( startsWith("<?xml")){
+            		ignoreUntil('<');
+            	} else {
+            		content();
+            	}
             }
         }
 
@@ -758,10 +760,16 @@ public class HtmlTokenizer {
 	    String part3 = attributeValue();
 	    skipWhitespaces();
 	    String part4 = attributeValue();
+	    skipWhitespaces();
+	    String part5 = attributeValue();
 
 	    ignoreUntil('<');
 
-	    _docType = new DoctypeToken(part1, part2, part3, part4);
+	    if (part5 == null || part5.isEmpty()){
+	    	_docType = new DoctypeToken(part1, part2, part3, part4);
+	    } else {
+	    	_docType = new DoctypeToken(part1, part2, part3, part4, part5);	    	
+	    }
     }
 
     public DoctypeToken getDocType() {

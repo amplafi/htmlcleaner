@@ -569,7 +569,7 @@ public class PropertiesTest extends TestCase {
     }
 
     public void testIgnoreClosingCData() throws IOException {
-        String html = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
+        String html = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
                 + "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta http-equiv=\"content-type\" content=\"application/xhtml+xml; charset=utf-8\" /><link href=\"aswa.css\" type=\"text/css\" rel=\"stylesheet\" /><title>ASWA - Events</title>"
                 + "<style type=\"text/css\">/*<![CDATA[*/\r\n"
                 + "#ampmep_188 { }\r\n"
