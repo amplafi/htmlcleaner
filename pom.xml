@@ -155,6 +155,7 @@
                     </execution>
                   </executions>
             </plugin>
+<!-- runs when doing even local install :-P
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -166,13 +167,14 @@
                         <goals>
                             <goal>sign</goal>
                         </goals>
-                        <!-- only required when scott is doing the release! -->
+                        only required when scott is doing the release! 
                         <configuration> 
                             <keyname>98654FBE</keyname> 
                         </configuration> 
                     </execution>
                 </executions>
             </plugin>
+-->
         </plugins>
         <extensions>
             <extension>
