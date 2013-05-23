@@ -4,11 +4,19 @@ import junit.framework.TestCase;
 
 import java.io.IOException;
 import java.io.File;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 import org.junit.Test;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 /**
  * Testing node manipulation after cleaning.
@@ -30,12 +38,54 @@ public class SerializationTest extends TestCase {
         return node;
     }
 
-    //TODO This should be properly tested, not only constructor
-    public void testDomSerializer() throws ParserConfigurationException, IOException {
-        final Document dom1 = new DomSerializer(properties, true).createDOM(getTestTagNode());
-        final Document dom2 = new DomSerializer(properties, false).createDOM(getTestTagNode());
+    /**
+     * Test if DomSerializer creates documents with a doctype where supplied. See issue #27
+     * 
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws TransformerException
+     */
+    public void testDomSerializerXhtml() throws ParserConfigurationException, IOException, TransformerException {
+    	
+        TagNode node = cleaner.clean(new File("src/test/resources/test10.html"), "UTF-8");
+
+        final Document dom = new DomSerializer(properties, true).createDOM(node);
+        
+        assertEquals("html", dom.getDoctype().getName());
+        assertEquals("-//W3C//DTD XHTML 1.0 Strict//EN", dom.getDoctype().getPublicId());
+        assertEquals("http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd", dom.getDoctype().getSystemId());
     }
     
+    /**
+     * Test if DomSerializer creates documents with a doctype where supplied. See issue #27
+     * 
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws TransformerException
+     */
+    public void testDomSerializerHtml4() throws ParserConfigurationException, IOException, TransformerException {
+    	
+        TagNode node = cleaner.clean(new File("src/test/resources/test4.html"), "UTF-8");
+
+        final Document dom = new DomSerializer(properties, true).createDOM(node);
+        
+        assertEquals("HTML", dom.getDoctype().getName());
+        assertEquals("-//W3C//DTD HTML 4.01 Transitional//EN", dom.getDoctype().getPublicId());
+        assertEquals("", dom.getDoctype().getSystemId());
+    }
+    
+    /**
+     * Test if DomSerializer creates documents without a DocType where there is none specified in the input
+     * 
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws TransformerException
+     */
+    public void testDomSerializerNoDocType() throws ParserConfigurationException, IOException, TransformerException {
+        TagNode node = cleaner.clean(new File("src/test/resources/test2.html"), "UTF-8");
+        final Document dom = new DomSerializer(properties, true).createDOM(node);
+        assertEquals(null, dom.getDoctype());
+    }
     
     /**
      * Test if we handle xml:lang with DomSerializer 
@@ -83,6 +133,17 @@ public class SerializationTest extends TestCase {
         String xml3 = new CompactXmlSerializer(properties).getAsString(node);
         assertTrue(xml3.indexOf("Moja mala nema mane...") >= 0);
 
+    }
+    
+    public static void printDocument(Document doc, OutputStream out) throws IOException, TransformerException {
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        transformer.transform(new DOMSource(doc), 
+             new StreamResult(new OutputStreamWriter(out, "UTF-8")));
     }
 
 }
