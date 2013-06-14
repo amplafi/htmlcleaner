@@ -1,9 +1,12 @@
 package org.htmlcleaner;
 
 import org.w3c.dom.Comment;
+import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.util.Iterator;
@@ -29,12 +32,28 @@ public class DomSerializer {
 
     public Document createDOM(TagNode rootNode) throws ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        DOMImplementation impl = builder.getDOMImplementation();
+        
+        
+        Document document;
+        
+        //
+        // Where a DOCTYPE is supplied in the input, ensure that this is in the output DOM. See issue #27
+        //
+        if (rootNode.getDocType() != null){
+        	String qualifiedName = rootNode.getDocType().getPart1();
+        	String publicId = rootNode.getDocType().getPublicId();
+        	String systemId = rootNode.getDocType().getSystemId();
+            DocumentType documentType = impl.createDocumentType(qualifiedName, publicId, systemId);
+            document = impl.createDocument(rootNode.getNamespaceURIOnPath(""), qualifiedName, documentType);
+        } else {
+        	document = builder.newDocument();
+        	Element rootElement = document.createElement(rootNode.getName());
+        	document.appendChild(rootElement);
+        }
 
-        Document document = factory.newDocumentBuilder().newDocument();
-        Element rootElement = document.createElement(rootNode.getName());
-        document.appendChild(rootElement);
-
-        createSubnodes(document, rootElement, rootNode.getAllChildren());
+        createSubnodes(document, (Element)document.getDocumentElement(), rootNode.getAllChildren());
 
         return document;
     }

@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 /**
  * Testing node manipulation after cleaning.
@@ -30,12 +31,54 @@ public class SerializationTest extends TestCase {
         return node;
     }
 
-    //TODO This should be properly tested, not only constructor
-    public void testDomSerializer() throws ParserConfigurationException, IOException {
-        final Document dom1 = new DomSerializer(properties, true).createDOM(getTestTagNode());
-        final Document dom2 = new DomSerializer(properties, false).createDOM(getTestTagNode());
+    /**
+     * Test if DomSerializer creates documents with a doctype where supplied. See issue #27
+     * 
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws TransformerException
+     */
+    public void testDomSerializerXhtml() throws ParserConfigurationException, IOException, TransformerException {
+    	
+        TagNode node = cleaner.clean(new File("src/test/resources/test10.html"), "UTF-8");
+
+        final Document dom = new DomSerializer(properties, true).createDOM(node);
+        
+        assertEquals("html", dom.getDoctype().getName());
+        assertEquals("-//W3C//DTD XHTML 1.0 Strict//EN", dom.getDoctype().getPublicId());
+        assertEquals("http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd", dom.getDoctype().getSystemId());
     }
     
+    /**
+     * Test if DomSerializer creates documents with a doctype where supplied. See issue #27
+     * 
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws TransformerException
+     */
+    public void testDomSerializerHtml4() throws ParserConfigurationException, IOException, TransformerException {
+    	
+        TagNode node = cleaner.clean(new File("src/test/resources/test4.html"), "UTF-8");
+
+        final Document dom = new DomSerializer(properties, true).createDOM(node);
+        
+        assertEquals("HTML", dom.getDoctype().getName());
+        assertEquals("-//W3C//DTD HTML 4.01 Transitional//EN", dom.getDoctype().getPublicId());
+        assertEquals("", dom.getDoctype().getSystemId());
+    }
+    
+    /**
+     * Test if DomSerializer creates documents without a DocType where there is none specified in the input
+     * 
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws TransformerException
+     */
+    public void testDomSerializerNoDocType() throws ParserConfigurationException, IOException, TransformerException {
+        TagNode node = cleaner.clean(new File("src/test/resources/test2.html"), "UTF-8");
+        final Document dom = new DomSerializer(properties, true).createDOM(node);
+        assertEquals(null, dom.getDoctype());
+    }
     
     /**
      * Test if we handle xml:lang with DomSerializer 

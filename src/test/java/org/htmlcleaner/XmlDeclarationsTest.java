@@ -87,6 +87,20 @@ public class XmlDeclarationsTest {
 		assertTrue(cleaned.getDocType().isValid());
 		assertEquals(expectedOutput, output);
 	}
+	
+	/**
+	 * This is to test issue #67
+	 */
+	@Test
+	public void checkXmlNoExtraWhitesapce(){
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n<html><head /><body><p>test</p></body></html>";
+		TagNode cleaned = cleaner.clean(expected);
+		cleaner.getProperties().setAddNewlineToHeadAndBody(false);
+		Serializer theSerializer = new SimpleXmlSerializer(cleaner.getProperties());
+		String output = theSerializer.getAsString(cleaned);
+		cleaner.getProperties().setAddNewlineToHeadAndBody(true);
+		assertEquals(expected, output);
+	}
 
 	@Test
 	public void checkXmlNoEncoding(){
