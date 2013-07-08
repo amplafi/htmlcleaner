@@ -765,7 +765,7 @@ public class HtmlTokenizer {
 
 	    ignoreUntil('<');
 
-	    if (part5 == null || part5.isEmpty()){
+	    if (part5 == null || part5.length()==0){
 	    	_docType = new DoctypeToken(part1, part2, part3, part4);
 	    } else {
 	    	_docType = new DoctypeToken(part1, part2, part3, part4, part5);	    	
