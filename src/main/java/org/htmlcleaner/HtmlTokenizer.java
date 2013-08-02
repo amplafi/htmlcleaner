@@ -79,6 +79,7 @@ public class HtmlTokenizer {
     private HtmlCleaner cleaner;
     private CleanerProperties props;
     private CleanerTransformations transformations;
+    private CleanTimeValues cleanTimeValues;
 
 
     /**
@@ -86,18 +87,19 @@ public class HtmlTokenizer {
      * @param cleaner
      * @param reader
      */
-    public HtmlTokenizer(HtmlCleaner cleaner, Reader reader) {
+    public HtmlTokenizer(HtmlCleaner cleaner, Reader reader, final CleanTimeValues cleanTimeValues) {
         this._reader = new BufferedReader(reader);
         this.cleaner = cleaner;
         this.props = cleaner.getProperties();
         this.transformations = cleaner.getTransformations();
+        this.cleanTimeValues = cleanTimeValues;
     }
 
     private void addToken(BaseToken token) {
         token.setRow(_row);
         token.setCol(_col);
         _tokenList.add(token);
-        cleaner.makeTree( _tokenList, _tokenList.listIterator(_tokenList.size() - 1) );
+        cleaner.makeTree( _tokenList, _tokenList.listIterator(_tokenList.size() - 1), this.cleanTimeValues );
     }
 
     private void readIfNeeded(int neededChars) throws IOException {
