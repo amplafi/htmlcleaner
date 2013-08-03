@@ -56,6 +56,7 @@ public class XmlDeclarationsTest {
 		CleanerProperties properties = cleaner.getProperties();
 		properties.setOmitXmlDeclaration(false);
 		properties.setOmitDoctypeDeclaration(false);
+		properties.setIgnoreQuestAndExclam(false);
 		serializer = new CompactXmlSerializer(properties);
 	}
 

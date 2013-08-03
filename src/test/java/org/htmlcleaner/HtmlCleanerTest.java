@@ -19,6 +19,7 @@ public class HtmlCleanerTest extends TestCase {
         cleanerProperties.setAdvancedXmlEscape(true);
         cleanerProperties.setTranslateSpecialEntities(false);
         cleanerProperties.setOmitComments(false);
+        cleanerProperties.setIgnoreQuestAndExclam(false);
 
         cleaner = new HtmlCleaner(cleanerProperties);
         serializer = new SimpleXmlSerializer(cleanerProperties);
