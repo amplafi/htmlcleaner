@@ -348,18 +348,11 @@ public class HtmlCleaner {
         try {
             reader = new InputStreamReader(in, charset);
             return clean(reader, new CleanTimeValues());
-        } catch (RuntimeException exception) {
+        } finally {
             if ( reader != null) {
-                reader.close();
+                try{ reader.close(); } catch(IOException e) {}
             }
-            in.close();
-            throw exception;
-        } catch (IOException exception) {
-            if ( reader != null) {
-                reader.close();
-            }
-            in.close();
-            throw exception;
+            try{ in.close(); } catch(IOException e) {}
         }
      }
 
