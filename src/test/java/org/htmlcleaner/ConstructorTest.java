@@ -3,14 +3,13 @@ package org.htmlcleaner;
 import junit.framework.TestCase;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 
 /**
  * Testing HtmlCleaner constructors.
  */
 public class ConstructorTest extends TestCase {
 
-    public void testPrpertiesConstructor() throws XPatherException, IOException {
+    public void testPropertiesConstructor() throws Exception {
         CleanerProperties props = new CleanerProperties();
         props.setOmitComments(true);
 
