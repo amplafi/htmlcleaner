@@ -53,6 +53,7 @@ import java.net.URL;
 /**
  * Default tag provider - reads XML file in specified format and creates tag infos
  */
+@Deprecated // see https://sourceforge.net/p/htmlcleaner/bugs/81/
 public class ConfigFileTagProvider extends HashMap implements ITagInfoProvider {
 
     // obtaining instance of the SAX parser factory
@@ -97,6 +98,7 @@ public class ConfigFileTagProvider extends HashMap implements ITagInfoProvider {
         }
     }
 
+    @Override
     public TagInfo getTagInfo(String tagName) {
         return (TagInfo) get(tagName);
     }
