@@ -9,7 +9,6 @@ import java.io.StringReader;
 
 import junit.framework.TestCase;
 
-import org.apache.tools.ant.util.FileUtils;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
@@ -30,7 +29,7 @@ public class TagBalancingTest extends TestCase {
     	cleaner.getProperties().setOmitComments(true);
     	SimpleXmlSerializer serializer = new SimpleXmlSerializer(cleaner.getProperties());
 
-    	String expected = FileUtils.readFully(new FileReader((new File("src/test/resources/reopenTagHavingItemsToMove-cleaned.html"))));
+    	String expected = readFully(new FileReader((new File("src/test/resources/reopenTagHavingItemsToMove-cleaned.html"))));
     	String actual = serializer.getAsString(cleaner.clean(new File("src/test/resources/reopenTagHavingItemsToMove.html")));
     	assertEquals(expected.trim(), actual.trim());
     }
@@ -41,7 +40,7 @@ public class TagBalancingTest extends TestCase {
     	cleaner.getProperties().setOmitComments(true);
     	SimpleXmlSerializer serializer = new SimpleXmlSerializer(cleaner.getProperties());
 
-    	String expected = FileUtils.readFully(new FileReader((new File("src/test/resources/severalTagsClosedByChildBreak-cleaned.html"))));
+    	String expected = readFully(new FileReader((new File("src/test/resources/severalTagsClosedByChildBreak-cleaned.html"))));
     	String actual = serializer.getAsString(cleaner.clean(new File("src/test/resources/severalTagsClosedByChildBreak.html")));
 
     	assertEquals(expected.trim(), actual.trim());
@@ -150,6 +149,25 @@ public class TagBalancingTest extends TestCase {
         Object xPathResult[] = node.evaluateXPath(xpath);
         assertTrue(xPathResult.length >= 1);
         assertEquals(xPathResult[0].toString(), value);
+    }
+    
+    
+    /*
+     * Utility method for reading a file; used here to prevent dependency on Ant Utils
+     */
+    private static String readFully(Reader rdr)
+    throws IOException {
+    	final char[] buffer = new char[8192];
+    	int bufferLength = 0;
+    	StringBuffer textBuffer = null;
+    	while (bufferLength != -1) {
+    		bufferLength = rdr.read(buffer);
+    		if (bufferLength > 0) {
+    			textBuffer = (textBuffer == null) ? new StringBuffer() : textBuffer;
+    			textBuffer.append(new String(buffer, 0, bufferLength));
+    		}
+    	}
+    	return (textBuffer == null) ? null : textBuffer.toString();
     }
 
 }

@@ -428,7 +428,7 @@ public class CleanerProperties implements HtmlModificationListener{
      * useEmptyElementTags = true;
      * allowMultiWordAttributes = true;
      * allowHtmlInsideAttributes = false;
-     * ignoreQuestAndExclam = false;
+     * ignoreQuestAndExclam = true;
      * namespacesAware = true;
      * keepHeadWhitespace = true;
      * addNewlineToHeadAndBody = true;
@@ -455,7 +455,7 @@ public class CleanerProperties implements HtmlModificationListener{
         useEmptyElementTags = true;
         allowMultiWordAttributes = true;
         allowHtmlInsideAttributes = false;
-        ignoreQuestAndExclam = false;
+        ignoreQuestAndExclam = true;
         namespacesAware = true;
         addNewlineToHeadAndBody = true;
         keepWhitespaceAndCommentsInHead = true;

@@ -579,6 +579,7 @@ public class PropertiesTest extends TestCase {
         properties.setOmitXmlDeclaration(true);
         properties.setUseCdataForScriptAndStyle(true);
         properties.setAddNewlineToHeadAndBody(false);
+        properties.setIgnoreQuestAndExclam(false);
         HtmlCleaner cleaner = new HtmlCleaner(properties);
         TagNode node = cleaner.clean(html);
         properties.setUseCdataForScriptAndStyle(false);
