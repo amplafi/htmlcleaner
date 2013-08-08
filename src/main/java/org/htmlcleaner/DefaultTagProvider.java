@@ -41,13 +41,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * This class is automatically created from ConfigFileTagProvider which reads
- * default XML configuration file with tag descriptions.
- * It is used as default tag info provider.
- * Class is created for performance purposes - parsing XML file requires some
- * processing time.
+ * This is the default tag provider for HTML Cleaner
+ * Note this is no longer generated from XML - see https://sourceforge.net/p/htmlcleaner/bugs/81/
  */
-@SuppressWarnings("serial")
 public class DefaultTagProvider implements ITagInfoProvider {
 
     private static final String STRONG = "strong";

@@ -51,9 +51,9 @@ import java.util.Map;
 import java.net.URL;
 
 /**
- * Default tag provider - reads XML file in specified format and creates tag infos
+ * Configuration file tag provider - reads XML file in specified format and creates a Tag Provider.
+ * Used to create custom tag providers when used on the command line.
  */
-@Deprecated // see https://sourceforge.net/p/htmlcleaner/bugs/81/
 public class ConfigFileTagProvider extends HashMap implements ITagInfoProvider {
 
     // obtaining instance of the SAX parser factory
@@ -98,7 +98,6 @@ public class ConfigFileTagProvider extends HashMap implements ITagInfoProvider {
         }
     }
 
-    @Override
     public TagInfo getTagInfo(String tagName) {
         return (TagInfo) get(tagName);
     }
@@ -106,9 +105,9 @@ public class ConfigFileTagProvider extends HashMap implements ITagInfoProvider {
     /**
      * Generates code for tag provider class from specified configuration XML file.
      * In order to create custom tag info provider, make config file and call this main method
-     * with the specified file. Output will be generated on the standard output. This way default
-     * tag provider (class DefaultTagProvider) is generated from default.xml which which is packaged
-     * in the source distribution.
+     * with the specified file. Output will be generated on the standard output. This way a custom
+     * tag provider (class CustomTagProvider) is generated from an XML file. An example XML file,
+     * "example.xml", can be found in the source distribution.
      *
      * @param args
      * @throws IOException
@@ -118,10 +117,15 @@ public class ConfigFileTagProvider extends HashMap implements ITagInfoProvider {
     public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
         final ConfigFileTagProvider provider = new ConfigFileTagProvider();
         provider.generateCode = true;
+        
+        String fileName = "default.xml";
+        if (args != null && args.length>0){
+        	fileName = args[0];
+        }
 
-        File configFile = new File("default.xml");
+        File configFile = new File(fileName);
         String packagePath = "org.htmlcleaner";
-        String className = "DefaultTagProvider";
+        String className = "CustomTagProvider";
 
         final ConfigParser parser = provider.new ConfigParser(provider);
         System.out.println("package " + packagePath + ";");
@@ -129,7 +133,7 @@ public class ConfigFileTagProvider extends HashMap implements ITagInfoProvider {
         System.out.println("public class " + className + " extends HashMap implements ITagInfoProvider {");
         System.out.println("private ConcurrentMap<String, TagInfo> tagInfoMap = new ConcurrentHashMap<String, TagInfo>();");
         System.out.println("// singleton instance, used if no other TagInfoProvider is specified");
-        System.out.println("public final static DefaultTagProvider INSTANCE= new DefaultTagProvider();");
+        System.out.println("public final static "+className+" INSTANCE= new "+className+"();");
         System.out.println("public " + className + "() {");
         System.out.println("TagInfo tagInfo;");
         parser.parse( new InputSource(new FileReader(configFile)) );
