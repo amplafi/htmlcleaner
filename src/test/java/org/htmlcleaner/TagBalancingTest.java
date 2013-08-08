@@ -69,7 +69,7 @@ public class TagBalancingTest extends TestCase {
 
     public void testTagProviders() throws IOException {
         HtmlCleaner cleaner1 = new HtmlCleaner();
-        HtmlCleaner cleaner2 = new HtmlCleaner(new ConfigFileTagProvider(new File("default.xml")));
+        HtmlCleaner cleaner2 = new HtmlCleaner(new ConfigFileTagProvider(new File("example.xml")));
         SimpleXmlSerializer serializer = new SimpleXmlSerializer(cleaner1.getProperties());
 
         String s1 = serializer.getAsString(cleaner1.clean(new File("src/test/resources/test5.html")));
